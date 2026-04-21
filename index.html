@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Iglesia Agua Viva - Sistema de Gestión</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo-icon">⛪</div>
+                <h1>Iglesia Agua Viva</h1>
+                <p>Sistema de Gestión de Servicios</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Iniciar Sesión</button>
+                <button class="tab-btn" onclick="switchTab('register')">Registrarse</button>
+            </div>
+
+            <!-- Formulario de Login -->
+            <div id="loginForm" class="auth-form active">
+                <div class="input-group">
+                    <label>📧 Correo Electrónico</label>
+                    <input type="email" id="loginEmail" placeholder="tu@email.com" class="auth-input">
+                </div>
+                <div class="input-group">
+                    <label>🔒 Contraseña</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" class="auth-input">
+                </div>
+                <button onclick="iniciarSesion()" class="auth-btn">Ingresar</button>
+            </div>
+
+            <!-- Formulario de Registro -->
+            <div id="registerForm" class="auth-form">
+                <div class="input-group">
+                    <label>👤 Nombre Completo</label>
+                    <input type="text" id="regNombre" placeholder="Nombre y Apellido" class="auth-input">
+                </div>
+                <div class="input-group">
+                    <label>📧 Correo Electrónico</label>
+                    <input type="email" id="regEmail" placeholder="tu@email.com" class="auth-input">
+                </div>
+                <div class="input-group">
+                    <label>📍 Sede/ Servicio</label>
+                    <select id="regSede" class="auth-input">
+                        <option value="">Selecciona tu sede</option>
+                        <option value="san_carlos_10am">San Carlos - 10am</option>
+                        <option value="san_carlos_12pm">San Carlos - 12pm</option>
+                        <option value="san_carlos_5pm">San Carlos - 5pm (Sábado)</option>
+                        <option value="san_carlos_7pm">San Carlos - 7pm (Sábado)</option>
+                        <option value="el_tambo_12pm">El Tambo - 12pm</option>
+                        <option value="el_tambo_6pm">El Tambo - 6pm</option>
+                        <option value="chupaca_6pm">Chupaca - 6pm</option>
+                        <option value="transformando_ciudades">Transformando Ciudades</option>
+                        <option value="jauja">Jauja</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>🔒 Contraseña</label>
+                    <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" class="auth-input">
+                </div>
+                <div class="input-group">
+                    <label>✅ Confirmar Contraseña</label>
+                    <input type="password" id="regConfirmPassword" placeholder="Repite tu contraseña" class="auth-input">
+                </div>
+                <button onclick="registrarUsuario()" class="auth-btn">Crear Cuenta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Verificación -->
+    <div id="verificationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔐 Verifica tu correo</h2>
+            </div>
+            <div class="modal-body">
+                <p>Hemos enviado un código de verificación a:</p>
+                <p id="verificationEmail" style="font-weight: bold; margin: 10px 0;"></p>
+                <div class="input-group">
+                    <label>Código de verificación</label>
+                    <input type="text" id="codigoVerificacion" placeholder="Ingresa el código de 6 dígitos" class="auth-input">
+                </div>
+                <button onclick="verificarCodigo()" class="auth-btn">Verificar</button>
+                <button onclick="reenviarCodigo()" class="auth-btn-secondary">Reenviar código</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        let usuarioPendiente = null;
+
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const tabs = document.querySelectorAll('.tab-btn');
+            
+            if(tab === 'login') {
+                loginForm.classList.add('active');
+                registerForm.classList.remove('active');
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+            } else {
+                loginForm.classList.remove('active');
+                registerForm.classList.add('active');
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+            }
+        }
+
+        async function iniciarSesion() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if(!email || !password) {
+                mostrarNotificacion('Por favor completa todos los campos', 'error');
+                return;
+            }
+            
+            const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+            const usuario = usuarios.find(u => u.email === email && u.password === password);
+            
+            if(usuario) {
+                if(!usuario.verificado) {
+                    mostrarNotificacion('Por favor verifica tu correo electrónico primero', 'error');
+                    return;
+                }
+                
+                localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+                mostrarNotificacion('¡Bienvenido!', 'success');
+                
+                if(usuario.email === 'jhonfernandezcondor@gmail.com' || usuario.email === 'kperezsuasnabar@gmail.com') {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } else {
+                mostrarNotificacion('Correo o contraseña incorrectos', 'error');
+            }
+        }
+
+        async function registrarUsuario() {
+            const nombre = document.getElementById('regNombre').value;
+            const email = document.getElementById('regEmail').value;
+            const sede = document.getElementById('regSede').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            if(!nombre || !email || !sede || !password) {
+                mostrarNotificacion('Por favor completa todos los campos', 'error');
+                return;
+            }
+            
+            if(password !== confirmPassword) {
+                mostrarNotificacion('Las contraseñas no coinciden', 'error');
+                return;
+            }
+            
+            if(password.length < 6) {
+                mostrarNotificacion('La contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+            
+            const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+            if(usuarios.find(u => u.email === email)) {
+                mostrarNotificacion('Este correo ya está registrado', 'error');
+                return;
+            }
+            
+            // Generar código de verificación
+            const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            usuarioPendiente = {
+                nombre,
+                email,
+                sede,
+                password,
+                codigoVerificacion: codigo,
+                verificado: false,
+                rol: 'lider'
+            };
+            
+            // Simular envío de correo (en producción usar backend real)
+            console.log(`Código de verificación para ${email}: ${codigo}`);
+            
+            document.getElementById('verificationEmail').innerText = email;
+            document.getElementById('verificationModal').style.display = 'flex';
+            
+            // Mostrar notificación
+            mostrarNotificacion(`Código enviado a ${email} (Demo: ${codigo})`, 'info');
+        }
+
+        function verificarCodigo() {
+            const codigoIngresado = document.getElementById('codigoVerificacion').value;
+            
+            if(codigoIngresado === usuarioPendiente.codigoVerificacion) {
+                usuarioPendiente.verificado = true;
+                delete usuarioPendiente.codigoVerificacion;
+                
+                const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+                usuarios.push(usuarioPendiente);
+                localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                
+                document.getElementById('verificationModal').style.display = 'none';
+                mostrarNotificacion('¡Cuenta verificada exitosamente! Ahora puedes iniciar sesión', 'success');
+                switchTab('login');
+                
+                document.getElementById('regNombre').value = '';
+                document.getElementById('regEmail').value = '';
+                document.getElementById('regSede').value = '';
+                document.getElementById('regPassword').value = '';
+                document.getElementById('regConfirmPassword').value = '';
+            } else {
+                mostrarNotificacion('Código incorrecto', 'error');
+            }
+        }
+
+        function reenviarCodigo() {
+            const nuevoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
+            usuarioPendiente.codigoVerificacion = nuevoCodigo;
+            console.log(`Nuevo código: ${nuevoCodigo}`);
+            mostrarNotificacion(`Nuevo código enviado: ${nuevoCodigo}`, 'info');
+        }
+
+        function mostrarNotificacion(mensaje, tipo) {
+            const notificacion = document.createElement('div');
+            notificacion.className = `notification notification-${tipo}`;
+            notificacion.innerHTML = mensaje;
+            document.body.appendChild(notificacion);
+            
+            setTimeout(() => {
+                notificacion.remove();
+            }, 3000);
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('verificationModal');
+            if(event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

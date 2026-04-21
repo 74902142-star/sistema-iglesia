@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dashboard - Iglesia Agua Viva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo p {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255,255,255,0.15);
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #2a5298;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .btn-excel {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn-excel:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-backup {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn-backup:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn-notify {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn-notify:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        /* Filters */
+        .filters-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .filters-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filters-grid {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .filter-select, .filter-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .btn-filter {
+            background: #2a5298;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-filter:hover {
+            background: #1e3c72;
+        }
+
+        .btn-new {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-new:hover {
+            background: #059669;
+        }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .chart-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        canvas {
+            max-height: 250px;
+            width: 100%;
+        }
+
+        /* Table */
+        .table-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        .table-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 10px;
+            background: #f8fafc;
+            color: #333;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #444;
+        }
+
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .btn-wa {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-wa:hover {
+            background: #128C7E;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .notification-success { background: #10b981; }
+        .notification-error { background: #ef4444; }
+        .notification-info { background: #3b82f6; }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .stat-icon {
+                font-size: 28px;
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
+
+            .filters-grid {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .btn-filter, .btn-new {
+                width: 100%;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-table th, .data-table td {
+                padding: 8px 6px;
+                font-size: 11px;
+            }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <h1>⛪ Iglesia Agua Viva</h1>
+            <p>Sistema de Gestión de Servicios</p>
+        </div>
+        <div class="user-info">
+            <div class="user-avatar">👤</div>
+            <div class="user-details">
+                <div class="user-name" id="userName">Jhon Smith</div>
+                <div class="user-role" id="userRole">Administrador</div>
+            </div>
+            <button class="btn-logout" onclick="cerrarSesion()">🚪 Salir</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="totalAsistentes">0</div>
+                <div class="stat-label">Total Asistentes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👨</div>
+                <div class="stat-value" id="totalVarones">0</div>
+                <div class="stat-label">Varones</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👩</div>
+                <div class="stat-value" id="totalMujeres">0</div>
+                <div class="stat-label">Mujeres</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🧒</div>
+                <div class="stat-value" id="totalKids">0</div>
+                <div class="stat-label">Kids (Niños)</div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn-excel" onclick="exportarExcel()">📊 Exportar a Excel</button>
+            <button class="btn-backup" onclick="backupDatos()">💾 Backup</button>
+            <button class="btn-backup" onclick="restaurarBackup()">🔄 Restaurar</button>
+            <button class="btn-notify" onclick="probarNotificacion()">🔔 Notificaciones</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-card">
+            <div class="filters-title">
+                🔍 Filtrar Reportes
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Sede</label>
+                    <select id="filtroSede" class="filter-select">
+                        <option value="todas">Todas las sedes</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Semana</label>
+                    <input type="week" id="filtroSemana" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label>Mes</label>
+                    <select id="filtroMes" class="filter-select">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Año</label>
+                    <select id="filtroAnio" class="filter-select">
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+                </div>
+                <button class="btn-filter" onclick="cargarDatos()">🔍 Filtrar</button>
+                <button class="btn-new" onclick="window.location.href='ingreso.html'">➕ Nuevo Registro</button>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>📊 Asistencia por Sede</h3>
+                <canvas id="chartSedes"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📈 Tendencia Semanal</h3>
+                <canvas id="chartTendencia"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>👥 Varones vs Mujeres</h3>
+                <canvas id="chartGenero"></canvas>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-card">
+            <h3>📋 Historial de Servicios</h3>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Fecha</th><th>Sede</th><th>Total</th><th>Varones</th><th>Mujeres</th><th>Kids</th><th>WhatsApp</th></tr>
+                    </thead>
+                    <tbody id="tablaBody">
+                        <tr><td colspan="7" class="empty-state">No hay registros</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let chartSedes, chartTendencia, chartGenero;
+
+        async function cargarDatos() {
+            const datos = await obtenerDatos();
+            const usuario = JSON.parse(localStorage.getItem('usuarioActual'));
+            
+            let filtrados = datos;
+            if (usuario.rol !== 'admin') {
+                filtrados = filtrados.filter(d => d.sede === usuario.sede);
+            }
+            
+            const sede = document.getElementById('filtroSede').value;
+            if (sede !== 'todas') {
+                filtrados = filtrados.filter(d => d.sede === sede);
+            }
+            
+            const semana = document.getElementById('filtroSemana').value;
+            if (semana) {
+                filtrados = filtrados.filter(d => d.semana === semana);
+            }
+            
+            const mes = document.getElementById('filtroMes').value;
+            if (mes) {
+                filtrados = filtrados.filter(d => d.mes === mes);
+            }
+            
+            const anio = document.getElementById('filtroAnio').value;
+            if (anio) {
+                filtrados = filtrados.filter(d => d.fecha.startsWith(anio));
+            }
+            
+            actualizarStats(filtrados);
+            actualizarTabla(filtrados);
+            actualizarGraficos(filtrados);
+        }
+
+        function actualizarStats(datos) {
+            let totalAsistentes = 0, totalVarones = 0, totalMujeres = 0, totalKids = 0;
+            
+            datos.forEach(d => {
+                totalAsistentes += d.totalGeneral;
+                totalVarones += d.totalVarones;
+                totalMujeres += d.totalMujeres;
+                totalKids += (d.asistentesKidsV + d.asistentesKidsM);
+            });
+            
+            document.getElementById('totalAsistentes').innerText = totalAsistentes;
+            document.getElementById('totalVarones').innerText = totalVarones;
+            document.getElementById('totalMujeres').innerText = totalMujeres;
+            document.getElementById('totalKids').innerText = totalKids;
+        }
+
+        function actualizarTabla(datos) {
+            const tbody = document.getElementById('tablaBody');
+            if (datos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No hay registros</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = datos.slice().reverse().map(d => `
+                <tr>
+                    <td>${d.fecha}</td>
+                    <td>${d.sede.replace(/_/g, ' ')}</td>
+                    <td><strong>${d.totalGeneral}</strong></td>
+                    <td>${d.totalVarones}</td>
+                    <td>${d.totalMujeres}</td>
+                    <td>${d.asistentesKidsV + d.asistentesKidsM}</td>
+                    <td><button class="btn-wa" onclick="enviarWhatsApp('${d.fecha}', '${d.sede}', ${d.totalGeneral})">📱 Enviar</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function actualizarGraficos(datos) {
+            const sedes = [...new Set(datos.map(d => d.sede))];
+            const totalsPorSede = sedes.map(sede => 
+                datos.filter(d => d.sede === sede).reduce((sum, d) => sum + d.totalGeneral, 0)
+            );
+            
+            if (chartSedes) chartSedes.destroy();
+            const ctxSedes = document.getElementById('chartSedes').getContext('2d');
+            chartSedes = new Chart(ctxSedes, {
+                type: 'bar',
+                data: {
+                    labels: sedes.map(s => s.replace(/_/g, ' ')),
+                    datasets: [{
+                        label: 'Asistentes',
+                        data: totalsPorSede,
+                        backgroundColor: '#2a5298',
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            const semanas = [...new Set(datos.map(d => d.semana))].sort();
+            const totalsPorSemana = semanas.map(semana =>
+                datos.filter(d => d.semana === semana).reduce((sum, d) => sum + d.totalGeneral, 0)
+            );
+            
+            if (chartTendencia) chartTendencia.destroy();
+            const ctxTendencia = document.getElementById('chartTendencia').getContext('2d');
+            chartTendencia = new Chart(ctxTendencia, {
+                type: 'line',
+                data: {
+                    labels: semanas,
+                    datasets: [{
+                        label: 'Asistencia',
+                        data: totalsPorSemana,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            const totalVarones = datos.reduce((sum, d) => sum + d.totalVarones, 0);
+            const totalMujeres = datos.reduce((sum, d) => sum + d.totalMujeres, 0);
+            
+            if (chartGenero) chartGenero.destroy();
+            const ctxGenero = document.getElementById('chartGenero').getContext('2d');
+            chartGenero = new Chart(ctxGenero, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Varones', 'Mujeres'],
+                    datasets: [{
+                        data: [totalVarones, totalMujeres],
+                        backgroundColor: ['#2a5298', '#ec489a']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+        }
+
+        async function exportarExcel() {
+            const datos = await obtenerDatos();
+            const ws = XLSX.utils.json_to_sheet(datos.map(d => ({
+                Fecha: d.fecha,
+                Sede: d.sede,
+                Total: d.totalGeneral,
+                Varones: d.totalVarones,
+                Mujeres: d.totalMujeres,
+                Kids: d.asistentesKidsV + d.asistentesKidsM
+            })));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
+            XLSX.writeFile(wb, `iglesia_${new Date().toISOString().split('T')[0]}.xlsx`);
+            mostrarNotificacion('Excel exportado', 'success');
+        }
+
+        async function backupDatos() {
+            const datos = await obtenerDatos();
+            const backup = { fecha: new Date(), datos, usuarios: JSON.parse(localStorage.getItem('usuarios') || '[]') };
+            const blob = new Blob([JSON.stringify(backup)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            mostrarNotificacion('Backup creado', 'success');
+        }
+
+        function restaurarBackup() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const backup = JSON.parse(event.target.result);
+                    await limpiarBaseDatos();
+                    for (const reg of backup.datos) await guardarRegistroExistente(reg);
+                    localStorage.setItem('usuarios', JSON.stringify(backup.usuarios));
+                    mostrarNotificacion('Backup restaurado', 'success');
+                    cargarDatos();
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function probarNotificacion() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted') {
+                        new Notification('Iglesia Agua Viva', { body: 'Sistema listo para usar' });
+                    }
+                });
+            }
+            mostrarNotificacion('Notificación enviada', 'info');
+        }
+
+        function mostrarNotificacion(msg, tipo) {
+            const n = document.createElement('div');
+            n.className = `notification notification-${tipo}`;
+            n.innerText = msg;
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3000);
+        }
+
+        async function limpiarBaseDatos() {
+            return new Promise((resolve) => {
+                const req = indexedDB.deleteDatabase('IglesiaDB');
+                req.onsuccess = () => initDB().then(resolve);
+            });
+        }
+
+        async function guardarRegistroExistente(reg) {
+            await initDB();
+            const tx = db.transaction(['registros'], 'readwrite');
+            tx.objectStore('registros').add(reg);
+        }
+
+        function cargarSelectores() {
+            const sedes = [
+                'san_carlos_10am', 'san_carlos_12pm', 'san_carlos_5pm', 'san_carlos_7pm',
+                'el_tambo_12pm', 'el_tambo_6pm', 'chupaca_6pm', 'transformando_ciudades', 'jauja'
+            ];
+            const selectSede = document.getElementById('filtroSede');
+            sedes.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s.replace(/_/g, ' ');
+                selectSede.appendChild(opt);
+            });
+            
+            const selectMes = document.getElementById('filtroMes');
+            for (let i = 1; i <= 12; i++) {
+                const opt = document.createElement('option');
+                opt.value = `2024-${String(i).padStart(2, '0')}`;
+                opt.textContent = `Mes ${i}`;
+                selectMes.appendChild(opt);
+            }
+        }
+
+        function cargarUsuario() {
+            const u = JSON.parse(localStorage.getItem('usuarioActual'));
+            if (u) {
+                document.getElementById('userName').innerText = u.nombre;
+                document.getElementById('userRole').innerText = u.rol === 'admin' ? 'Administrador' : 'Líder';
+            }
+        }
+
+        window.onload = () => {
+            if (!verificarSesion()) return;
+            cargarUsuario();
+            cargarSelectores();
+            const hoy = new Date();
+            const semana = `${hoy.getFullYear()}-W${Math.ceil(((hoy - new Date(hoy.getFullYear(),0,1)) / 86400000 + 1)/7)}`;
+            document.getElementById('filtroSemana').value = semana;
+            cargarDatos();
+        };
+    </script>
+</body>
+</html>
