@@ -2,505 +2,152 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Iglesia Agua Viva - Sistema de Gestión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Iglesia Agua Viva | Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="database.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
-
-        .auth-container {
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .auth-card {
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 32px;
-            padding: 32px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-            animation: fadeInUp 0.5s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .logo-icon {
-            font-size: 56px;
-            margin-bottom: 12px;
-        }
-
-        .auth-header h1 {
-            font-size: 28px;
-            color: #1e3c72;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .auth-header p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .auth-tabs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 28px;
-            background: #f1f5f9;
-            padding: 6px;
-            border-radius: 60px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            background: transparent;
-            border: none;
-            font-size: 15px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            border-radius: 50px;
-            transition: all 0.3s;
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
-        }
-
-        .auth-form {
-            display: none;
-            animation: fadeIn 0.4s;
-        }
-
-        .auth-form.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .auth-input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 15px;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s;
-        }
-
-        .auth-input:focus {
-            outline: none;
-            border-color: #2a5298;
-            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
-        }
-
-        .auth-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 12px;
-        }
-
-        .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
-        }
-
-        .auth-btn-secondary {
-            width: 100%;
-            padding: 12px;
-            background: #f1f5f9;
-            color: #475569;
-            border: none;
-            border-radius: 16px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 12px;
-            transition: all 0.3s;
-        }
-
-        .auth-btn-secondary:hover {
-            background: #e2e8f0;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        body::before {
+            content: '';
+            position: absolute;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
-            justify-content: center;
+            background: radial-gradient(circle at 20% 50%, rgba(37,99,235,0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .login-wrapper { width: 100%; max-width: 480px; z-index: 1; }
+        .login-card {
+            background: rgba(255,255,255,0.98);
+            border-radius: 40px;
+            padding: 40px 32px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .logo { text-align: center; margin-bottom: 32px; }
+        .logo-icon {
+            font-size: 64px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            width: 80px;
+            height: 80px;
+            border-radius: 60px;
+            display: flex;
             align-items: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s;
+            justify-content: center;
+            margin: 0 auto 16px;
+            animation: float 3s ease-in-out infinite;
         }
-
-        .modal-content {
-            background: white;
-            border-radius: 28px;
-            max-width: 400px;
-            width: 90%;
-            animation: slideUp 0.3s;
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        .logo h1 { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo p { color: #64748b; font-size: 14px; margin-top: 8px; }
+        .tabs {
+            display: flex; gap: 8px; background: #f1f5f9; padding: 6px; border-radius: 60px; margin-bottom: 32px;
         }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .tab {
+            flex: 1; text-align: center; padding: 12px; font-weight: 600; border-radius: 50px; cursor: pointer;
+            transition: all 0.3s; color: #64748b;
         }
-
-        .modal-header {
-            padding: 24px;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            border-radius: 28px 28px 0 0;
+        .tab.active { background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .form-panel { display: none; animation: fadeIn 0.3s ease; }
+        .form-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { font-size: 12px; font-weight: 600; color: #1e293b; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input {
+            width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 28px; font-size: 15px;
+            font-family: 'Inter', sans-serif; transition: all 0.3s;
         }
-
-        .modal-header h2 {
-            font-size: 22px;
+        .input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+        .btn {
+            width: 100%; padding: 14px; background: linear-gradient(135deg, #2563eb, #7c3aed); color: white;
+            border: none; border-radius: 30px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px;
+            transition: all 0.3s;
         }
-
-        .modal-body {
-            padding: 24px;
-        }
-
-        /* Notificaciones */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            left: 20px;
-            padding: 14px 20px;
-            border-radius: 16px;
-            color: white;
-            font-weight: 500;
-            text-align: center;
-            z-index: 2000;
-            animation: slideInRight 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .notification-success { background: #10b981; }
-        .notification-error { background: #ef4444; }
-        .notification-info { background: #3b82f6; }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        select.auth-input {
-            cursor: pointer;
-        }
-
-        @media (max-width: 600px) {
-            .auth-card {
-                padding: 24px;
-            }
-            .auth-header h1 {
-                font-size: 24px;
-            }
-        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,99,235,0.4); }
+        select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 20px; }
+        .toast { position: fixed; bottom: 24px; left: 24px; right: 24px; padding: 14px; border-radius: 60px; color: white; text-align: center; z-index: 1000; animation: toastIn 0.3s; font-weight: 500; }
+        .toast-success { background: linear-gradient(135deg, #10b981, #059669); }
+        .toast-error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        @keyframes toastIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @media (max-width: 600px) { .login-card { padding: 28px 20px; } .logo-icon { width: 64px; height: 64px; font-size: 32px; } }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="logo">
                 <div class="logo-icon">⛪</div>
                 <h1>Iglesia Agua Viva</h1>
                 <p>Sistema de Gestión de Servicios</p>
             </div>
-            
-            <div class="auth-tabs">
-                <button class="tab-btn active" onclick="switchTab('login')">Iniciar Sesión</button>
-                <button class="tab-btn" onclick="switchTab('register')">Registrarse</button>
+            <div class="tabs">
+                <div class="tab active" onclick="cambiarTab('login')">Iniciar Sesión</div>
+                <div class="tab" onclick="cambiarTab('register')">Registrarse</div>
             </div>
-
-            <!-- Login Form -->
-            <div id="loginForm" class="auth-form active">
-                <div class="input-group">
-                    <label>📧 Correo Electrónico</label>
-                    <input type="email" id="loginEmail" placeholder="tu@email.com" class="auth-input">
-                </div>
-                <div class="input-group">
-                    <label>🔒 Contraseña</label>
-                    <input type="password" id="loginPassword" placeholder="••••••••" class="auth-input">
-                </div>
-                <button onclick="iniciarSesion()" class="auth-btn">Ingresar</button>
+            <div id="loginPanel" class="form-panel active">
+                <div class="input-group"><label>📧 Correo Electrónico</label><input type="email" id="loginEmail" class="input" placeholder="tu@email.com" onkeypress="if(event.key==='Enter') iniciarSesion()"></div>
+                <div class="input-group"><label>🔒 Contraseña</label><input type="password" id="loginPassword" class="input" placeholder="••••••••" onkeypress="if(event.key==='Enter') iniciarSesion()"></div>
+                <button class="btn" onclick="iniciarSesion()">Ingresar</button>
             </div>
-
-            <!-- Register Form -->
-            <div id="registerForm" class="auth-form">
-                <div class="input-group">
-                    <label>👤 Nombre Completo</label>
-                    <input type="text" id="regNombre" placeholder="Nombre y Apellido" class="auth-input">
-                </div>
-                <div class="input-group">
-                    <label>📧 Correo Electrónico</label>
-                    <input type="email" id="regEmail" placeholder="tu@email.com" class="auth-input">
-                </div>
-                <div class="input-group">
-                    <label>📍 Sede/ Servicio</label>
-                    <select id="regSede" class="auth-input">
-                        <option value="">Selecciona tu sede</option>
-                        <option value="san_carlos_10am">San Carlos - 10am (Domingo)</option>
-                        <option value="san_carlos_12pm">San Carlos - 12pm (Domingo)</option>
-                        <option value="san_carlos_5pm">San Carlos - 5pm (Sábado)</option>
-                        <option value="san_carlos_7pm">San Carlos - 7pm (Sábado)</option>
-                        <option value="el_tambo_12pm">El Tambo - 12pm</option>
-                        <option value="el_tambo_6pm">El Tambo - 6pm</option>
-                        <option value="chupaca_6pm">Chupaca - 6pm</option>
-                        <option value="transformando_ciudades">Transformando Ciudades</option>
-                        <option value="jauja">Jauja</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>🔒 Contraseña</label>
-                    <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" class="auth-input">
-                </div>
-                <div class="input-group">
-                    <label>✅ Confirmar Contraseña</label>
-                    <input type="password" id="regConfirmPassword" placeholder="Repite tu contraseña" class="auth-input">
-                </div>
-                <button onclick="registrarUsuario()" class="auth-btn">Crear Cuenta</button>
+            <div id="registerPanel" class="form-panel">
+                <div class="input-group"><label>👤 Nombre Completo</label><input type="text" id="regNombre" class="input" placeholder="Juan Pérez" onfocus="this.placeholder=''" onblur="if(!this.value) this.placeholder='Juan Pérez'"></div>
+                <div class="input-group"><label>📧 Correo Electrónico</label><input type="email" id="regEmail" class="input" placeholder="juan@ejemplo.com" onfocus="this.placeholder=''" onblur="if(!this.value) this.placeholder='juan@ejemplo.com'"></div>
+                <div class="input-group"><label>📍 Sede</label><select id="regSede" class="input"><option value="">Seleccionar sede</option><option value="san_carlos_10am">🏛️ San Carlos 10am</option><option value="san_carlos_12pm">🏛️ San Carlos 12pm</option><option value="san_carlos_5pm">🌙 San Carlos 5pm</option><option value="san_carlos_7pm">🌙 San Carlos 7pm</option><option value="el_tambo_12pm">🏛️ El Tambo 12pm</option><option value="el_tambo_6pm">🌙 El Tambo 6pm</option><option value="chupaca_6pm">🌙 Chupaca 6pm</option><option value="jauja">🏔️ Jauja</option><option value="belen">🏠 Belén</option><option value="transformando_ciudades">🌍 Transformando Ciudades</option></select></div>
+                <div class="input-group"><label>🔒 Contraseña</label><input type="password" id="regPassword" class="input" placeholder="Mínimo 6 caracteres" onfocus="this.placeholder=''" onblur="if(!this.value) this.placeholder='Mínimo 6 caracteres'"></div>
+                <div class="input-group"><label>✅ Confirmar Contraseña</label><input type="password" id="regConfirm" class="input" placeholder="Repite tu contraseña" onfocus="this.placeholder=''" onblur="if(!this.value) this.placeholder='Repite tu contraseña'"></div>
+                <button class="btn" onclick="registrar()">Crear Cuenta</button>
             </div>
         </div>
     </div>
-
-    <!-- Modal de Verificación -->
-    <div id="verificationModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>🔐 Verifica tu correo</h2>
-            </div>
-            <div class="modal-body">
-                <p>Hemos enviado un código de verificación a:</p>
-                <p id="verificationEmail" style="font-weight: bold; margin: 12px 0; color: #1e3c72;"></p>
-                <div class="input-group">
-                    <label>Código de verificación</label>
-                    <input type="text" id="codigoVerificacion" placeholder="Ingresa el código de 6 dígitos" class="auth-input">
-                </div>
-                <button onclick="verificarCodigo()" class="auth-btn">Verificar</button>
-                <button onclick="reenviarCodigo()" class="auth-btn-secondary">Reenviar código</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Usuarios predefinidos
-        const usuariosPredefinidos = [
-            { nombre: "Jhon Smith", email: "jhonfernandezcondor@gmail.com", password: "JSferco18", sede: "admin", rol: "admin", verificado: true },
-            { nombre: "Patricia Perez", email: "kperezsuasnabar@gmail.com", password: "72566646", sede: "admin", rol: "admin", verificado: true }
-        ];
-
-        function inicializarUsuarios() {
-            if(!localStorage.getItem('usuarios')) {
-                localStorage.setItem('usuarios', JSON.stringify(usuariosPredefinidos));
-            }
-        }
-
-        let usuarioPendiente = null;
-
-        function switchTab(tab) {
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const tabs = document.querySelectorAll('.tab-btn');
-            
-            if(tab === 'login') {
-                loginForm.classList.add('active');
-                registerForm.classList.remove('active');
-                tabs[0].classList.add('active');
-                tabs[1].classList.remove('active');
+        function cambiarTab(tab) {
+            document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            if (tab === 'login') {
+                document.getElementById('loginPanel').classList.add('active');
+                document.querySelectorAll('.tab')[0].classList.add('active');
             } else {
-                loginForm.classList.remove('active');
-                registerForm.classList.add('active');
-                tabs[0].classList.remove('active');
-                tabs[1].classList.add('active');
+                document.getElementById('registerPanel').classList.add('active');
+                document.querySelectorAll('.tab')[1].classList.add('active');
             }
         }
-
+        function toast(msg, type) { const t = document.createElement('div'); t.className = `toast toast-${type}`; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
         function iniciarSesion() {
-            const email = document.getElementById('loginEmail').value;
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
-            
-            if(!email || !password) {
-                mostrarNotificacion('Por favor completa todos los campos', 'error');
-                return;
-            }
-            
-            const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-            const usuario = usuarios.find(u => u.email === email && u.password === password);
-            
-            if(usuario) {
-                if(!usuario.verificado) {
-                    mostrarNotificacion('Por favor verifica tu correo electrónico primero', 'error');
-                    return;
-                }
-                
-                localStorage.setItem('usuarioActual', JSON.stringify(usuario));
-                mostrarNotificacion('¡Bienvenido!', 'success');
-                window.location.href = 'dashboard.html';
-            } else {
-                mostrarNotificacion('Correo o contraseña incorrectos', 'error');
-            }
+            const result = db.login(email, password);
+            if (result.success) { toast('Bienvenido', 'success'); setTimeout(() => window.location.href = 'dashboard.html', 800); }
+            else { toast(result.message, 'error'); }
         }
-
-        function registrarUsuario() {
-            const nombre = document.getElementById('regNombre').value;
-            const email = document.getElementById('regEmail').value;
+        function registrar() {
+            const nombre = document.getElementById('regNombre').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
             const sede = document.getElementById('regSede').value;
             const password = document.getElementById('regPassword').value;
-            const confirmPassword = document.getElementById('regConfirmPassword').value;
-            
-            if(!nombre || !email || !sede || !password) {
-                mostrarNotificacion('Por favor completa todos los campos', 'error');
-                return;
-            }
-            
-            if(password !== confirmPassword) {
-                mostrarNotificacion('Las contraseñas no coinciden', 'error');
-                return;
-            }
-            
-            if(password.length < 6) {
-                mostrarNotificacion('La contraseña debe tener al menos 6 caracteres', 'error');
-                return;
-            }
-            
-            const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-            if(usuarios.find(u => u.email === email)) {
-                mostrarNotificacion('Este correo ya está registrado', 'error');
-                return;
-            }
-            
-            const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-            
-            usuarioPendiente = {
-                nombre, email, sede, password,
-                codigoVerificacion: codigo,
-                verificado: false,
-                rol: 'lider'
-            };
-            
-            document.getElementById('verificationEmail').innerText = email;
-            document.getElementById('verificationModal').style.display = 'flex';
-            mostrarNotificacion(`Código enviado a ${email} (Demo: ${codigo})`, 'info');
+            const confirm = document.getElementById('regConfirm').value;
+            if (!nombre || !email || !sede || !password) { toast('Completa todos los campos', 'error'); return; }
+            if (password !== confirm) { toast('Las contraseñas no coinciden', 'error'); return; }
+            if (password.length < 6) { toast('Mínimo 6 caracteres', 'error'); return; }
+            const result = db.registrarUsuario(nombre, email, sede, password);
+            if (result.success) { toast('Cuenta creada exitosamente', 'success'); cambiarTab('login'); }
+            else { toast(result.message, 'error'); }
         }
-
-        function verificarCodigo() {
-            const codigoIngresado = document.getElementById('codigoVerificacion').value;
-            
-            if(codigoIngresado === usuarioPendiente.codigoVerificacion) {
-                usuarioPendiente.verificado = true;
-                delete usuarioPendiente.codigoVerificacion;
-                
-                const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-                usuarios.push(usuarioPendiente);
-                localStorage.setItem('usuarios', JSON.stringify(usuarios));
-                
-                document.getElementById('verificationModal').style.display = 'none';
-                mostrarNotificacion('¡Cuenta verificada exitosamente!', 'success');
-                switchTab('login');
-                
-                document.getElementById('regNombre').value = '';
-                document.getElementById('regEmail').value = '';
-                document.getElementById('regSede').value = '';
-                document.getElementById('regPassword').value = '';
-                document.getElementById('regConfirmPassword').value = '';
-            } else {
-                mostrarNotificacion('Código incorrecto', 'error');
-            }
-        }
-
-        function reenviarCodigo() {
-            const nuevoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
-            usuarioPendiente.codigoVerificacion = nuevoCodigo;
-            mostrarNotificacion(`Nuevo código: ${nuevoCodigo}`, 'info');
-        }
-
-        function mostrarNotificacion(mensaje, tipo) {
-            const notificacion = document.createElement('div');
-            notificacion.className = `notification notification-${tipo}`;
-            notificacion.innerHTML = mensaje;
-            document.body.appendChild(notificacion);
-            setTimeout(() => notificacion.remove(), 3000);
-        }
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('verificationModal');
-            if(event.target === modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        inicializarUsuarios();
     </script>
 </body>
 </html>

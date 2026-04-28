@@ -3,506 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Registrar Servicio - Iglesia Agua Viva</title>
+    <title>Registrar Servicio | Iglesia Agua Viva</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="auth.js"></script>
+    <script src="database.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f0f2f5;
-            min-height: 100vh;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo h1 {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .logo p {
-            font-size: 11px;
-            opacity: 0.8;
-            margin-top: 4px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255,255,255,0.15);
-            padding: 8px 16px;
-            border-radius: 50px;
-        }
-
-        .user-avatar {
-            width: 35px;
-            height: 35px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .user-name {
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .user-role {
-            font-size: 10px;
-            opacity: 0.8;
-        }
-
-        .btn-back {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.3s;
-        }
-
-        .btn-back:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .form-card {
-            background: white;
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e3c72;
-            margin: 24px 0 16px 0;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-title:first-of-type {
-            margin-top: 0;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 6px;
-        }
-
-        .form-input, .form-select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 15px;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s;
-        }
-
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #2a5298;
-            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
-        }
-
-        .double-input {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .input-group {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 12px;
-        }
-
-        .input-group label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 16px;
-            text-align: center;
-            font-weight: 600;
-            background: white;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #2a5298;
-        }
-
-        .ministerios-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .ministerio-card {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 12px;
-            transition: all 0.3s;
-        }
-
-        .ministerio-card:hover {
-            background: #f1f5f9;
-        }
-
-        .ministerio-nombre {
-            font-weight: 600;
-            font-size: 14px;
-            color: #1e3c72;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .btn-save {
-            width: 100%;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 24px;
-            transition: all 0.3s;
-        }
-
-        .btn-save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-save:active {
-            transform: translateY(0);
-        }
-
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            padding: 14px;
-            border-radius: 14px;
-            color: white;
-            font-weight: 500;
-            text-align: center;
-            z-index: 1000;
-            animation: slideUp 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .notification-success { background: #10b981; }
-        .notification-error { background: #ef4444; }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 12px;
-            }
-            
-            .form-card {
-                padding: 18px;
-            }
-            
-            .ministerios-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .double-input {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-            
-            .section-title {
-                font-size: 16px;
-                margin: 20px 0 12px 0;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; }
+        .header { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; position: sticky; top: 0; z-index: 100; }
+        .logo h1 { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .user-area { display: flex; align-items: center; gap: 20px; background: linear-gradient(135deg, #2563eb, #7c3aed); padding: 8px 20px; border-radius: 60px; color: white; }
+        .btn-back { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-back:hover { background: rgba(255,255,255,0.3); transform: scale(1.02); }
+        .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+        .form-card { background: white; border-radius: 48px; padding: 36px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3); animation: slideIn 0.5s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .section-title { font-size: 20px; font-weight: 800; margin: 28px 0 20px 0; background: linear-gradient(135deg, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .section-title:first-of-type { margin-top: 0; }
+        .double-input { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { font-size: 12px; font-weight: 700; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+        .form-control, .form-select { width: 100%; padding: 14px 18px; border: 2px solid #e2e8f0; border-radius: 28px; font-family: 'Inter', sans-serif; font-size: 15px; transition: all 0.3s; }
+        .form-control:focus, .form-select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+        .ministerio-card { background: #f8fafc; border-radius: 24px; padding: 20px; margin-bottom: 16px; transition: all 0.3s; }
+        .ministerio-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .ministerio-nombre { font-weight: 800; margin-bottom: 16px; color: #1e293b; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+        .number-control { display: flex; align-items: center; gap: 12px; background: white; border-radius: 60px; border: 1px solid #e2e8f0; padding: 4px; }
+        .number-control input { flex: 1; border: none; text-align: center; font-size: 18px; font-weight: 700; padding: 10px 0; background: transparent; font-family: 'Inter', sans-serif; }
+        .number-control input:focus { outline: none; }
+        .number-control input[type="number"] { -moz-appearance: textfield; }
+        .number-control input::-webkit-inner-spin-button, .number-control input::-webkit-outer-spin-button { display: none; }
+        .number-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: #e2e8f0; font-size: 24px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .number-btn:hover { background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; transform: scale(1.05); }
+        .btn-save { width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 18px; border-radius: 60px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 36px; transition: all 0.3s; }
+        .btn-save:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -10px rgba(16,185,129,0.5); }
+        .toast { position: fixed; bottom: 24px; left: 24px; right: 24px; padding: 14px; border-radius: 60px; color: white; text-align: center; z-index: 1000; animation: toastIn 0.3s; font-weight: 500; }
+        .toast-success { background: linear-gradient(135deg, #10b981, #059669); }
+        .toast-error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        @keyframes toastIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @media (max-width: 600px) { .container { padding: 16px; } .form-card { padding: 24px; } .double-input { grid-template-columns: 1fr; gap: 12px; } .number-btn { width: 36px; height: 36px; } }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo">
-            <h1>⛪ Iglesia Agua Viva</h1>
-            <p>Registro de Servicio</p>
-        </div>
-        <div class="user-info">
-            <div class="user-avatar">👤</div>
-            <div>
-                <div class="user-name" id="userName">Cargando...</div>
-                <div class="user-role" id="userRole"></div>
-            </div>
-            <button class="btn-back" onclick="window.location.href='dashboard.html'">← Volver</button>
-        </div>
+        <div class="logo"><h1>⛪ Iglesia Agua Viva</h1></div>
+        <div class="user-area"><span>👤 <span id="userName">Cargando...</span></span><button class="btn-back" onclick="window.location.href='dashboard.html'">← Volver</button></div>
     </div>
-
     <div class="container">
         <div class="form-card">
-            <form id="formRegistro">
-                <!-- Fecha y Sede -->
+            <form id="registroForm">
                 <div class="double-input">
-                    <div class="form-group">
-                        <label>📅 Fecha</label>
-                        <input type="date" id="fecha" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label>📍 Sede</label>
-                        <select id="sede" class="form-select" required>
-                            <option value="">Seleccionar...</option>
-                            <option value="san_carlos_10am">San Carlos - 10am (Domingo)</option>
-                            <option value="san_carlos_12pm">San Carlos - 12pm (Domingo)</option>
-                            <option value="san_carlos_5pm">San Carlos - 5pm (Sábado)</option>
-                            <option value="san_carlos_7pm">San Carlos - 7pm (Sábado)</option>
-                            <option value="el_tambo_12pm">El Tambo - 12pm</option>
-                            <option value="el_tambo_6pm">El Tambo - 6pm</option>
-                            <option value="chupaca_6pm">Chupaca - 6pm</option>
-                            <option value="transformando_ciudades">Transformando Ciudades</option>
-                            <option value="jauja">Jauja</option>
-                        </select>
-                    </div>
+                    <div class="form-group"><label>📅 FECHA</label><input type="date" id="fecha" class="form-control" required></div>
+                    <div class="form-group"><label>📍 SEDE</label><select id="sede" class="form-select" required>
+                        <option value="">Seleccionar</option>
+                        <option value="san_carlos_10am">🏛️ San Carlos - 10am (Domingo)</option>
+                        <option value="san_carlos_12pm">🏛️ San Carlos - 12pm (Domingo)</option>
+                        <option value="san_carlos_5pm">🌙 San Carlos - 5pm (Sábado)</option>
+                        <option value="san_carlos_7pm">🌙 San Carlos - 7pm (Sábado)</option>
+                        <option value="el_tambo_12pm">🏛️ El Tambo - 12pm</option>
+                        <option value="el_tambo_6pm">🌙 El Tambo - 6pm</option>
+                        <option value="chupaca_6pm">🌙 Chupaca - 6pm</option>
+                        <option value="jauja">🏔️ Jauja</option>
+                        <option value="belen">🏠 Belén - Tu Casa</option>
+                        <option value="transformando_ciudades">🌍 Transformando Ciudades</option>
+                    </select></div>
                 </div>
-
-                <!-- Ministerios -->
-                <div class="section-title">
-                    🎵 Ministerios
-                </div>
-                <div class="ministerios-grid">
-                    <div class="ministerio-card">
-                        <div class="ministerio-nombre">🎸 Alabanza</div>
-                        <div class="double-input">
-                            <div class="input-group">
-                                <label>Varones</label>
-                                <input type="number" id="alabanzaV" value="0" min="0">
-                            </div>
-                            <div class="input-group">
-                                <label>Mujeres</label>
-                                <input type="number" id="alabanzaM" value="0" min="0">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ministerio-card">
-                        <div class="ministerio-nombre">🎛️ Producción</div>
-                        <div class="double-input">
-                            <div class="input-group">
-                                <label>Varones</label>
-                                <input type="number" id="produccionV" value="0" min="0">
-                            </div>
-                            <div class="input-group">
-                                <label>Mujeres</label>
-                                <input type="number" id="produccionM" value="0" min="0">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ministerio-card">
-                        <div class="ministerio-nombre">🛡️ Servidores</div>
-                        <div class="double-input">
-                            <div class="input-group">
-                                <label>Varones</label>
-                                <input type="number" id="servidoresV" value="0" min="0">
-                            </div>
-                            <div class="input-group">
-                                <label>Mujeres</label>
-                                <input type="number" id="servidoresM" value="0" min="0">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ministerio-card">
-                        <div class="ministerio-nombre">🤝 Conexión</div>
-                        <div class="double-input">
-                            <div class="input-group">
-                                <label>Varones</label>
-                                <input type="number" id="conexionV" value="0" min="0">
-                            </div>
-                            <div class="input-group">
-                                <label>Mujeres</label>
-                                <input type="number" id="conexionM" value="0" min="0">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ministerio-card">
-                        <div class="ministerio-nombre">👩‍🏫 Maestros Kids</div>
-                        <div class="double-input">
-                            <div class="input-group">
-                                <label>Varones</label>
-                                <input type="number" id="maestrosV" value="0" min="0">
-                            </div>
-                            <div class="input-group">
-                                <label>Mujeres</label>
-                                <input type="number" id="maestrosM" value="0" min="0">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Asistentes -->
-                <div class="section-title">
-                    👥 Asistentes
-                </div>
-                <div class="ministerios-grid">
-                    <div class="ministerio-card">
-                        <div class="ministerio-nombre">👨 Adultos</div>
-                        <div class="double-input">
-                            <div class="input-group">
-                                <label>Varones</label>
-                                <input type="number" id="adultosV" value="0" min="0">
-                            </div>
-                            <div class="input-group">
-                                <label>Mujeres</label>
-                                <input type="number" id="adultosM" value="0" min="0">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ministerio-card">
-                        <div class="ministerio-nombre">🧒 Kids (Niños)</div>
-                        <div class="double-input">
-                            <div class="input-group">
-                                <label>Varones</label>
-                                <input type="number" id="kidsV" value="0" min="0">
-                            </div>
-                            <div class="input-group">
-                                <label>Mujeres</label>
-                                <input type="number" id="kidsM" value="0" min="0">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-save">💾 Guardar Registro</button>
+                <div class="section-title">🎵 MINISTERIOS</div>
+                <div id="ministeriosContainer"></div>
+                <div class="section-title">👥 ASISTENTES</div>
+                <div id="asistentesContainer"></div>
+                <button type="submit" class="btn-save">💾 GUARDAR REGISTRO</button>
             </form>
         </div>
     </div>
-
-    <script src="app.js"></script>
     <script>
-        function cargarUsuario() {
-            const usuario = JSON.parse(localStorage.getItem('usuarioActual'));
-            if (usuario) {
-                document.getElementById('userName').innerText = usuario.nombre;
-                document.getElementById('userRole').innerText = usuario.rol === 'admin' ? 'Administrador' : 'Líder';
-                
-                if (usuario.rol !== 'admin' && usuario.sede) {
-                    const sedeSelect = document.getElementById('sede');
-                    for (let opt of sedeSelect.options) {
-                        if (opt.value === usuario.sede) {
-                            opt.selected = true;
-                            break;
-                        }
-                    }
-                    sedeSelect.disabled = true;
-                }
-            }
+        const ministerios = ['Alabanza','Producción','Servidores','Conexión','Maestros Kids'];
+        const mids = ['alabanza','produccion','servidores','conexion','maestros'];
+        const asistentes = ['Adultos','Kids'];
+        const aids = ['adultos','kids'];
+        
+        function crearControlNumerico(id) {
+            const div = document.createElement('div'); div.className = 'number-control';
+            const btnM = document.createElement('button'); btnM.type = 'button'; btnM.className = 'number-btn'; btnM.textContent = '−';
+            const input = document.createElement('input'); input.type = 'number'; input.id = id; input.value = '0'; input.min = '0';
+            input.addEventListener('change', () => { if (parseInt(input.value) < 0) input.value = 0; });
+            input.addEventListener('click', () => input.select());
+            const btnP = document.createElement('button'); btnP.type = 'button'; btnP.className = 'number-btn'; btnP.textContent = '+';
+            btnM.onclick = () => { let v = parseInt(input.value) || 0; if (v > 0) input.value = v - 1; };
+            btnP.onclick = () => { let v = parseInt(input.value) || 0; input.value = v + 1; };
+            div.appendChild(btnM); div.appendChild(input); div.appendChild(btnP);
+            return div;
         }
-
-        function mostrarNotificacion(mensaje, tipo) {
-            const n = document.createElement('div');
-            n.className = `notification notification-${tipo}`;
-            n.innerText = mensaje;
-            document.body.appendChild(n);
-            setTimeout(() => n.remove(), 3000);
+        
+        function cargarFormulario() {
+            const contM = document.getElementById('ministeriosContainer'); contM.innerHTML = '';
+            ministerios.forEach((m, i) => {
+                const card = document.createElement('div'); card.className = 'ministerio-card';
+                card.innerHTML = `<div class="ministerio-nombre">${m}</div><div class="double-input"></div>`;
+                const div = card.querySelector('.double-input');
+                div.appendChild(crearControlNumerico(`${mids[i]}V`));
+                div.appendChild(crearControlNumerico(`${mids[i]}M`));
+                contM.appendChild(card);
+            });
+            const contA = document.getElementById('asistentesContainer'); contA.innerHTML = '';
+            asistentes.forEach((a, i) => {
+                const card = document.createElement('div'); card.className = 'ministerio-card';
+                card.innerHTML = `<div class="ministerio-nombre">${a}</div><div class="double-input"></div>`;
+                const div = card.querySelector('.double-input');
+                div.appendChild(crearControlNumerico(`${aids[i]}V`));
+                div.appendChild(crearControlNumerico(`${aids[i]}M`));
+                contA.appendChild(card);
+            });
         }
-
-        document.getElementById('formRegistro').addEventListener('submit', async (e) => {
+        
+        function obtenerDatos() {
+            const datos = { fecha: document.getElementById('fecha').value, sede: document.getElementById('sede').value, ministerios: {}, asistentes: {} };
+            mids.forEach(m => { datos.ministerios[m] = { v: Number(document.getElementById(`${m}V`).value) || 0, m: Number(document.getElementById(`${m}M`).value) || 0 }; });
+            aids.forEach(a => { datos.asistentes[a] = { v: Number(document.getElementById(`${a}V`).value) || 0, m: Number(document.getElementById(`${a}M`).value) || 0 }; });
+            return datos;
+        }
+        
+        function toast(msg, type) { const t = document.createElement('div'); t.className = `toast toast-${type}`; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+        
+        document.getElementById('registroForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const datos = {
-                fecha: document.getElementById('fecha').value,
-                sede: document.getElementById('sede').value,
-                ministerios: {
-                    alabanza: { v: parseInt(document.getElementById('alabanzaV').value) || 0, m: parseInt(document.getElementById('alabanzaM').value) || 0 },
-                    produccion: { v: parseInt(document.getElementById('produccionV').value) || 0, m: parseInt(document.getElementById('produccionM').value) || 0 },
-                    servidores: { v: parseInt(document.getElementById('servidoresV').value) || 0, m: parseInt(document.getElementById('servidoresM').value) || 0 },
-                    conexion: { v: parseInt(document.getElementById('conexionV').value) || 0, m: parseInt(document.getElementById('conexionM').value) || 0 },
-                    maestrosKids: { v: parseInt(document.getElementById('maestrosV').value) || 0, m: parseInt(document.getElementById('maestrosM').value) || 0 }
-                },
-                asistentes: {
-                    adultos: { v: parseInt(document.getElementById('adultosV').value) || 0, m: parseInt(document.getElementById('adultosM').value) || 0 },
-                    kids: { v: parseInt(document.getElementById('kidsV').value) || 0, m: parseInt(document.getElementById('kidsM').value) || 0 }
-                }
-            };
-            
-            if (!datos.fecha || !datos.sede) {
-                mostrarNotificacion('❌ Completa fecha y sede', 'error');
-                return;
-            }
-            
-            await guardarRegistro(datos);
-            mostrarNotificacion('✅ Registro guardado exitosamente', 'success');
-            
-            // Limpiar formulario (mantener fecha y sede)
-            document.querySelectorAll('input[type="number"]').forEach(input => input.value = '0');
-            document.getElementById('fecha').value = '';
-            if (document.getElementById('sede').disabled === false) {
-                document.getElementById('sede').value = '';
-            }
+            const datos = obtenerDatos();
+            if (!datos.fecha) return toast('❌ Selecciona fecha', 'error');
+            if (!datos.sede) return toast('❌ Selecciona sede', 'error');
+            try {
+                await db.guardarRegistro(datos);
+                toast('✅ Registro guardado exitosamente', 'success');
+                setTimeout(() => window.location.href = 'dashboard.html', 1200);
+            } catch (error) { toast(error.message || '❌ Error al guardar', 'error'); }
         });
-
-        // Fecha actual por defecto
+        
+        function cargarUsuario() { const u = db.obtenerUsuarioActual(); if (u) document.getElementById('userName').innerText = u.nombre; }
         document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
-
-        window.onload = () => {
-            if (!verificarSesion()) return;
-            cargarUsuario();
-        };
+        if (!db.verificarSesion()) window.location.href = 'index.html';
+        cargarUsuario(); cargarFormulario();
     </script>
 </body>
 </html>
