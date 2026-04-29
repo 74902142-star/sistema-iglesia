@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Dashboard | Iglesia Agua Viva</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -14,61 +14,356 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f1f5f9; }
-        .header { background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; position: sticky; top: 0; z-index: 100; }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
         .logo h1 { font-size: 20px; font-weight: 700; }
-        .user-area { display: flex; align-items: center; gap: 20px; background: rgba(255,255,255,0.1); padding: 8px 20px; border-radius: 60px; }
-        .logout-btn { background: rgba(255,255,255,0.15); border: none; padding: 8px 20px; border-radius: 40px; color: white; cursor: pointer; transition: all 0.3s; }
+        .logo p { font-size: 11px; opacity: 0.7; margin-top: 4px; }
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 60px;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .logout-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
         .logout-btn:hover { background: rgba(255,255,255,0.25); }
-        .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
-        .stat-card { background: white; border-radius: 28px; padding: 24px; border: 1px solid #e2e8f0; transition: all 0.3s; text-align: center; }
-        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
-        .stat-value { font-size: 36px; font-weight: 800; color: #1e293b; }
-        .stat-label { font-size: 14px; color: #64748b; margin-top: 8px; }
-        .report-section { background: white; border-radius: 28px; padding: 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
-        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-        .report-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
-        .report-card { background: #f8fafc; border-radius: 20px; padding: 20px; border-left: 4px solid; }
+        
+        /* Container */
+        .container { max-width: 1440px; margin: 0 auto; padding: 24px 32px; }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        .stat-value { font-size: 36px; font-weight: 800; color: #1e293b; margin-top: 8px; }
+        .stat-label { font-size: 14px; color: #64748b; margin-top: 4px; }
+        .stat-icon { font-size: 28px; }
+        
+        /* Report Section */
+        .report-section {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 28px;
+            border: 1px solid #e2e8f0;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .report-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .report-card {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 20px;
+            border-left: 4px solid;
+        }
         .report-card h3 { font-size: 15px; margin-bottom: 16px; }
-        .report-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
-        .report-row:last-child { border-bottom: none; font-weight: 700; background: #f1f5f9; margin-top: 8px; padding: 10px; border-radius: 12px; }
-        .btn-whatsapp { background: #25D366; color: white; border: none; padding: 14px; border-radius: 40px; font-weight: 700; width: 100%; cursor: pointer; transition: all 0.3s; font-size: 16px; }
-        .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,211,102,0.3); }
-        .filters-bar { background: white; border-radius: 28px; padding: 20px 24px; margin-bottom: 24px; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; border: 1px solid #e2e8f0; }
-        .filter-group { flex: 1; min-width: 130px; }
-        .filter-group label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
-        .filter-select, .filter-input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 20px; font-family: 'Inter', sans-serif; font-size: 14px; background: white; }
-        .filter-select:focus, .filter-input:focus { outline: none; border-color: #2563eb; }
-        .btn-primary { background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; border: none; padding: 10px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-        .btn-secondary { background: white; border: 1px solid #e2e8f0; padding: 10px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .report-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .report-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            background: #f1f5f9;
+            margin-top: 8px;
+            padding: 10px;
+            border-radius: 12px;
+        }
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37,211,102,0.3);
+        }
+        
+        /* Filters */
+        .filters-bar {
+            background: white;
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            border: 1px solid #e2e8f0;
+        }
+        .filter-group { flex: 1; min-width: 140px; }
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .filter-select, .filter-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: white;
+        }
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        }
+        .btn-secondary {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
         .btn-secondary:hover { background: #f8fafc; }
-        .charts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
-        .chart-card { background: white; border-radius: 24px; padding: 20px; border: 1px solid #e2e8f0; }
-        .chart-card h3 { font-size: 14px; font-weight: 600; color: #64748b; margin-bottom: 16px; }
+        
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .chart-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 16px;
+        }
         canvas { max-height: 220px; width: 100%; }
-        .table-container { background: white; border-radius: 24px; padding: 20px; overflow-x: auto; border: 1px solid #e2e8f0; }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .data-table th { text-align: left; padding: 12px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; font-weight: 600; }
-        .data-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .data-table th {
+            text-align: left;
+            padding: 14px 12px;
+            background: #f8fafc;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .data-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
         .data-table tr:hover { background: #f8fafc; }
-        .btn-edit { background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 30px; cursor: pointer; font-size: 11px; margin-right: 6px; transition: all 0.2s; }
-        .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 30px; cursor: pointer; font-size: 11px; transition: all 0.2s; }
-        .empty-state { text-align: center; padding: 48px; color: #64748b; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; border-radius: 32px; max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; animation: modalIn 0.3s ease; }
-        @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .modal-header { padding: 20px 24px; background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; border-radius: 32px 32px 0 0; display: flex; justify-content: space-between; align-items: center; }
-        .modal-close { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+        .btn-edit {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-right: 6px;
+        }
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 48px;
+            color: #64748b;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            border-radius: 32px 32px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+        }
         .modal-body { padding: 24px; }
         .form-group { margin-bottom: 20px; }
-        .form-group label { font-size: 12px; font-weight: 600; color: #1e293b; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .form-control { width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 20px; font-family: 'Inter', sans-serif; }
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            display: block;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+        }
         .double-input { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .toast { position: fixed; bottom: 24px; left: 24px; right: 24px; padding: 14px 20px; border-radius: 60px; color: white; text-align: center; z-index: 2000; animation: toastIn 0.3s ease; font-weight: 500; }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            border-radius: 60px;
+            color: white;
+            text-align: center;
+            z-index: 2000;
+            animation: toastIn 0.3s ease;
+            font-weight: 500;
+        }
         .toast-success { background: linear-gradient(135deg, #10b981, #059669); }
         .toast-error { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        @keyframes toastIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes toastIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
             .container { padding: 16px; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -82,33 +377,108 @@
 </head>
 <body>
     <div class="header">
-        <div class="logo"><h1>Iglesia Agua Viva</h1></div>
-        <div class="user-area"><span>👤 <span id="userName">Cargando...</span></span><button class="logout-btn" onclick="db.logout()">Salir</button></div>
+        <div class="logo">
+            <h1>⛪ Iglesia Agua Viva</h1>
+            <p>Sistema de Gestión de Servicios</p>
+        </div>
+        <div class="user-area">
+            <div class="user-avatar">👤</div>
+            <div>
+                <div id="userName" style="font-weight: 500; font-size: 14px;">Cargando...</div>
+                <div id="userRol" style="font-size: 10px; opacity: 0.7;"></div>
+            </div>
+            <button class="logout-btn" onclick="db.logout()">Salir</button>
+        </div>
     </div>
+    
     <div class="container">
+        <!-- Stats Cards -->
         <div class="stats-grid" id="statsGrid"></div>
+        
+        <!-- Reportes NEXT/DOMINGO/KIDS -->
         <div class="report-section">
-            <div class="section-title">REPORTE DE SERVICIOS <span id="filtroInfo" style="font-size: 12px; color: #64748b; font-weight: normal;"></span></div>
+            <div class="section-title">
+                <span>📊</span> REPORTE DE SERVICIOS
+                <span id="filtroInfo" style="font-size: 12px; color: #64748b; font-weight: normal;"></span>
+            </div>
             <div class="report-cards" id="reportCards"></div>
-            <button class="btn-whatsapp" id="whatsappBtn">ENVIAR REPORTE POR WHATSAPP</button>
+            <button class="btn-whatsapp" id="whatsappBtn">📱 ENVIAR REPORTE POR WHATSAPP</button>
         </div>
+        
+        <!-- Filtros -->
         <div class="filters-bar">
-            <div class="filter-group"><label>SEDE</label><select id="filtroSede" class="filter-select"><option value="todas">Todas las sedes</option></select></div>
-            <div class="filter-group"><label>SEMANA</label><input type="week" id="filtroSemana" class="filter-input"></div>
-            <div class="filter-group"><label>MES</label><select id="filtroMes" class="filter-select"><option value="">Todos</option></select></div>
-            <div class="filter-group"><label>AÑO</label><select id="filtroAnio" class="filter-select"><option value="2026" selected>2026</option><option value="2027">2027</option><option value="2028">2028</option></select></div>
-            <button class="btn-primary" onclick="cargarDatos()">Aplicar filtros</button>
-            <button class="btn-secondary" onclick="window.location.href='ingreso.html'">Nuevo registro</button>
-            <button class="btn-secondary" onclick="exportarExcel()">Exportar Excel</button>
+            <div class="filter-group">
+                <label>📍 SEDE</label>
+                <select id="filtroSede" class="filter-select">
+                    <option value="todas">Todas las sedes</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>📅 SEMANA</label>
+                <input type="week" id="filtroSemana" class="filter-input">
+            </div>
+            <div class="filter-group">
+                <label>📆 MES</label>
+                <select id="filtroMes" class="filter-select">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>🗓️ AÑO</label>
+                <select id="filtroAnio" class="filter-select">
+                    <option value="2026" selected>2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="cargarDatos()">🔍 Aplicar filtros</button>
+            <button class="btn-secondary" onclick="window.location.href='ingreso.html'">➕ Nuevo registro</button>
+            <button class="btn-secondary" onclick="exportarExcel()">📎 Exportar Excel</button>
         </div>
+        
+        <!-- Gráficos -->
         <div class="charts-grid">
-            <div class="chart-card"><h3>Asistencia por sede</h3><canvas id="chartSedes"></canvas></div>
-            <div class="chart-card"><h3>Tendencia semanal</h3><canvas id="chartTendencia"></canvas></div>
-            <div class="chart-card"><h3>Varones vs Mujeres</h3><canvas id="chartGenero"></canvas></div>
+            <div class="chart-card">
+                <h3>📊 Asistencia por sede</h3>
+                <canvas id="chartSedes"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📈 Tendencia semanal</h3>
+                <canvas id="chartTendencia"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>👥 Varones vs Mujeres</h3>
+                <canvas id="chartGenero"></canvas>
+            </div>
         </div>
-        <div class="table-container"><h3 style="margin-bottom:16px;">Historial de registros</h3><div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Fecha</th><th>Sede</th><th>Semana</th><th>Total</th><th>Varones</th><th>Mujeres</th><th>Kids</th><th>Acciones</th></tr></thead><tbody id="tablaBody"><tr><td colspan="8" class="empty-state">No hay registros disponibles</td></tr></tbody></table></div></div>
+        
+        <!-- Tabla de registros -->
+        <div class="table-container">
+            <h3 style="margin-bottom: 16px;">📋 Historial de registros</h3>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Fecha</th><th>Sede</th><th>Semana</th><th>Total</th><th>Varones</th><th>Mujeres</th><th>Kids</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="tablaBody">
+                        <tr><td colspan="8" class="empty-state">No hay registros disponibles</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div id="editModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>Editar registro</h3><button class="modal-close" onclick="cerrarModal()">&times;</button></div><div class="modal-body" id="editModalBody"></div></div></div>
+    
+    <!-- Modal de edición -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Editar registro</h3>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="editModalBody"></div>
+        </div>
+    </div>
+    
     <script>
         let chartSedes, chartTendencia, chartGenero, datosFiltrados = [], registroEditando = null;
         const usuarioActual = db.obtenerUsuarioActual();
@@ -126,6 +496,7 @@
             actualizarReportes();
             actualizarTabla();
             actualizarGraficos();
+            
             let info = [];
             if (filtros.semana) info.push('Semana ' + filtros.semana);
             if (filtros.mes) info.push('Mes ' + filtros.mes);
@@ -134,22 +505,25 @@
         }
         
         function actualizarStats() {
-            var total = 0, varones = 0, mujeres = 0, kids = 0;
-            for (var i = 0; i < datosFiltrados.length; i++) {
-                var d = datosFiltrados[i];
+            let total = 0, varones = 0, mujeres = 0, kids = 0;
+            for (let d of datosFiltrados) {
                 total += d.totalGeneral;
                 varones += d.totalVarones;
                 mujeres += d.totalMujeres;
                 kids += (d.totalKV || 0) + (d.totalKM || 0);
             }
-            document.getElementById('statsGrid').innerHTML = '<div class="stat-card"><div class="stat-value">' + total.toLocaleString() + '</div><div class="stat-label">Total asistentes</div></div><div class="stat-card"><div class="stat-value">' + varones.toLocaleString() + '</div><div class="stat-label">Varones</div></div><div class="stat-card"><div class="stat-value">' + mujeres.toLocaleString() + '</div><div class="stat-label">Mujeres</div></div><div class="stat-card"><div class="stat-value">' + kids.toLocaleString() + '</div><div class="stat-label">Kids</div></div>';
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value">${total.toLocaleString()}</div><div class="stat-label">Total asistentes</div></div>
+                <div class="stat-card"><div class="stat-icon">👨</div><div class="stat-value">${varones.toLocaleString()}</div><div class="stat-label">Varones</div></div>
+                <div class="stat-card"><div class="stat-icon">👩</div><div class="stat-value">${mujeres.toLocaleString()}</div><div class="stat-label">Mujeres</div></div>
+                <div class="stat-card"><div class="stat-icon">🧒</div><div class="stat-value">${kids.toLocaleString()}</div><div class="stat-label">Kids</div></div>
+            `;
         }
         
         function actualizarReportes() {
-            var nextT = 0, nextH = 0, nextM = 0, domT = 0, domH = 0, domM = 0, kidsT = 0, kidsH = 0, kidsM = 0;
-            for (var i = 0; i < datosFiltrados.length; i++) {
-                var d = datosFiltrados[i];
-                var esNext = d.sede.indexOf('5pm') !== -1 || d.sede.indexOf('7pm') !== -1 || d.sede === 'el_tambo_6pm' || d.sede === 'chupaca_6pm';
+            let nextT = 0, nextH = 0, nextM = 0, domT = 0, domH = 0, domM = 0, kidsT = 0, kidsH = 0, kidsM = 0;
+            for (let d of datosFiltrados) {
+                const esNext = d.sede.includes('5pm') || d.sede.includes('7pm') || d.sede === 'el_tambo_6pm' || d.sede === 'chupaca_6pm';
                 if (esNext) {
                     nextT += d.totalGeneral;
                     nextH += d.totalVarones;
@@ -163,127 +537,133 @@
                 kidsH += d.totalKV || 0;
                 kidsM += d.totalKM || 0;
             }
-            document.getElementById('reportCards').innerHTML = '<div class="report-card" style="border-left-color:#3b82f6"><h3>NEXT (Sabados)</h3><div class="report-row"><span>Total</span><span><strong>' + nextT + '</strong></span></div><div class="report-row"><span>Hombres</span><span>' + nextH + '</span></div><div class="report-row"><span>Mujeres</span><span>' + nextM + '</span></div></div><div class="report-card" style="border-left-color:#10b981"><h3>DOMINGO</h3><div class="report-row"><span>Total</span><span><strong>' + domT + '</strong></span></div><div class="report-row"><span>Hombres</span><span>' + domH + '</span></div><div class="report-row"><span>Mujeres</span><span>' + domM + '</span></div></div><div class="report-card" style="border-left-color:#f59e0b"><h3>KIDS</h3><div class="report-row"><span>Total</span><span><strong>' + kidsT + '</strong></span></div><div class="report-row"><span>Ninos</span><span>' + kidsH + '</span></div><div class="report-row"><span>Ninas</span><span>' + kidsM + '</span></div></div>';
+            document.getElementById('reportCards').innerHTML = `
+                <div class="report-card" style="border-left-color:#3b82f6"><h3>🌙 NEXT (Sábados)</h3><div class="report-row"><span>👥 Total</span><span><strong>${nextT}</strong></span></div><div class="report-row"><span>👨 Hombres</span><span>${nextH}</span></div><div class="report-row"><span>👩 Mujeres</span><span>${nextM}</span></div></div>
+                <div class="report-card" style="border-left-color:#10b981"><h3>☀️ DOMINGO</h3><div class="report-row"><span>👥 Total</span><span><strong>${domT}</strong></span></div><div class="report-row"><span>👨 Hombres</span><span>${domH}</span></div><div class="report-row"><span>👩 Mujeres</span><span>${domM}</span></div></div>
+                <div class="report-card" style="border-left-color:#f59e0b"><h3>🧒 KIDS</h3><div class="report-row"><span>👥 Total</span><span><strong>${kidsT}</strong></span></div><div class="report-row"><span>👨 Niños</span><span>${kidsH}</span></div><div class="report-row"><span>👩 Niñas</span><span>${kidsM}</span></div></div>
+            `;
             
-            var btn = document.getElementById('whatsappBtn');
-            btn.onclick = function() {
-                var semanaTexto = document.getElementById('filtroSemana').value || 'Resumen general';
-                var fechaActual = new Date().toLocaleDateString('es-ES');
-                var totalGeneral = nextT + domT;
-                var mensaje = 'IGLESIA AGUA VIVA\n';
-                mensaje += 'REPORTE DE SERVICIOS\n';
-                mensaje += '================================\n\n';
-                mensaje += 'PERIODO: ' + semanaTexto + '\n';
-                mensaje += 'FECHA: ' + fechaActual + '\n\n';
-                mensaje += 'NEXT (SABADOS)\n';
-                mensaje += '- Total: ' + nextT + ' personas\n';
-                mensaje += '- Hombres: ' + nextH + '\n';
-                mensaje += '- Mujeres: ' + nextM + '\n\n';
-                mensaje += 'DOMINGO\n';
-                mensaje += '- Total: ' + domT + ' personas\n';
-                mensaje += '- Hombres: ' + domH + '\n';
-                mensaje += '- Mujeres: ' + domM + '\n\n';
-                mensaje += 'KIDS (NINOS)\n';
-                mensaje += '- Total: ' + kidsT + ' ninos\n';
-                mensaje += '- Ninos: ' + kidsH + '\n';
-                mensaje += '- Ninas: ' + kidsM + '\n\n';
-                mensaje += '================================\n';
-                mensaje += 'TOTAL GENERAL: ' + totalGeneral + ' asistentes\n';
-                mensaje += '================================\n\n';
-                mensaje += 'Dios les bendiga ricamente.';
+            const btn = document.getElementById('whatsappBtn');
+            btn.onclick = () => {
+                const semanaTexto = document.getElementById('filtroSemana').value || 'Resumen general';
+                const fechaActual = new Date().toLocaleDateString('es-ES');
+                const totalGeneral = nextT + domT;
+                const mensaje = `IGLESIA AGUA VIVA\nREPORTE DE SERVICIOS\n================================\n\nPERIODO: ${semanaTexto}\nFECHA: ${fechaActual}\n\nNEXT (SABADOS)\n- Total: ${nextT} personas\n- Hombres: ${nextH}\n- Mujeres: ${nextM}\n\nDOMINGO\n- Total: ${domT} personas\n- Hombres: ${domH}\n- Mujeres: ${domM}\n\nKIDS (NINOS)\n- Total: ${kidsT} ninos\n- Ninos: ${kidsH}\n- Ninas: ${kidsM}\n\n================================\nTOTAL GENERAL: ${totalGeneral} asistentes\n================================\n\nDios les bendiga ricamente.`;
                 window.open('https://wa.me/?text=' + encodeURIComponent(mensaje), '_blank');
             };
         }
         
         function actualizarTabla() {
-            var tbody = document.getElementById('tablaBody');
+            const tbody = document.getElementById('tablaBody');
             if (datosFiltrados.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No hay registros disponibles</td></tr>';
                 return;
             }
-            var html = '';
-            for (var i = 0; i < datosFiltrados.length; i++) {
-                var d = datosFiltrados[i];
-                var kidsValue = (d.totalKV || 0) + (d.totalKM || 0);
-                var acciones = '';
-                if (esAdmin) {
-                    acciones = '<button class="btn-edit" onclick="abrirEditar(' + d.id + ')">Editar</button><button class="btn-delete" onclick="eliminarRegistro(' + d.id + ')">Eliminar</button>';
-                }
-                html += '<tr><td>' + d.fecha + '</td><td>' + db.formatearSede(d.sede) + '</td><td>' + d.semana + '</td><td><strong>' + d.totalGeneral + '</strong></td><td>' + d.totalVarones + '</td><td>' + d.totalMujeres + '</td><td>' + kidsValue + '</td><td>' + acciones + '</td></tr>';
+            let html = '';
+            for (let d of datosFiltrados) {
+                const kidsValue = (d.totalKV || 0) + (d.totalKM || 0);
+                const acciones = esAdmin ? `<button class="btn-edit" onclick="abrirEditar(${d.id})">✏️ Editar</button><button class="btn-delete" onclick="eliminarRegistro(${d.id})">🗑️ Eliminar</button>` : '';
+                html += `<tr><td>${d.fecha}</td><td>${db.formatearSede(d.sede)}</td><td>${d.semana}</td><td><strong>${d.totalGeneral}</strong></td><td>${d.totalVarones}</td><td>${d.totalMujeres}</td><td>${kidsValue}</td><td>${acciones}</td></tr>`;
             }
             tbody.innerHTML = html;
         }
         
         async function actualizarGraficos() {
-            var sedesMap = {};
-            for (var i = 0; i < datosFiltrados.length; i++) {
-                var d = datosFiltrados[i];
+            const sedesMap = {};
+            for (let d of datosFiltrados) {
                 sedesMap[d.sede] = (sedesMap[d.sede] || 0) + d.totalGeneral;
             }
-            var sedesLabels = Object.keys(sedesMap).map(function(s) { return db.formatearSede(s); });
-            var sedesValues = Object.values(sedesMap);
+            const sedesLabels = Object.keys(sedesMap).map(s => db.formatearSede(s));
+            const sedesValues = Object.values(sedesMap);
             if (chartSedes) chartSedes.destroy();
-            chartSedes = new Chart(document.getElementById('chartSedes'), { type: 'bar', data: { labels: sedesLabels, datasets: [{ label: 'Asistentes', data: sedesValues, backgroundColor: '#2563eb', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: true } });
+            chartSedes = new Chart(document.getElementById('chartSedes'), {
+                type: 'bar',
+                data: { labels: sedesLabels, datasets: [{ label: 'Asistentes', data: sedesValues, backgroundColor: '#2563eb', borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
             
-            var semanasMap = {};
-            for (var i = 0; i < datosFiltrados.length; i++) {
-                var d = datosFiltrados[i];
+            const semanasMap = {};
+            for (let d of datosFiltrados) {
                 semanasMap[d.semana] = (semanasMap[d.semana] || 0) + d.totalGeneral;
             }
-            var semanasLabels = Object.keys(semanasMap).sort();
-            var semanasValues = semanasLabels.map(function(s) { return semanasMap[s]; });
+            const semanasLabels = Object.keys(semanasMap).sort();
+            const semanasValues = semanasLabels.map(s => semanasMap[s]);
             if (chartTendencia) chartTendencia.destroy();
-            chartTendencia = new Chart(document.getElementById('chartTendencia'), { type: 'line', data: { labels: semanasLabels, datasets: [{ label: 'Asistencia', data: semanasValues, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: true } });
+            chartTendencia = new Chart(document.getElementById('chartTendencia'), {
+                type: 'line',
+                data: { labels: semanasLabels, datasets: [{ label: 'Asistencia', data: semanasValues, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 }] },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
             
-            var totalV = 0, totalM = 0;
-            for (var i = 0; i < datosFiltrados.length; i++) {
-                totalV += datosFiltrados[i].totalVarones;
-                totalM += datosFiltrados[i].totalMujeres;
-            }
+            const totalV = datosFiltrados.reduce((s, d) => s + d.totalVarones, 0);
+            const totalM = datosFiltrados.reduce((s, d) => s + d.totalMujeres, 0);
             if (chartGenero) chartGenero.destroy();
-            chartGenero = new Chart(document.getElementById('chartGenero'), { type: 'doughnut', data: { labels: ['Varones', 'Mujeres'], datasets: [{ data: [totalV, totalM], backgroundColor: ['#2563eb', '#ec489a'] }] }, options: { responsive: true, maintainAspectRatio: true } });
+            chartGenero = new Chart(document.getElementById('chartGenero'), {
+                type: 'doughnut',
+                data: { labels: ['Varones', 'Mujeres'], datasets: [{ data: [totalV, totalM], backgroundColor: ['#2563eb', '#ec489a'] }] },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
         }
         
         async function abrirEditar(id) {
-            var todos = await db.obtenerRegistrosFiltrados({});
-            var registro = null;
-            for (var i = 0; i < todos.length; i++) {
-                if (todos[i].id === id) { registro = todos[i]; break; }
-            }
+            const todos = await db.obtenerRegistrosFiltrados({});
+            const registro = todos.find(r => r.id === id);
             if (!registro) return;
             registroEditando = registro;
-            var mids = ['alabanza', 'produccion', 'servidores', 'conexion', 'maestros'];
-            var mNames = ['Alabanza', 'Produccion', 'Servidores', 'Conexion', 'Maestros Kids'];
-            var sedesOpciones = '';
-            for (var i = 0; i < db.SEDES.length; i++) {
-                var s = db.SEDES[i];
-                sedesOpciones += '<option value="' + s.id + '"' + (s.id === registro.sede ? ' selected' : '') + '>' + s.icono + ' ' + s.nombre + '</option>';
+            
+            const mids = ['alabanza', 'produccion', 'servidores', 'conexion', 'maestros'];
+            const mNames = ['Alabanza', 'Producción', 'Servidores', 'Conexión', 'Maestros Kids'];
+            let sedesOpciones = '';
+            for (let s of db.SEDES) {
+                sedesOpciones += `<option value="${s.id}" ${s.id === registro.sede ? 'selected' : ''}>${s.icono} ${s.nombre}</option>`;
             }
-            var html = '<div class="form-group"><label>FECHA</label><input type="date" id="editFecha" class="form-control" value="' + registro.fecha + '"></div><div class="form-group"><label>SEDE</label><select id="editSede" class="form-control">' + sedesOpciones + '</select></div><h4 style="margin:20px 0 12px 0">Ministerios</h4>';
-            for (var i = 0; i < mids.length; i++) {
-                var m = mids[i];
-                var vVal = registro.ministerios[m] ? registro.ministerios[m].v || 0 : 0;
-                var mVal = registro.ministerios[m] ? registro.ministerios[m].m || 0 : 0;
-                html += '<div style="background:#f8fafc;border-radius:20px;padding:16px;margin-bottom:12px;"><div style="font-weight:600;margin-bottom:12px;">' + mNames[i] + '</div><div class="double-input"><input type="number" id="edit_' + m + '_v" class="form-control" value="' + vVal + '" min="0" placeholder="Varones"><input type="number" id="edit_' + m + '_m" class="form-control" value="' + mVal + '" min="0" placeholder="Mujeres"></div></div>';
+            let html = `<div class="form-group"><label>FECHA</label><input type="date" id="editFecha" class="form-control" value="${registro.fecha}"></div>
+                        <div class="form-group"><label>SEDE</label><select id="editSede" class="form-control">${sedesOpciones}</select></div>
+                        <h4 style="margin:20px 0 12px 0">🎵 Ministerios</h4>`;
+            for (let i = 0; i < mids.length; i++) {
+                const m = mids[i];
+                const vVal = registro.ministerios[m] ? registro.ministerios[m].v || 0 : 0;
+                const mVal = registro.ministerios[m] ? registro.ministerios[m].m || 0 : 0;
+                html += `<div style="background:#f8fafc;border-radius:20px;padding:16px;margin-bottom:12px;">
+                            <div style="font-weight:600;margin-bottom:12px;">${mNames[i]}</div>
+                            <div class="double-input">
+                                <input type="number" id="edit_${m}_v" class="form-control" value="${vVal}" min="0" placeholder="Varones">
+                                <input type="number" id="edit_${m}_m" class="form-control" value="${mVal}" min="0" placeholder="Mujeres">
+                            </div>
+                         </div>`;
             }
-            html += '<h4 style="margin:20px 0 12px 0">Asistentes</h4><div style="background:#f8fafc;border-radius:20px;padding:16px;margin-bottom:12px;"><div style="font-weight:600;margin-bottom:12px;">Adultos</div><div class="double-input"><input type="number" id="edit_adultos_v" class="form-control" value="' + (registro.asistentes.adultos ? registro.asistentes.adultos.v || 0 : 0) + '" min="0" placeholder="Varones"><input type="number" id="edit_adultos_m" class="form-control" value="' + (registro.asistentes.adultos ? registro.asistentes.adultos.m || 0 : 0) + '" min="0" placeholder="Mujeres"></div></div><div style="background:#f8fafc;border-radius:20px;padding:16px;margin-bottom:12px;"><div style="font-weight:600;margin-bottom:12px;">Kids (Ninos)</div><div class="double-input"><input type="number" id="edit_kids_v" class="form-control" value="' + (registro.asistentes.kids ? registro.asistentes.kids.v || 0 : 0) + '" min="0" placeholder="Ninos"><input type="number" id="edit_kids_m" class="form-control" value="' + (registro.asistentes.kids ? registro.asistentes.kids.m || 0 : 0) + '" min="0" placeholder="Ninas"></div></div><button class="btn-primary" style="width:100%;margin-top:20px;" onclick="guardarEdicion()">Guardar cambios</button>';
+            html += `<h4 style="margin:20px 0 12px 0">👥 Asistentes</h4>
+                     <div style="background:#f8fafc;border-radius:20px;padding:16px;margin-bottom:12px;">
+                        <div style="font-weight:600;margin-bottom:12px;">Adultos</div>
+                        <div class="double-input">
+                            <input type="number" id="edit_adultos_v" class="form-control" value="${registro.asistentes.adultos ? registro.asistentes.adultos.v || 0 : 0}" min="0" placeholder="Varones">
+                            <input type="number" id="edit_adultos_m" class="form-control" value="${registro.asistentes.adultos ? registro.asistentes.adultos.m || 0 : 0}" min="0" placeholder="Mujeres">
+                        </div>
+                     </div>
+                     <div style="background:#f8fafc;border-radius:20px;padding:16px;margin-bottom:12px;">
+                        <div style="font-weight:600;margin-bottom:12px;">Kids (Niños)</div>
+                        <div class="double-input">
+                            <input type="number" id="edit_kids_v" class="form-control" value="${registro.asistentes.kids ? registro.asistentes.kids.v || 0 : 0}" min="0" placeholder="Niños">
+                            <input type="number" id="edit_kids_m" class="form-control" value="${registro.asistentes.kids ? registro.asistentes.kids.m || 0 : 0}" min="0" placeholder="Niñas">
+                        </div>
+                     </div>
+                     <button class="btn-primary" style="width:100%;margin-top:20px;" onclick="guardarEdicion()">💾 Guardar cambios</button>`;
             document.getElementById('editModalBody').innerHTML = html;
             document.getElementById('editModal').style.display = 'flex';
         }
         
         async function guardarEdicion() {
-            var nuevosDatos = {
+            const nuevosDatos = {
                 fecha: document.getElementById('editFecha').value,
                 sede: document.getElementById('editSede').value,
                 ministerios: {},
                 asistentes: {}
             };
-            var mids = ['alabanza', 'produccion', 'servidores', 'conexion', 'maestros'];
-            for (var i = 0; i < mids.length; i++) {
-                var m = mids[i];
+            const mids = ['alabanza', 'produccion', 'servidores', 'conexion', 'maestros'];
+            for (let m of mids) {
                 nuevosDatos.ministerios[m] = {
-                    v: Number(document.getElementById('edit_' + m + '_v').value) || 0,
-                    m: Number(document.getElementById('edit_' + m + '_m').value) || 0
+                    v: Number(document.getElementById(`edit_${m}_v`).value) || 0,
+                    m: Number(document.getElementById(`edit_${m}_m`).value) || 0
                 };
             }
             nuevosDatos.asistentes.adultos = {
@@ -295,7 +675,7 @@
                 m: Number(document.getElementById('edit_kids_m').value) || 0
             };
             await db.actualizarRegistro(registroEditando.id, nuevosDatos);
-            toast('Registro actualizado', 'success');
+            toast('✅ Registro actualizado', 'success');
             cerrarModal();
             cargarDatos();
         }
@@ -303,37 +683,56 @@
         async function eliminarRegistro(id) {
             if (confirm('¿Eliminar este registro?')) {
                 await db.eliminarRegistro(id);
-                toast('Registro eliminado', 'success');
+                toast('✅ Registro eliminado', 'success');
                 cargarDatos();
             }
         }
         
-        function cerrarModal() { document.getElementById('editModal').style.display = 'none'; registroEditando = null; }
-        function exportarExcel() { db.exportarExcel(datosFiltrados); toast('Excel exportado', 'success'); }
-        function toast(msg, type) { var t = document.createElement('div'); t.className = 'toast toast-' + type; t.innerText = msg; document.body.appendChild(t); setTimeout(function() { t.remove(); }, 3000); }
+        function cerrarModal() {
+            document.getElementById('editModal').style.display = 'none';
+            registroEditando = null;
+        }
+        
+        function exportarExcel() {
+            db.exportarExcel(datosFiltrados);
+            toast('📎 Excel exportado', 'success');
+        }
+        
+        function toast(msg, type) {
+            const t = document.createElement('div');
+            t.className = `toast toast-${type}`;
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
         
         function inicializarFiltros() {
-            var selectSede = document.getElementById('filtroSede');
-            for (var i = 0; i < db.SEDES.length; i++) {
-                var s = db.SEDES[i];
-                var opt = document.createElement('option');
+            const selectSede = document.getElementById('filtroSede');
+            for (let s of db.SEDES) {
+                const opt = document.createElement('option');
                 opt.value = s.id;
                 opt.textContent = s.icono + ' ' + s.nombre;
                 selectSede.appendChild(opt);
             }
-            var selectMes = document.getElementById('filtroMes');
-            for (var i = 1; i <= 12; i++) {
-                var opt = document.createElement('option');
+            const selectMes = document.getElementById('filtroMes');
+            for (let i = 1; i <= 12; i++) {
+                const opt = document.createElement('option');
                 opt.value = '2026-' + (i < 10 ? '0' + i : i);
                 opt.textContent = 'Mes ' + i;
                 selectMes.appendChild(opt);
             }
-            var hoy = new Date();
-            var semana = hoy.getFullYear() + '-W' + Math.ceil(((hoy - new Date(hoy.getFullYear(), 0, 1)) / 86400000 + 1) / 7);
+            const hoy = new Date();
+            const semana = hoy.getFullYear() + '-W' + Math.ceil(((hoy - new Date(hoy.getFullYear(), 0, 1)) / 86400000 + 1) / 7);
             document.getElementById('filtroSemana').value = semana;
         }
         
-        function cargarUsuario() { var u = db.obtenerUsuarioActual(); if (u) document.getElementById('userName').innerHTML = u.nombre; }
+        function cargarUsuario() {
+            const u = db.obtenerUsuarioActual();
+            if (u) {
+                document.getElementById('userName').innerHTML = u.nombre;
+                document.getElementById('userRol').innerHTML = u.rol === 'admin' ? 'Administrador' : 'Líder';
+            }
+        }
         
         if (!db.verificarSesion()) window.location.href = 'index.html';
         cargarUsuario();
