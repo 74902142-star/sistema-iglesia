@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f0f2f8; color: #1a2a3a; }
@@ -303,13 +306,6 @@
             font-size: 14px;
         }
         .form-control:focus { outline: none; border-color: #2a5298; }
-        .ministerio-card {
-            background: #f8fafd;
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        .ministerio-nombre { font-weight: 700; margin-bottom: 12px; color: #1a3a5c; }
 
         /* Toast */
         .toast {
@@ -392,7 +388,7 @@
             <h3 style="margin-bottom:20px;">📋 Historial de registros</h3>
             <table class="data-table">
                 <thead><tr><th>Fecha</th><th>Sede</th><th>Semana</th><th>Total</th><th>Varones</th><th>Mujeres</th><th>Kids</th><th>Acciones</th></tr></thead>
-                <tbody id="tablaBody"><tr><td colspan="8" class="empty-state">No hay registros</td></tr></tbody>
+                <tbody id="tablaBody"><tr><td colspan="8" class="empty-state">Cargando registros...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -409,18 +405,8 @@
         // Usuario actual
         let usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || '{"nombre":"Jhon Smith","rol":"admin"}');
         let esAdmin = usuarioActual.rol === 'admin';
-
-        // Datos de registros
-        let registros = JSON.parse(localStorage.getItem('registrosIglesia') || '[]');
-        if (registros.length === 0) {
-            registros = [
-                { id: 1, fecha: "2026-04-27", sede: "san_carlos_10am", semana: "2026-W17", totalGeneral: 115, totalVarones: 53, totalMujeres: 62, totalKV: 12, totalKM: 18, ministerios: {}, asistentes: {} },
-                { id: 2, fecha: "2026-04-20", sede: "el_tambo_12pm", semana: "2026-W16", totalGeneral: 85, totalVarones: 40, totalMujeres: 45, totalKV: 8, totalKM: 10, ministerios: {}, asistentes: {} }
-            ];
-            localStorage.setItem('registrosIglesia', JSON.stringify(registros));
-        }
-
-        let datosFiltrados = [...registros];
+        let registros = [];
+        let datosFiltrados = [];
         let chartSedes, chartTendencia, chartGenero;
         let registroEditando = null;
 
@@ -435,7 +421,23 @@
             return sedes[sedeId] || sedeId;
         }
 
-        function cargarDatos() {
+        function obtenerSemana(fecha) {
+            let d = new Date(fecha);
+            let year = d.getFullYear();
+            let start = new Date(year, 0, 1);
+            let days = Math.floor((d - start) / (24 * 60 * 60 * 1000));
+            let week = Math.ceil((days + start.getDay() + 1) / 7);
+            return `${year}-W${week.toString().padStart(2, '0')}`;
+        }
+
+        async function cargarDatos() {
+            // Cargar desde Firebase
+            const snapshot = await db.collection('registros').orderBy('fecha', 'desc').get();
+            registros = [];
+            snapshot.forEach(doc => {
+                registros.push({ firebaseId: doc.id, ...doc.data() });
+            });
+            
             let sede = document.getElementById('filtroSede').value;
             let semana = document.getElementById('filtroSemana').value;
             let mes = document.getElementById('filtroMes').value;
@@ -521,7 +523,7 @@
         function actualizarTabla() {
             let tbody = document.getElementById('tablaBody');
             if (datosFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No hay registros</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No hay registros disponibles</td></tr>';
                 return;
             }
             let html = '';
@@ -529,8 +531,8 @@
                 let kidsVal = (d.totalKV || 0) + (d.totalKM || 0);
                 let acciones = '';
                 if (esAdmin) {
-                    acciones = `<button class="btn-edit" onclick="abrirEditar(${d.id})">✏️ Editar</button>
-                               <button class="btn-delete" onclick="eliminarRegistro(${d.id})">🗑️ Eliminar</button>`;
+                    acciones = `<button class="btn-edit" onclick="abrirEditar('${d.firebaseId}')">✏️ Editar</button>
+                               <button class="btn-delete" onclick="eliminarRegistro('${d.firebaseId}')">🗑️ Eliminar</button>`;
                 }
                 html += `<tr>
                     <td>${d.fecha}</td>
@@ -571,10 +573,10 @@
             });
         }
 
-        // Funciones de edición/eliminación (solo admin)
-        function abrirEditar(id) {
+        // Funciones de edición/eliminación con Firebase
+        async function abrirEditar(firebaseId) {
             if (!esAdmin) return;
-            let registro = registros.find(r => r.id === id);
+            let registro = registros.find(r => r.firebaseId === firebaseId);
             if (!registro) return;
             registroEditando = registro;
             mostrarModalEdicion(registro);
@@ -609,46 +611,31 @@
             document.getElementById('editModal').style.display = 'flex';
         }
 
-        function guardarEdicion() {
-            let index = registros.findIndex(r => r.id === registroEditando.id);
-            if (index !== -1) {
-                let kids = parseInt(document.getElementById('editKids').value) || 0;
-                registros[index] = {
-                    ...registros[index],
-                    fecha: document.getElementById('editFecha').value,
-                    sede: document.getElementById('editSede').value,
-                    semana: obtenerSemana(document.getElementById('editFecha').value),
-                    totalGeneral: parseInt(document.getElementById('editTotal').value) || 0,
-                    totalVarones: parseInt(document.getElementById('editVarones').value) || 0,
-                    totalMujeres: parseInt(document.getElementById('editMujeres').value) || 0,
-                    totalKV: kids,
-                    totalKM: 0
-                };
-                localStorage.setItem('registrosIglesia', JSON.stringify(registros));
-                registros = JSON.parse(localStorage.getItem('registrosIglesia') || '[]');
-                toast('✅ Registro actualizado');
-                cerrarModal();
-                cargarDatos();
-            }
+        async function guardarEdicion() {
+            let kids = parseInt(document.getElementById('editKids').value) || 0;
+            let datosActualizados = {
+                fecha: document.getElementById('editFecha').value,
+                sede: document.getElementById('editSede').value,
+                semana: obtenerSemana(document.getElementById('editFecha').value),
+                totalGeneral: parseInt(document.getElementById('editTotal').value) || 0,
+                totalVarones: parseInt(document.getElementById('editVarones').value) || 0,
+                totalMujeres: parseInt(document.getElementById('editMujeres').value) || 0,
+                totalKV: kids,
+                totalKM: 0
+            };
+            await db.collection('registros').doc(registroEditando.firebaseId).update(datosActualizados);
+            toast('✅ Registro actualizado');
+            cerrarModal();
+            cargarDatos();
         }
 
-        function eliminarRegistro(id) {
+        async function eliminarRegistro(firebaseId) {
             if (!esAdmin) return;
             if (confirm('¿Eliminar este registro permanentemente?')) {
-                registros = registros.filter(r => r.id !== id);
-                localStorage.setItem('registrosIglesia', JSON.stringify(registros));
+                await db.collection('registros').doc(firebaseId).delete();
                 toast('🗑️ Registro eliminado');
                 cargarDatos();
             }
-        }
-
-        function obtenerSemana(fecha) {
-            let d = new Date(fecha);
-            let year = d.getFullYear();
-            let start = new Date(year, 0, 1);
-            let days = Math.floor((d - start) / (24 * 60 * 60 * 1000));
-            let week = Math.ceil((days + start.getDay() + 1) / 7);
-            return `${year}-W${week.toString().padStart(2, '0')}`;
         }
 
         function cerrarModal() { document.getElementById('editModal').style.display = 'none'; }
@@ -667,6 +654,7 @@
         }
 
         function toast(msg) { let t = document.createElement('div'); t.className = 'toast toast-success'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+        
         function cerrarSesion() { localStorage.clear(); window.location.href = 'index.html'; }
 
         function inicializarFiltros() {

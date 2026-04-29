@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Registrar Servicio | Iglesia Agua Viva</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #1a3a5c, #2a5298); min-height: 100vh; padding: 20px; }
@@ -168,14 +171,14 @@
                         <label>📍 SEDE</label>
                         <select id="sede" class="form-select" required>
                             <option value="">Seleccionar</option>
-                            <option value="san_carlos_10am">🏛️ SEDE Hyo - 10am (Domingo)</option>
-                            <option value="san_carlos_12pm">🏛️ SEDE Hyo - 12pm (Domingo)</option>
-                            <option value="san_carlos_5pm">🌙 NEXT - 5pm (Sábado)</option>
-                            <option value="san_carlos_7pm">🌙 NEXT PLUS - 7pm (Sábado)</option>
-                            <option value="el_tambo_12pm">🏛️ SEDE El Tambo - 12pm</option>
-                            <option value="el_tambo_6pm">🌙 SEDE El Tambo - 6pm</option>
-                            <option value="chupaca_6pm">🌙 SEDE Chupaca - 6pm</option>
-                            <option value="jauja">🏔️ SEDE Jauja - 10am</option>
+                            <option value="san_carlos_10am">🏛️ San Carlos - 10am (Domingo)</option>
+                            <option value="san_carlos_12pm">🏛️ San Carlos - 12pm (Domingo)</option>
+                            <option value="san_carlos_5pm">🌙 San Carlos - 5pm (Sábado)</option>
+                            <option value="san_carlos_7pm">🌙 San Carlos - 7pm (Sábado)</option>
+                            <option value="el_tambo_12pm">🏛️ El Tambo - 12pm</option>
+                            <option value="el_tambo_6pm">🌙 El Tambo - 6pm</option>
+                            <option value="chupaca_6pm">🌙 Chupaca - 6pm</option>
+                            <option value="jauja">🏔️ Jauja</option>
                             <option value="belen">🏠 Belén - Tu Casa</option>
                             <option value="transformando_ciudades">🌍 Transformando Ciudades</option>
                         </select>
@@ -207,6 +210,9 @@
             { nombre: 'Adultos', id: 'adultos', icono: '👨' },
             { nombre: 'Kids (Niños)', id: 'kids', icono: '🧒' }
         ];
+
+        // Firebase reference
+        const dbFirebase = firebase.firestore();
 
         function crearControlNumerico(id) {
             const div = document.createElement('div');
@@ -320,10 +326,8 @@
             return `${year}-W${week.toString().padStart(2, '0')}`;
         }
 
-        function guardarRegistro(registro) {
-            let registros = JSON.parse(localStorage.getItem('registrosIglesia') || '[]');
-            registros.push(registro);
-            localStorage.setItem('registrosIglesia', JSON.stringify(registros));
+        async function guardarRegistroFirebase(registro) {
+            await dbFirebase.collection('registros').add(registro);
         }
 
         function toast(msg) {
@@ -334,7 +338,7 @@
             setTimeout(() => t.remove(), 3000);
         }
 
-        document.getElementById('registroForm').addEventListener('submit', (e) => {
+        document.getElementById('registroForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const datos = obtenerDatos();
@@ -349,7 +353,6 @@
             const totalKidsM = datos.asistentes.kids.m;
             
             const nuevoRegistro = {
-                id: Date.now(),
                 fecha: datos.fecha,
                 sede: datos.sede,
                 semana: obtenerSemana(datos.fecha),
@@ -362,7 +365,7 @@
                 asistentes: datos.asistentes
             };
             
-            guardarRegistro(nuevoRegistro);
+            await guardarRegistroFirebase(nuevoRegistro);
             toast('✅ Registro guardado exitosamente');
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
