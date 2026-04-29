@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Registrar Servicio | Iglesia Agua Viva</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="database-firebase.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; }
@@ -40,43 +43,43 @@
         .toast-success { background: linear-gradient(135deg, #10b981, #059669); }
         .toast-error { background: linear-gradient(135deg, #ef4444, #dc2626); }
         @keyframes toastIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @media (max-width: 600px) { .container { padding: 16px; } .form-card { padding: 24px; } .double-input { grid-template-columns: 1fr; gap: 12px; } .number-btn { width: 36px; height: 36px; } }
+        @media (max-width: 600px) { .container { padding: 16px; } .form-card { padding: 24px; } .double-input { grid-template-columns: 1fr; gap: 12px; } }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo"><h1>⛪ Iglesia Agua Viva</h1></div>
-        <div class="user-area"><span>👤 <span id="userName">Cargando...</span></span><button class="btn-back" onclick="window.location.href='dashboard.html'">← Volver</button></div>
+        <div class="logo"><h1>Iglesia Agua Viva</h1></div>
+        <div class="user-area"><span>👤 <span id="userName">Cargando...</span></span><button class="btn-back" onclick="window.location.href='dashboard.html'">Volver</button></div>
     </div>
     <div class="container">
         <div class="form-card">
             <form id="registroForm">
                 <div class="double-input">
-                    <div class="form-group"><label>📅 FECHA</label><input type="date" id="fecha" class="form-control" required></div>
-                    <div class="form-group"><label>📍 SEDE</label><select id="sede" class="form-select" required>
+                    <div class="form-group"><label>FECHA</label><input type="date" id="fecha" class="form-control" required></div>
+                    <div class="form-group"><label>SEDE</label><select id="sede" class="form-select" required>
                         <option value="">Seleccionar</option>
-                        <option value="san_carlos_10am">🏛️ San Carlos - 10am (Domingo)</option>
-                        <option value="san_carlos_12pm">🏛️ San Carlos - 12pm (Domingo)</option>
-                        <option value="san_carlos_5pm">🌙 San Carlos - 5pm (Sábado)</option>
-                        <option value="san_carlos_7pm">🌙 San Carlos - 7pm (Sábado)</option>
-                        <option value="el_tambo_12pm">🏛️ El Tambo - 12pm</option>
-                        <option value="el_tambo_6pm">🌙 El Tambo - 6pm</option>
-                        <option value="chupaca_6pm">🌙 Chupaca - 6pm</option>
-                        <option value="jauja">🏔️ Jauja</option>
-                        <option value="belen">🏠 Belén - Tu Casa</option>
-                        <option value="transformando_ciudades">🌍 Transformando Ciudades</option>
+                        <option value="san_carlos_10am">San Carlos - 10am (Domingo)</option>
+                        <option value="san_carlos_12pm">San Carlos - 12pm (Domingo)</option>
+                        <option value="san_carlos_5pm">San Carlos - 5pm (Sabado)</option>
+                        <option value="san_carlos_7pm">San Carlos - 7pm (Sabado)</option>
+                        <option value="el_tambo_12pm">El Tambo - 12pm</option>
+                        <option value="el_tambo_6pm">El Tambo - 6pm</option>
+                        <option value="chupaca_6pm">Chupaca - 6pm</option>
+                        <option value="jauja">Jauja</option>
+                        <option value="belen">Belen - Tu Casa</option>
+                        <option value="transformando_ciudades">Transformando Ciudades</option>
                     </select></div>
                 </div>
-                <div class="section-title">🎵 MINISTERIOS</div>
+                <div class="section-title">MINISTERIOS</div>
                 <div id="ministeriosContainer"></div>
-                <div class="section-title">👥 ASISTENTES</div>
+                <div class="section-title">ASISTENTES</div>
                 <div id="asistentesContainer"></div>
-                <button type="submit" class="btn-save">💾 GUARDAR REGISTRO</button>
+                <button type="submit" class="btn-save">GUARDAR REGISTRO</button>
             </form>
         </div>
     </div>
     <script>
-        const ministerios = ['Alabanza','Producción','Servidores','Conexión','Maestros Kids'];
+        const ministerios = ['Alabanza','Produccion','Servidores','Conexion','Maestros Kids'];
         const mids = ['alabanza','produccion','servidores','conexion','maestros'];
         const asistentes = ['Adultos','Kids'];
         const aids = ['adultos','kids'];
@@ -127,13 +130,13 @@
         document.getElementById('registroForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const datos = obtenerDatos();
-            if (!datos.fecha) return toast('❌ Selecciona fecha', 'error');
-            if (!datos.sede) return toast('❌ Selecciona sede', 'error');
+            if (!datos.fecha) return toast('Selecciona fecha', 'error');
+            if (!datos.sede) return toast('Selecciona sede', 'error');
             try {
                 await db.guardarRegistro(datos);
-                toast('✅ Registro guardado exitosamente', 'success');
+                toast('Registro guardado exitosamente', 'success');
                 setTimeout(() => window.location.href = 'dashboard.html', 1200);
-            } catch (error) { toast(error.message || '❌ Error al guardar', 'error'); }
+            } catch (error) { toast(error.message || 'Error al guardar', 'error'); }
         });
         
         function cargarUsuario() { const u = db.obtenerUsuarioActual(); if (u) document.getElementById('userName').innerText = u.nombre; }
