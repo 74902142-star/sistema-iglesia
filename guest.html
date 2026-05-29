@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitado | Iglesia Agua Viva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .guest-container { max-width: 480px; width: 100%; }
+        .guest-header { text-align: center; margin-bottom: 28px; }
+        .guest-header .icon { font-size: 44px; margin-bottom: 10px; }
+        .guest-header h1 { font-size: 24px; font-weight: 800; color: #0f172a; }
+        .guest-header p { font-size: 14px; color: #64748b; margin-top: 4px; }
+        .guest-header .user-name { font-weight: 600; color: #2d5aa0; }
+
+        .module-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1.5px solid #e8ecf1;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .module-card:hover {
+            border-color: #2d5aa0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+        }
+        .module-icon {
+            width: 56px; height: 56px;
+            background: #0f172a;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .module-info h3 { font-size: 17px; font-weight: 700; color: #0f172a; }
+        .module-info p { font-size: 13px; color: #64748b; margin-top: 3px; line-height: 1.4; }
+
+        .btn-logout {
+            display: block; width: 100%; padding: 12px;
+            border: 1.5px solid #e2e6ec; border-radius: 12px;
+            background: white; color: #64748b;
+            font-weight: 600; font-size: 14px; cursor: pointer;
+            transition: all 0.2s; margin-top: 8px;
+            text-align: center; font-family: 'Inter', sans-serif;
+        }
+        .btn-logout:hover { background: #f1f4f9; color: #ef4444; border-color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="guest-container">
+        <div class="guest-header">
+            <div class="icon">⛪</div>
+            <h1>Iglesia Agua Viva</h1>
+            <p>Bienvenido, <span class="user-name" id="userName">Invitado</span></p>
+        </div>
+
+        <a href="ingreso.html" class="module-card">
+            <div class="module-icon">📊</div>
+            <div class="module-info">
+                <h3>Reporte de Asistencia</h3>
+                <p>Registra la asistencia de los servicios. Llena los conteos por ministerio y asistentes.</p>
+            </div>
+        </a>
+
+        <a href="edl.html" class="module-card">
+            <div class="module-icon">🎓</div>
+            <div class="module-info">
+                <h3>EDL — Escuela de Liderazgo</h3>
+                <p>Inscríbete a los cursos y seminarios disponibles. Completa tus datos para matricularte.</p>
+            </div>
+        </a>
+
+        <button class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        const user = Auth.getUsuario();
+        if (!user || user.rol !== 'invitado') {
+            window.location.href = 'index.html';
+        }
+        document.getElementById('userName').textContent = user.nombre || 'Invitado';
+        function cerrarSesion() { Auth.cerrarSesion(); }
+    </script>
+</body>
+</html>

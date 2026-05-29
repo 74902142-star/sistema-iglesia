@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            background: linear-gradient(135deg, #0f172a, #152244, #0f172a);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -24,110 +24,82 @@
 
         .login-container {
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
         }
 
         .login-card {
             background: white;
-            border-radius: 32px;
-            padding: 40px 32px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
-            animation: fadeInUp 0.5s ease-out;
+            border-radius: 20px;
+            padding: 36px 28px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.4s ease-out;
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .logo {
-            text-align: center;
-            margin-bottom: 32px;
-        }
+        .logo { text-align: center; margin-bottom: 28px; }
+        .logo-icon { font-size: 56px; margin-bottom: 10px; }
+        .logo h1 { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+        .logo p { color: #64748b; font-size: 14px; }
 
-        .logo-icon {
-            font-size: 64px;
-            margin-bottom: 12px;
-        }
-
-        .logo h1 {
-            font-size: 28px;
-            font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 8px;
-        }
-
-        .logo p {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 8px;
-        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px; }
 
         .input {
             width: 100%;
             padding: 14px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 24px;
+            border: 1.5px solid #e2e6ec;
+            border-radius: 12px;
             font-size: 15px;
             font-family: 'Inter', sans-serif;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            background: #f8fafc;
+            color: #0f172a;
         }
-
         .input:focus {
             outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+            border-color: #2d5aa0;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(45,90,160,0.1);
+        }
+        .input::placeholder { color: #94a3b8; font-size: 14px; }
+        .form-group .input-icon {
+            position: relative;
+        }
+        .form-group .input-icon input { padding-left: 42px; }
+        .form-group .input-icon .icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            font-size: 18px; color: #94a3b8; pointer-events: none;
         }
 
         .btn {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            background: #0f172a;
             color: white;
             border: none;
-            border-radius: 28px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background 0.2s;
             margin-top: 8px;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(37,99,235,0.4);
-        }
+        .btn:hover { background: #1e3a5f; }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .divider {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin: 28px 0;
+            margin: 24px 0;
             color: #94a3b8;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -135,46 +107,43 @@
             content: '';
             flex: 1;
             height: 1px;
-            background: #e2e8f0;
+            background: #e2e6ec;
         }
 
         .guest-card {
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            border: 2px solid #bae6fd;
-            border-radius: 24px;
-            padding: 24px;
-            margin-bottom: 8px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e6ec;
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 6px;
         }
-        .guest-card h3 { font-size: 16px; color: #1a3a5c; margin-bottom: 8px; }
-        .guest-card p { font-size: 13px; color: #64748b; margin-bottom: 16px; line-height: 1.5; }
+        .guest-card h3 { font-size: 16px; color: #0f172a; margin-bottom: 6px; }
+        .guest-card p { font-size: 13px; color: #64748b; margin-bottom: 14px; line-height: 1.5; }
 
         .btn-guest {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 12px;
+            background: #10b981;
             color: white;
             border: none;
-            border-radius: 28px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background 0.2s;
         }
-        .btn-guest:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(16,185,129,0.4);
-        }
+        .btn-guest:hover { background: #059669; }
 
         .btn-link-admin {
             display: block;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 18px;
             font-size: 13px;
             color: #64748b;
             text-decoration: none;
             font-weight: 600;
         }
-        .btn-link-admin:hover { color: #2563eb; }
+        .btn-link-admin:hover { color: #0f172a; }
 
         .admin-section { display: none; }
         .admin-section.visible { display: block; }
@@ -211,13 +180,13 @@
                 <p>Sistema de Gestión de Servicios</p>
             </div>
             <div class="guest-card">
-                <h3>📝 Modo invitado</h3>
-                <p>Para líderes de sede: registra la asistencia del servicio sin iniciar sesión. El administrador verá tu reporte en el dashboard.</p>
+                <h3>📝 Acceso invitado</h3>
+                <p>Ingresa tu nombre para acceder a los módulos de <strong>Reporte de Asistencia</strong> y <strong>EDL (Escuela de Liderazgo)</strong>.</p>
                 <div class="form-group" style="margin-bottom:16px;">
-                    <label>Tu nombre (opcional)</label>
+                    <label>Tu nombre</label>
                     <input type="text" id="guestName" class="input" placeholder="Ej: María - Líder San Carlos">
                 </div>
-                <button type="button" class="btn-guest" id="guestBtn">➡️ Registrar asistencia</button>
+                <button type="button" class="btn-guest" id="guestBtn">➡️ Continuar</button>
             </div>
 
             <div class="divider">o acceso administrador</div>
@@ -253,7 +222,7 @@
             window.location.href = 'dashboard.html';
         }
         if (Auth.esInvitado()) {
-            window.location.href = 'ingreso.html';
+            window.location.href = 'guest.html';
         }
 
         const adminSection = document.getElementById('adminSection');
@@ -270,8 +239,8 @@
         document.getElementById('guestBtn').addEventListener('click', () => {
             const nombre = document.getElementById('guestName').value.trim();
             Auth.entrarComoInvitado(nombre);
-            mostrarNotificacion('✅ Puedes registrar la asistencia', 'success');
-            setTimeout(() => window.location.href = 'ingreso.html', 500);
+            mostrarNotificacion('✅ Bienvenido ' + (nombre || 'Invitado'), 'success');
+            setTimeout(() => window.location.href = 'guest.html', 500);
         });
 
         document.getElementById('guestName').addEventListener('keypress', (e) => {
