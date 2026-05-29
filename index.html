@@ -121,6 +121,64 @@
             transform: none;
         }
 
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 28px 0;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .guest-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 2px solid #bae6fd;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 8px;
+        }
+        .guest-card h3 { font-size: 16px; color: #1a3a5c; margin-bottom: 8px; }
+        .guest-card p { font-size: 13px; color: #64748b; margin-bottom: 16px; line-height: 1.5; }
+
+        .btn-guest {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 28px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-guest:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16,185,129,0.4);
+        }
+
+        .btn-link-admin {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .btn-link-admin:hover { color: #2563eb; }
+
+        .admin-section { display: none; }
+        .admin-section.visible { display: block; }
+
         .toast {
             position: fixed;
             bottom: 24px;
@@ -152,6 +210,19 @@
                 <h1>Iglesia Agua Viva</h1>
                 <p>Sistema de Gestión de Servicios</p>
             </div>
+            <div class="guest-card">
+                <h3>📝 Modo invitado</h3>
+                <p>Para líderes de sede: registra la asistencia del servicio sin iniciar sesión. El administrador verá tu reporte en el dashboard.</p>
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label>Tu nombre (opcional)</label>
+                    <input type="text" id="guestName" class="input" placeholder="Ej: María - Líder San Carlos">
+                </div>
+                <button type="button" class="btn-guest" id="guestBtn">➡️ Registrar asistencia</button>
+            </div>
+
+            <div class="divider">o acceso administrador</div>
+
+            <div id="adminSection" class="admin-section">
             <div class="form-group">
                 <label>📧 Correo Electrónico</label>
                 <input type="email" id="loginEmail" class="input" placeholder="tu@email.com">
@@ -160,10 +231,14 @@
                 <label>🔒 Contraseña</label>
                 <input type="password" id="loginPassword" class="input" placeholder="••••••••">
             </div>
-            <button id="loginBtn" class="btn">Iniciar Sesión</button>
+            <button id="loginBtn" class="btn">🔐 Iniciar sesión (Admin)</button>
+            </div>
+
+            <a href="#" class="btn-link-admin" id="toggleAdmin">¿Eres administrador? Mostrar login</a>
         </div>
     </div>
 
+    <script src="auth.js"></script>
     <script>
         const USERS = [
             { email: "jhonfernandezcondor@gmail.com", password: "JSferco18", nombre: "Jhon Smith", rol: "admin" },
@@ -173,6 +248,35 @@
         if (!localStorage.getItem('iglesia_usuarios')) {
             localStorage.setItem('iglesia_usuarios', JSON.stringify(USERS));
         }
+
+        if (Auth.esAdmin()) {
+            window.location.href = 'dashboard.html';
+        }
+        if (Auth.esInvitado()) {
+            window.location.href = 'ingreso.html';
+        }
+
+        const adminSection = document.getElementById('adminSection');
+        const toggleAdmin = document.getElementById('toggleAdmin');
+        let adminVisible = false;
+
+        toggleAdmin.addEventListener('click', (e) => {
+            e.preventDefault();
+            adminVisible = !adminVisible;
+            adminSection.classList.toggle('visible', adminVisible);
+            toggleAdmin.textContent = adminVisible ? 'Volver a modo invitado' : '¿Eres administrador? Mostrar login';
+        });
+
+        document.getElementById('guestBtn').addEventListener('click', () => {
+            const nombre = document.getElementById('guestName').value.trim();
+            Auth.entrarComoInvitado(nombre);
+            mostrarNotificacion('✅ Puedes registrar la asistencia', 'success');
+            setTimeout(() => window.location.href = 'ingreso.html', 500);
+        });
+
+        document.getElementById('guestName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('guestBtn').click();
+        });
 
         function mostrarNotificacion(mensaje, tipo) {
             const t = document.createElement('div');

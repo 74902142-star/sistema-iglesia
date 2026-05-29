@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Reglas abiertas — igual que cuando el sistema funcionaba en GitHub Pages.
+    // Publicar estas reglas en Firebase Console → Firestore → Reglas → Publicar
+    match /registros/{docId} {
+      allow read, write: if true;
+    }
+    match /participantes/{docId} {
+      allow read, write: if true;
+    }
+    match /creativos/{docId} {
+      allow read, write: if true;
+    }
+    match /inscripciones/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

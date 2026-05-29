@@ -10,9 +10,28 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
+    <script src="firebase-auth.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f0f2f8; color: #1a2a3a; }
+        body { font-family: 'Inter', sans-serif; background: #f0f2f8; color: #1a2a3a; min-height: 100vh; }
+
+        /* Sidebar + layout */
+        .app-layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px; background: linear-gradient(180deg, #1a3a5c 0%, #2a5298 100%);
+            color: white; padding: 32px 20px; display: flex; flex-direction: column; gap: 8px;
+            position: sticky; top: 0; height: 100vh; z-index: 100; box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+        .sidebar-logo { padding: 0 12px; margin-bottom: 40px; }
+        .sidebar-logo h2 { font-size: 22px; font-weight: 800; }
+        .sidebar-logo p { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 18px;
+            color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.2s;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
+        .nav-link.active { background: white; color: #1a3a5c; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-x: hidden; min-width: 0; }
 
         /* Header */
         .header {
@@ -323,7 +342,34 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
         .toast-success { background: linear-gradient(135deg, #10b981, #059669); }
+        .toast-error { background: linear-gradient(135deg, #ef4444, #dc2626); }
         @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .perm-alert {
+            display: none;
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            color: #991b1b;
+        }
+        .perm-alert.visible { display: block; }
+        .perm-alert h4 { font-size: 16px; margin-bottom: 10px; color: #b91c1c; }
+        .perm-alert ol { margin: 10px 0 10px 20px; line-height: 1.8; font-size: 14px; }
+        .perm-alert a { color: #1d4ed8; font-weight: 600; }
+        .perm-alert pre {
+            background: #1e293b; color: #e2e8f0; padding: 14px; border-radius: 12px;
+            font-size: 11px; overflow-x: auto; margin-top: 12px; max-height: 180px;
+        }
+        .btn-copy { background: #1a3a5c; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; margin-top: 10px; }
+
+        @media (max-width: 992px) {
+            .app-layout { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; padding: 12px 20px; position: sticky; top: 0; }
+            .sidebar-logo { display: none; }
+            .nav-link { white-space: nowrap; padding: 10px 16px; border-radius: 12px; }
+        }
 
         /* Responsive */
         @media (max-width: 1024px) {
@@ -340,9 +386,34 @@
             .filter-group { width: 100%; }
             .btn-primary, .btn-secondary { width: 100%; text-align: center; }
         }
+
+        .badge-origen {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .badge-inv { background: #d1fae5; color: #065f46; }
+        .badge-adm { background: #dbeafe; color: #1e40af; }
     </style>
 </head>
 <body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>⛪ Agua Viva</h2>
+                <p>Gestión Ministerial</p>
+            </div>
+            <a href="dashboard.html" class="nav-link active">📊 Reporte de Asistencia</a>
+            <a href="predicadores.html" class="nav-link nav-admin" style="display:none;">🎤 Anfitriones y Predicadores</a>
+            <a href="creativos.html" class="nav-link nav-admin" style="display:none;">🎨 Creativos</a>
+            <a href="edl.html" class="nav-link nav-admin" style="display:none;">🎓 EDL (Escuela de Liderazgo)</a>
+        </aside>
+
+        <div class="main-content">
     <div class="header">
         <div class="logo">
             <h1>⛪ Iglesia Agua Viva</h1>
@@ -358,13 +429,57 @@
     </div>
 
     <div class="container">
-        <div class="stats-grid" id="statsGrid"></div>
+        <div id="permAlert" class="perm-alert">
+            <h4>🔒 Firestore bloqueado — acción requerida (1 sola vez)</h4>
+            <p>Las reglas de Firebase están cerradas. El código está bien; debes publicar las reglas en la consola:</p>
+            <ol>
+                <li>Abre <a href="https://console.firebase.google.com/project/iglesia-agua-viva/firestore/rules" target="_blank">Firebase Console → Reglas</a></li>
+                <li>Borra todo el contenido y pega las reglas de abajo</li>
+                <li>Pulsa <strong>Publicar</strong> y recarga esta página (Ctrl+F5)</li>
+            </ol>
+            <pre id="rulesText">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /registros/{docId} { allow read, write: if true; }
+    match /participantes/{docId} { allow read, write: if true; }
+    match /creativos/{docId} { allow read, write: if true; }
+    match /inscripciones/{docId} { allow read, write: if true; }
+  }
+}</pre>
+            <button class="btn-copy" onclick="copiarReglas()">📋 Copiar reglas</button>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value">0</div><div class="stat-label">Total asistentes</div></div>
+            <div class="stat-card"><div class="stat-icon">👨</div><div class="stat-value">0</div><div class="stat-label">Varones</div></div>
+            <div class="stat-card"><div class="stat-icon">👩</div><div class="stat-value">0</div><div class="stat-label">Mujeres</div></div>
+            <div class="stat-card"><div class="stat-icon">🧒</div><div class="stat-value">0</div><div class="stat-label">Kids</div></div>
+        </div>
 
         <div class="report-section">
             <div class="section-header">
                 <div class="section-title">📊 REPORTE DE SERVICIOS <span id="filtroInfo" style="font-size:13px;color:#6c7a8a;"></span></div>
             </div>
-            <div class="report-cards" id="reportCards"></div>
+            <div class="report-cards" id="reportCards">
+                <div class="report-card" style="border-left-color:#10b981">
+                    <h3>☀️ DOMINGO</h3>
+                    <div class="report-row"><span>👨 Hombres</span><span>0</span></div>
+                    <div class="report-row"><span>👩 Mujeres</span><span>0</span></div>
+                    <div class="report-row"><span>👥 Total</span><span><strong>0</strong></span></div>
+                </div>
+                <div class="report-card" style="border-left-color:#3b82f6">
+                    <h3>🌙 NEXT (Sábados)</h3>
+                    <div class="report-row"><span>👨 Hombres</span><span>0</span></div>
+                    <div class="report-row"><span>👩 Mujeres</span><span>0</span></div>
+                    <div class="report-row"><span>👥 Total</span><span><strong>0</strong></span></div>
+                </div>
+                <div class="report-card" style="border-left-color:#f59e0b">
+                    <h3>🧒 KIDS</h3>
+                    <div class="report-row"><span>👨 Niños</span><span>0</span></div>
+                    <div class="report-row"><span>👩 Niñas</span><span>0</span></div>
+                    <div class="report-row"><span>👥 Total</span><span><strong>0</strong></span></div>
+                </div>
+            </div>
             <button class="btn-whatsapp" id="whatsappBtn">📱 ENVIAR REPORTE POR WHATSAPP</button>
         </div>
 
@@ -387,9 +502,11 @@
         <div class="table-container">
             <h3 style="margin-bottom:20px;">📋 Historial de registros</h3>
             <table class="data-table">
-                <thead><tr><th>Fecha</th><th>Sede</th><th>Semana</th><th>Total</th><th>Varones</th><th>Mujeres</th><th>Kids</th><th>Acciones</th></tr></thead>
-                <tbody id="tablaBody"><tr><td colspan="8" class="empty-state">Cargando registros...</td></tr></tbody>
+                <thead><tr><th>Fecha</th><th>Sede</th><th>Semana</th><th>Total</th><th>Varones</th><th>Mujeres</th><th>Kids</th><th>Registrado por</th><th>Acciones</th></tr></thead>
+                <tbody id="tablaBody"><tr><td colspan="9" class="empty-state">Cargando registros...</td></tr></tbody>
             </table>
+        </div>
+    </div>
         </div>
     </div>
 
@@ -401,14 +518,21 @@
         </div>
     </div>
 
+    <script src="auth.js"></script>
     <script>
-        // Usuario actual
-        let usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || '{"nombre":"Jhon Smith","rol":"admin"}');
-        let esAdmin = usuarioActual.rol === 'admin';
+        if (!Auth.esAdmin()) {
+            window.location.replace('index.html');
+        }
+        let usuarioActual = Auth.getUsuario();
+        let esAdmin = true;
         let registros = [];
         let datosFiltrados = [];
         let chartSedes, chartTendencia, chartGenero;
         let registroEditando = null;
+
+        if (esAdmin) {
+            document.querySelectorAll('.nav-admin').forEach(el => el.style.display = 'flex');
+        }
 
         function formatearSede(sedeId) {
             const sedes = {
@@ -431,13 +555,23 @@
         }
 
         async function cargarDatos() {
-            // Cargar desde Firebase
-            const snapshot = await db.collection('registros').orderBy('fecha', 'desc').get();
-            registros = [];
-            snapshot.forEach(doc => {
-                registros.push({ firebaseId: doc.id, ...doc.data() });
-            });
-            
+            try {
+                await firebaseReady;
+                const snapshot = await db.collection('registros').orderBy('fecha', 'desc').get();
+                registros = [];
+                snapshot.forEach(doc => {
+                    registros.push({ firebaseId: doc.id, ...doc.data() });
+                });
+                document.getElementById('permAlert').classList.remove('visible');
+            } catch (err) {
+                console.error(err);
+                registros = [];
+                if (err.code === 'permission-denied' || (err.message || '').includes('permission')) {
+                    document.getElementById('permAlert').classList.add('visible');
+                }
+                toast('❌ Datos bloqueados por Firebase. Sigue los pasos del recuadro rojo arriba.', 'error');
+            }
+
             let sede = document.getElementById('filtroSede').value;
             let semana = document.getElementById('filtroSemana').value;
             let mes = document.getElementById('filtroMes').value;
@@ -446,8 +580,9 @@
             datosFiltrados = registros.filter(r => {
                 if (sede !== 'todas' && r.sede !== sede) return false;
                 if (semana && r.semana !== semana) return false;
-                if (mes && r.mes !== mes) return false;
-                if (anio && !r.fecha.startsWith(anio)) return false;
+                if (mes && r.mes && r.mes !== mes) return false;
+                if (mes && !r.mes && r.fecha && !r.fecha.startsWith(mes)) return false;
+                if (anio && r.fecha && !r.fecha.startsWith(anio)) return false;
                 return true;
             });
 
@@ -523,17 +658,18 @@
         function actualizarTabla() {
             let tbody = document.getElementById('tablaBody');
             if (datosFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No hay registros disponibles</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No hay registros disponibles</td></tr>';
                 return;
             }
             let html = '';
             for (let d of datosFiltrados) {
                 let kidsVal = (d.totalKV || 0) + (d.totalKM || 0);
-                let acciones = '';
-                if (esAdmin) {
-                    acciones = `<button class="btn-edit" onclick="abrirEditar('${d.firebaseId}')">✏️ Editar</button>
+                let por = d.registradoPor || '—';
+                let badge = d.origen === 'invitado'
+                    ? '<span class="badge-origen badge-inv">Invitado</span>'
+                    : (d.origen === 'admin' ? '<span class="badge-origen badge-adm">Admin</span>' : '');
+                let acciones = `<button class="btn-edit" onclick="abrirEditar('${d.firebaseId}')">✏️ Editar</button>
                                <button class="btn-delete" onclick="eliminarRegistro('${d.firebaseId}')">🗑️ Eliminar</button>`;
-                }
                 html += `<tr>
                     <td>${d.fecha}</td>
                     <td>${formatearSede(d.sede)}</td>
@@ -542,6 +678,7 @@
                     <td>${d.totalVarones}</td>
                     <td>${d.totalMujeres}</td>
                     <td>${kidsVal}</td>
+                    <td>${por}${badge}</td>
                     <td>${acciones}</td>
                 </tr>`;
             }
@@ -612,29 +749,40 @@
         }
 
         async function guardarEdicion() {
-            let kids = parseInt(document.getElementById('editKids').value) || 0;
-            let datosActualizados = {
-                fecha: document.getElementById('editFecha').value,
-                sede: document.getElementById('editSede').value,
-                semana: obtenerSemana(document.getElementById('editFecha').value),
-                totalGeneral: parseInt(document.getElementById('editTotal').value) || 0,
-                totalVarones: parseInt(document.getElementById('editVarones').value) || 0,
-                totalMujeres: parseInt(document.getElementById('editMujeres').value) || 0,
-                totalKV: kids,
-                totalKM: 0
-            };
-            await db.collection('registros').doc(registroEditando.firebaseId).update(datosActualizados);
-            toast('✅ Registro actualizado');
-            cerrarModal();
-            cargarDatos();
+            try {
+                await firebaseReady;
+                let kids = parseInt(document.getElementById('editKids').value) || 0;
+                let datosActualizados = {
+                    fecha: document.getElementById('editFecha').value,
+                    sede: document.getElementById('editSede').value,
+                    semana: obtenerSemana(document.getElementById('editFecha').value),
+                    mes: document.getElementById('editFecha').value.substring(0, 7),
+                    totalGeneral: parseInt(document.getElementById('editTotal').value) || 0,
+                    totalVarones: parseInt(document.getElementById('editVarones').value) || 0,
+                    totalMujeres: parseInt(document.getElementById('editMujeres').value) || 0,
+                    totalKV: kids,
+                    totalKM: 0
+                };
+                await db.collection('registros').doc(registroEditando.firebaseId).update(datosActualizados);
+                toast('✅ Registro actualizado');
+                cerrarModal();
+                cargarDatos();
+            } catch (err) {
+                toast('❌ Error al guardar: ' + err.message, 'error');
+            }
         }
 
         async function eliminarRegistro(firebaseId) {
             if (!esAdmin) return;
             if (confirm('¿Eliminar este registro permanentemente?')) {
-                await db.collection('registros').doc(firebaseId).delete();
-                toast('🗑️ Registro eliminado');
-                cargarDatos();
+                try {
+                    await firebaseReady;
+                    await db.collection('registros').doc(firebaseId).delete();
+                    toast('🗑️ Registro eliminado');
+                    cargarDatos();
+                } catch (err) {
+                    toast('❌ Error al eliminar: ' + err.message, 'error');
+                }
             }
         }
 
@@ -644,7 +792,8 @@
             let datos = datosFiltrados.map(d => ({
                 Fecha: d.fecha, Sede: formatearSede(d.sede), Semana: d.semana,
                 Total: d.totalGeneral, Varones: d.totalVarones, Mujeres: d.totalMujeres,
-                Kids: (d.totalKV || 0) + (d.totalKM || 0)
+                Kids: (d.totalKV || 0) + (d.totalKM || 0),
+                RegistradoPor: d.registradoPor || '', Origen: d.origen || ''
             }));
             let ws = XLSX.utils.json_to_sheet(datos);
             let wb = XLSX.utils.book_new();
@@ -653,9 +802,21 @@
             toast('📎 Excel exportado');
         }
 
-        function toast(msg) { let t = document.createElement('div'); t.className = 'toast toast-success'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+        function toast(msg, tipo) {
+            let t = document.createElement('div');
+            t.className = 'toast toast-' + (tipo || 'success');
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 5000);
+        }
+
+        function copiarReglas() {
+            navigator.clipboard.writeText(document.getElementById('rulesText').innerText).then(() => {
+                toast('📋 Reglas copiadas. Pégalas en Firebase Console → Reglas → Publicar');
+            });
+        }
         
-        function cerrarSesion() { localStorage.clear(); window.location.href = 'index.html'; }
+        function cerrarSesion() { Auth.cerrarSesion(); }
 
         function inicializarFiltros() {
             let sedes = ['san_carlos_10am', 'san_carlos_12pm', 'san_carlos_5pm', 'san_carlos_7pm', 'el_tambo_12pm', 'el_tambo_6pm', 'chupaca_6pm', 'jauja', 'belen', 'transformando_ciudades'];

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Predicadores y Anfitriones | Iglesia Agua Viva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-auth.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f2f8; color: #1a2a3a; min-height: 100vh; }
+
+        .app-layout { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a3a5c 0%, #2a5298 100%);
+            color: white;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+        .sidebar-logo { padding: 0 12px; margin-bottom: 40px; }
+        .sidebar-logo h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .sidebar-logo p { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 18px;
+            color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.2s;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
+        .nav-link.active { background: white; color: #1a3a5c; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-x: hidden; }
+
+        .header {
+            background: white; color: #1a3a5c; padding: 20px 32px; display: flex;
+            justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 10;
+        }
+        .user-area { display: flex; align-items: center; gap: 20px; background: #f8fafd; padding: 8px 24px; border-radius: 60px; border: 1px solid #e2e8f0; }
+        .logout-btn { background: #1a3a5c; border: none; padding: 8px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; }
+
+        .container { max-width: 1400px; width: 100%; margin: 0 auto; padding: 32px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+        .stat-card {
+            background: white; border-radius: 28px; padding: 24px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03);
+        }
+        .stat-value { font-size: 38px; font-weight: 800; color: #1a3a5c; }
+        .stat-label { font-size: 14px; color: #6c7a8a; margin-top: 8px; font-weight: 500; }
+
+        .section-card { background: white; border-radius: 28px; padding: 28px; margin-bottom: 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .section-title { font-size: 20px; font-weight: 700; color: #1a2a3a; display: flex; align-items: center; gap: 10px; }
+
+        .btn-add { background: linear-gradient(135deg, #2a5298, #1a3a5c); color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-template { background: #f8fafd; border: 1px solid #e2e8f0; padding: 12px 24px; border-radius: 30px; color: #1a3a5c; font-weight: 600; cursor: pointer; font-size: 14px; }
+
+        .table-container { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+        .data-table th { text-align: left; padding: 14px 12px; background: #f8fafd; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        .data-table td { padding: 14px 12px; border-bottom: 1px solid #eef2f8; vertical-align: middle; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-sent { background: #dcfce7; color: #166534; }
+
+        .action-btn { border: none; padding: 6px 12px; border-radius: 30px; cursor: pointer; font-size: 11px; font-weight: 600; margin-right: 4px; transition: all 0.2s; }
+        .btn-wa { background: #25D366; color: white; }
+        .btn-edit { background: #2a5298; color: white; }
+        .btn-del { background: #dc2626; color: white; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 40px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative; }
+        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; background: none; border: none; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 700; color: #1a2a3a; text-transform: uppercase; margin-bottom: 6px; }
+        .form-control { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 24px; font-family: inherit; font-size: 14px; }
+        .form-control:focus { outline: none; border-color: #2a5298; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .upload-area {
+            border: 2px dashed #e2e8f0; border-radius: 24px; padding: 40px; text-align: center;
+            color: #64748b; margin-top: 20px; cursor: pointer; transition: all 0.3s;
+        }
+        .upload-area:hover, .upload-area.dragover { border-color: #2a5298; background: #f8fafd; color: #1a3a5c; }
+        .upload-filename { margin-top: 12px; font-weight: 600; color: #1a3a5c; font-size: 14px; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); padding: 14px 32px; border-radius: 60px; color: white; font-weight: 600; z-index: 2000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .toast-success { background: #10b981; }
+        .toast-warning { background: #f59e0b; }
+
+        @media (max-width: 992px) {
+            .app-layout { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; position: sticky; top: 0; padding: 12px 20px; }
+            .sidebar-logo { display: none; }
+            .nav-link { white-space: nowrap; padding: 10px 16px; border-radius: 12px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>⛪ Agua Viva</h2>
+                <p>Gestión Ministerial</p>
+            </div>
+            <a href="dashboard.html" class="nav-link">📊 Reporte de Asistencia</a>
+            <a href="predicadores.html" class="nav-link active">🎤 Anfitriones y Predicadores</a>
+            <a href="creativos.html" class="nav-link">🎨 Creativos</a>
+            <a href="edl.html" class="nav-link">🎓 EDL (Escuela de Liderazgo)</a>
+        </aside>
+
+        <div class="main-content">
+            <div class="header">
+                <div style="font-weight: 800; font-size: 20px; color: #1a3a5c;">🎤 Anfitriones y Predicadores</div>
+                <div class="user-area">
+                    <div id="userName" style="font-weight: 600; font-size: 14px;">Administrador</div>
+                    <button class="logout-btn" onclick="cerrarSesion()">Salir</button>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div style="font-size: 32px;">🎤</div>
+                        <div class="stat-value" id="countPredicadores">0</div>
+                        <div class="stat-label">Total Predicadores</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 32px;">🎙️</div>
+                        <div class="stat-value" id="countAnfitriones">0</div>
+                        <div class="stat-label">Total Anfitriones</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 32px;">🔔</div>
+                        <div class="stat-value" id="countPendientes">0</div>
+                        <div class="stat-label">Recordatorios Pendientes</div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">👥 Gestión de Participantes</div>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn-template" onclick="descargarPlantilla()">📎 Descargar Plantilla</button>
+                            <button class="btn-add" onclick="abrirModal()">➕ Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="upload-area" id="uploadArea">
+                        <div>📂 Carga masiva (Excel, Word o imagen)</div>
+                        <div style="font-size: 12px; margin-top: 8px;">Arrastra un archivo aquí o haz clic para seleccionar</div>
+                        <div class="upload-filename" id="uploadFilename"></div>
+                        <input type="file" id="bulkUpload" style="display: none;" accept=".xlsx,.xls,.csv,.doc,.docx,.png,.jpg,.jpeg,.gif,.webp">
+                    </div>
+
+                    <h3 style="margin: 32px 0 16px; color: #1a3a5c;">🎤 Predicadores</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Teléfono</th><th>Status</th><th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaPredicadores">
+                                <tr><td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 style="margin: 40px 0 16px; color: #1a3a5c;">🎙️ Anfitriones</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Teléfono</th><th>Status</th><th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaAnfitriones">
+                                <tr><td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalRegistro" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            <h2 style="margin-bottom: 24px; color: #1a3a5c;" id="modalTitle">Nuevo Registro</h2>
+            <form id="formRegistro">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="regNombre" class="form-control" required placeholder="Ej: Juan Pérez">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" id="regFecha" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hora</label>
+                        <input type="time" id="regHora" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono (WhatsApp)</label>
+                    <input type="tel" id="regTelefono" class="form-control" required placeholder="Ej: 51999888777">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo de Servicio</label>
+                        <select id="regServicio" class="form-control" required>
+                            <option value="NEXT">NEXT</option>
+                            <option value="NEXT PLUS">NEXT PLUS</option>
+                            <option value="DOMINGO">DOMINGO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Rol</label>
+                        <select id="regRol" class="form-control" required>
+                            <option value="Predicador">Predicador</option>
+                            <option value="Anfitrión">Anfitrión</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" id="groupSede" style="display: none;">
+                    <label>Sede (Solo para Domingo)</label>
+                    <input type="text" id="regSede" class="form-control" placeholder="Ej: San Carlos">
+                </div>
+                <button type="submit" class="btn-add" style="width: 100%; justify-content: center; margin-top: 10px;">💾 Guardar Registro</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual'));
+        if (!usuarioActual || usuarioActual.rol !== 'admin') { window.location.href = 'index.html'; }
+        document.getElementById('userName').innerText = usuarioActual.nombre;
+
+        const dbPart = db.collection('participantes');
+        let editandoId = null;
+        let participantesCache = [];
+
+        function esEnviado(p) { return p.enviado === true || p.recordatorioEnviado === true; }
+
+        function hoyStr() { return new Date().toISOString().split('T')[0]; }
+
+        function formatearHora(hora) {
+            if (!hora) return '';
+            const [h, m] = hora.split(':');
+            const hh = parseInt(h);
+            const ampm = hh >= 12 ? 'pm' : 'am';
+            const h12 = hh % 12 || 12;
+            return `${h12}:${m} ${ampm}`;
+        }
+
+        function construirMensaje(p) {
+            const nombre = p.nombre;
+            const hora = formatearHora(p.hora);
+            const sede = p.sede || '';
+
+            if (p.rol === 'Anfitrión') {
+                if (p.tipoServicio === 'DOMINGO') {
+                    return `Hola ${nombre} buenas noches, comentarte que el día de mañana domingo, eres anfitriona(e) en el culto de las ${hora} en la sede ${sede}. Te envío las indicaciones a tener en cuenta:\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\nGracias ☺️`;
+                }
+                if (p.tipoServicio === 'NEXT PLUS') {
+                    return `Hola ${nombre} buenas noches, comentarte que el día de mañana sábado, eres anfitriona(e) en el culto de NEXT PLUS. Te envío las indicaciones a tener en cuenta:\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\nGracias ☺️`;
+                }
+                return `Hola ${nombre} buenas noches, comentarte que el día de mañana sábado, eres anfitriona(e) en el culto de NEXT. Te envío las indicaciones a tener en cuenta:\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\nGracias ☺️`;
+            }
+
+            if (p.tipoServicio === 'DOMINGO') {
+                return `Pastorcito buenos días, también comentarle que el día domingo le toca predicar en el culto de las ${hora} en la sede ${sede}, le envío las indicaciones a tener en cuenta:\n1. Deberá de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar una vestimenta adecuada.\n3. Los tiempos establecidos son: 45 min de prédica (30 min prédica + 5 min llamado + 10 min ministración)\nBendiciones, Gracias ☺️`;
+            }
+            if (p.tipoServicio === 'NEXT PLUS') {
+                return `Hola ${nombre}, comentarte que el día de mañana te toca predicar en el culto de NEXT PLUS, te envío las indicaciones a tener en cuenta:\n1. Deberá de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar una vestimenta adecuada.\n3. Los tiempos establecidos son: 40 min de prédica (30 min prédica + 5 min llamado + 5 min ministración)\nBendiciones, Gracias ☺️`;
+            }
+            return `Hola ${nombre}, comentarte que el día de mañana te toca predicar en el culto de NEXT, te envío las indicaciones a tener en cuenta:\n1. Deberá de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar una vestimenta adecuada.\n3. Los tiempos establecidos son: 30 min de prédica (20 min prédica + 5 min llamado + 5 min ministración)\nBendiciones, Gracias ☺️`;
+        }
+
+        document.getElementById('regServicio').addEventListener('change', function() {
+            document.getElementById('groupSede').style.display = this.value === 'DOMINGO' ? 'block' : 'none';
+        });
+
+        async function cargarParticipantes() {
+            await firebaseReady;
+            const snapshot = await dbPart.orderBy('fecha', 'asc').get();
+            participantesCache = [];
+            snapshot.forEach(doc => participantesCache.push({ id: doc.id, ...doc.data() }));
+
+            const predicadores = participantesCache.filter(p => p.rol === 'Predicador');
+            const anfitriones = participantesCache.filter(p => p.rol === 'Anfitrión');
+            const hoy = hoyStr();
+
+            renderTabla(predicadores, 'tablaPredicadores');
+            renderTabla(anfitriones, 'tablaAnfitriones');
+
+            document.getElementById('countPredicadores').innerText = predicadores.length;
+            document.getElementById('countAnfitriones').innerText = anfitriones.length;
+            document.getElementById('countPendientes').innerText = participantesCache.filter(p => !esEnviado(p) && p.fecha >= hoy).length;
+        }
+
+        function renderTabla(data, elementId) {
+            const tbody = document.getElementById(elementId);
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">No hay registros</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = data.map(p => {
+                const enviado = esEnviado(p);
+                return `<tr>
+                    <td><strong>${p.nombre}</strong></td>
+                    <td>${p.tipoServicio}${p.sede ? ' (' + p.sede + ')' : ''}</td>
+                    <td>${p.fecha}</td>
+                    <td>${p.hora || '-'}</td>
+                    <td>${p.telefono}</td>
+                    <td><span class="status-badge ${enviado ? 'status-sent' : 'status-pending'}">${enviado ? 'Enviado' : 'Pendiente'}</span></td>
+                    <td>
+                        <button class="action-btn btn-wa" onclick="enviarWhatsApp('${p.id}')" title="Enviar">📱</button>
+                        <button class="action-btn btn-edit" onclick="editarRegistro('${p.id}')" title="Editar">✏️</button>
+                        <button class="action-btn btn-del" onclick="eliminarRegistro('${p.id}')" title="Eliminar">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        document.getElementById('formRegistro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                nombre: document.getElementById('regNombre').value.trim(),
+                fecha: document.getElementById('regFecha').value,
+                hora: document.getElementById('regHora').value,
+                telefono: document.getElementById('regTelefono').value.trim(),
+                tipoServicio: document.getElementById('regServicio').value,
+                rol: document.getElementById('regRol').value,
+                sede: document.getElementById('regSede').value.trim() || '',
+                enviado: false
+            };
+
+            if (editandoId) {
+                const prev = participantesCache.find(p => p.id === editandoId);
+                if (prev && esEnviado(prev)) data.enviado = prev.enviado ?? prev.recordatorioEnviado ?? false;
+                await dbPart.doc(editandoId).update(data);
+                toast('✅ Registro actualizado');
+            } else {
+                await dbPart.add(data);
+                toast('✅ Registro agregado');
+            }
+            cerrarModal();
+            cargarParticipantes();
+        });
+
+        function abrirModal() {
+            editandoId = null;
+            document.getElementById('formRegistro').reset();
+            document.getElementById('groupSede').style.display = 'none';
+            document.getElementById('modalTitle').innerText = 'Nuevo Registro';
+            document.getElementById('modalRegistro').style.display = 'flex';
+        }
+
+        async function editarRegistro(id) {
+            const doc = await dbPart.doc(id).get();
+            const p = doc.data();
+            editandoId = id;
+            document.getElementById('regNombre').value = p.nombre;
+            document.getElementById('regFecha').value = p.fecha;
+            document.getElementById('regHora').value = p.hora;
+            document.getElementById('regTelefono').value = p.telefono;
+            document.getElementById('regServicio').value = p.tipoServicio;
+            document.getElementById('regRol').value = p.rol;
+            document.getElementById('regSede').value = p.sede || '';
+            document.getElementById('groupSede').style.display = p.tipoServicio === 'DOMINGO' ? 'block' : 'none';
+            document.getElementById('modalTitle').innerText = 'Editar Registro';
+            document.getElementById('modalRegistro').style.display = 'flex';
+        }
+
+        async function eliminarRegistro(id) {
+            if (confirm('¿Eliminar este registro?')) {
+                await dbPart.doc(id).delete();
+                toast('🗑️ Registro eliminado');
+                cargarParticipantes();
+            }
+        }
+
+        async function enviarWhatsApp(id, automatico = false) {
+            const doc = await dbPart.doc(id).get();
+            if (!doc.exists) return;
+            const p = doc.data();
+            const msg = construirMensaje(p);
+            window.open(`https://wa.me/${p.telefono}?text=${encodeURIComponent(msg)}`, '_blank');
+            await dbPart.doc(id).update({ enviado: true, recordatorioEnviado: true });
+            if (automatico) toast('🔔 Recordatorio automático enviado a ' + p.nombre);
+            cargarParticipantes();
+        }
+
+        async function revisarRecordatoriosAutomaticos() {
+            const hoy = new Date();
+            const dosDias = new Date(hoy);
+            dosDias.setDate(hoy.getDate() + 2);
+            const fechaStr = dosDias.toISOString().split('T')[0];
+
+            const snapshot = await dbPart.where('fecha', '==', fechaStr).get();
+            snapshot.forEach(doc => {
+                const p = doc.data();
+                if (!esEnviado(p)) {
+                    enviarWhatsApp(doc.id, true);
+                }
+            });
+        }
+
+        setInterval(revisarRecordatoriosAutomaticos, 3600000);
+        revisarRecordatoriosAutomaticos();
+
+        function descargarPlantilla() {
+            const csv = 'Nombre,Fecha,Hora,Telefono,Servicio,Rol,Sede\nJuan Perez,2026-06-20,18:00,51999888777,NEXT,Predicador,\nMaria Lopez,2026-06-21,10:00,51999888666,DOMINGO,Anfitrión,San Carlos\n';
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'plantilla_participantes.csv';
+            link.click();
+            toast('📎 Plantilla CSV descargada');
+        }
+
+        const uploadArea = document.getElementById('uploadArea');
+        const bulkUpload = document.getElementById('bulkUpload');
+        const uploadFilename = document.getElementById('uploadFilename');
+
+        uploadArea.addEventListener('click', () => bulkUpload.click());
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length) mostrarArchivo(e.dataTransfer.files[0]);
+        });
+        bulkUpload.addEventListener('change', (e) => {
+            if (e.target.files.length) mostrarArchivo(e.target.files[0]);
+        });
+
+        function mostrarArchivo(file) {
+            uploadFilename.innerText = '📄 ' + file.name;
+            toast('Archivo seleccionado: ' + file.name);
+        }
+
+        function toast(msg, tipo = 'success') {
+            const t = document.createElement('div');
+            t.className = 'toast toast-' + tipo;
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, 3000);
+        }
+
+        function cerrarModal() { document.getElementById('modalRegistro').style.display = 'none'; }
+        function cerrarSesion() { localStorage.removeItem('usuarioActual'); window.location.href = 'index.html'; }
+
+        cargarParticipantes();
+    </script>
+</body>
+</html>

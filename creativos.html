@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Creativos | Iglesia Agua Viva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-auth.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f2f8; color: #1a2a3a; min-height: 100vh; }
+
+        .app-layout { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a3a5c 0%, #2a5298 100%);
+            color: white;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+        .sidebar-logo { padding: 0 12px; margin-bottom: 40px; }
+        .sidebar-logo h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .sidebar-logo p { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 18px;
+            color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.2s;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
+        .nav-link.active { background: white; color: #1a3a5c; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-x: hidden; }
+
+        .header {
+            background: white; color: #1a3a5c; padding: 20px 32px; display: flex;
+            justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 10;
+        }
+        .user-area { display: flex; align-items: center; gap: 20px; background: #f8fafd; padding: 8px 24px; border-radius: 60px; border: 1px solid #e2e8f0; }
+        .logout-btn { background: #1a3a5c; border: none; padding: 8px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; }
+
+        .container { max-width: 1400px; width: 100%; margin: 0 auto; padding: 32px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 32px; }
+        .stat-card {
+            background: white; border-radius: 28px; padding: 24px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-value { font-size: 38px; font-weight: 800; color: #1a3a5c; }
+        .stat-label { font-size: 14px; color: #6c7a8a; margin-top: 8px; font-weight: 500; }
+
+        .section-card { background: white; border-radius: 28px; padding: 28px; margin-bottom: 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .section-title { font-size: 20px; font-weight: 700; color: #1a2a3a; display: flex; align-items: center; gap: 10px; }
+
+        .btn-add { background: linear-gradient(135deg, #2a5298, #1a3a5c); color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+
+        .table-container { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+        .data-table th { text-align: left; padding: 14px 12px; background: #f8fafd; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        .data-table td { padding: 14px 12px; border-bottom: 1px solid #eef2f8; vertical-align: middle; }
+
+        .rol-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-produccion { background: #dbeafe; color: #1e40af; }
+        .badge-fotografia { background: #f3e8ff; color: #7c3aed; }
+        .badge-multimedia { background: #dcfce7; color: #166534; }
+        .badge-anfitrion { background: #ffedd5; color: #c2410c; }
+
+        .action-btn { border: none; padding: 8px; border-radius: 12px; cursor: pointer; font-size: 14px; margin-right: 4px; transition: all 0.2s; }
+        .btn-wa { background: #25D366; color: white; }
+        .btn-edit { background: #2a5298; color: white; }
+        .btn-del { background: #dc2626; color: white; }
+        .action-btn:hover { transform: scale(1.1); }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 40px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative; }
+        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; background: none; border: none; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 700; color: #1a2a3a; text-transform: uppercase; margin-bottom: 6px; }
+        .form-control { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 24px; font-family: inherit; font-size: 14px; }
+        .form-control:focus { outline: none; border-color: #2a5298; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); padding: 14px 32px; border-radius: 60px; color: white; font-weight: 600; z-index: 2000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .toast-success { background: #10b981; }
+
+        @media (max-width: 992px) {
+            .app-layout { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; position: sticky; top: 0; padding: 12px 20px; }
+            .sidebar-logo { display: none; }
+            .nav-link { white-space: nowrap; padding: 10px 16px; border-radius: 12px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .container { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>⛪ Agua Viva</h2>
+                <p>Gestión Ministerial</p>
+            </div>
+            <a href="dashboard.html" class="nav-link">📊 Reporte de Asistencia</a>
+            <a href="predicadores.html" class="nav-link">🎤 Anfitriones y Predicadores</a>
+            <a href="creativos.html" class="nav-link active">🎨 Creativos</a>
+            <a href="edl.html" class="nav-link">🎓 EDL (Escuela de Liderazgo)</a>
+        </aside>
+
+        <div class="main-content">
+            <div class="header">
+                <div style="font-weight: 800; font-size: 20px; color: #1a3a5c;">🎨 Equipo de Creativos</div>
+                <div class="user-area">
+                    <div id="userName" style="font-weight: 600; font-size: 14px;">Administrador</div>
+                    <button class="logout-btn" onclick="cerrarSesion()">Salir</button>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div style="font-size: 32px;">🎛️</div>
+                        <div class="stat-value" id="countProduccion">0</div>
+                        <div class="stat-label">Producción</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 32px;">📸</div>
+                        <div class="stat-value" id="countFotografia">0</div>
+                        <div class="stat-label">Fotografía</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 32px;">💻</div>
+                        <div class="stat-value" id="countMultimedia">0</div>
+                        <div class="stat-label">Multimedia</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 32px;">🎙️</div>
+                        <div class="stat-value" id="countAnfitriones">0</div>
+                        <div class="stat-label">Anfitriones</div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">👥 Listado de Creativos</div>
+                        <button class="btn-add" onclick="abrirModal()">➕ Agregar</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th><th>Rol</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Teléfono</th><th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaCreativos">
+                                <tr><td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">Cargando creativos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalCreativo" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            <h2 style="margin-bottom: 24px; color: #1a3a5c;" id="modalTitle">Nuevo Creativo</h2>
+            <form id="formCreativo">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Nombre Completo *</label>
+                    <input type="text" id="creNombre" class="form-control" required placeholder="Ej: Maria Lopez">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rol</label>
+                        <select id="creRol" class="form-control" required>
+                            <option value="Producción">🎛️ Producción</option>
+                            <option value="Fotografía">📸 Fotografía</option>
+                            <option value="Multimedia">💻 Multimedia</option>
+                            <option value="Anfitrión">🎙️ Anfitrión</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Servicio</label>
+                        <select id="creServicio" class="form-control" required>
+                            <option value="NEXT">NEXT</option>
+                            <option value="NEXT PLUS">NEXT PLUS</option>
+                            <option value="DOMINGO">DOMINGO</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha (Opcional)</label>
+                        <input type="date" id="creFecha" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Hora (Opcional)</label>
+                        <input type="time" id="creHora" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono (Opcional)</label>
+                    <input type="tel" id="creTelefono" class="form-control" placeholder="Ej: 51999888777">
+                </div>
+                <button type="submit" class="btn-add" style="width: 100%; justify-content: center; margin-top: 10px;">💾 Guardar Registro</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual'));
+        if (!usuarioActual || usuarioActual.rol !== 'admin') { window.location.href = 'index.html'; }
+        document.getElementById('userName').innerText = usuarioActual.nombre;
+
+        const dbCreativos = db.collection('creativos');
+        let editandoId = null;
+
+        const ROL_BADGES = {
+            'Producción': { icon: '🎛️', cls: 'badge-produccion' },
+            'Fotografía': { icon: '📸', cls: 'badge-fotografia' },
+            'Multimedia': { icon: '💻', cls: 'badge-multimedia' },
+            'Anfitrión': { icon: '🎙️', cls: 'badge-anfitrion' }
+        };
+
+        function rolBadge(rol) {
+            const b = ROL_BADGES[rol] || { icon: '👤', cls: 'badge-produccion' };
+            return `<span class="rol-badge ${b.cls}">${b.icon} ${rol}</span>`;
+        }
+
+        async function cargarCreativos() {
+            await firebaseReady;
+            const snapshot = await dbCreativos.get();
+            const creativos = [];
+            snapshot.forEach(doc => creativos.push({ id: doc.id, ...doc.data() }));
+            creativos.sort((a, b) => (b.fecha || b.timestamp || '').localeCompare(a.fecha || a.timestamp || ''));
+            renderTabla(creativos);
+            actualizarStats(creativos);
+        }
+
+        function actualizarStats(data) {
+            document.getElementById('countProduccion').innerText = data.filter(c => c.rol === 'Producción').length;
+            document.getElementById('countFotografia').innerText = data.filter(c => c.rol === 'Fotografía').length;
+            document.getElementById('countMultimedia').innerText = data.filter(c => c.rol === 'Multimedia').length;
+            document.getElementById('countAnfitriones').innerText = data.filter(c => c.rol === 'Anfitrión').length;
+        }
+
+        function renderTabla(data) {
+            const tbody = document.getElementById('tablaCreativos');
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">No hay registros de creativos</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = data.map(c => `
+                <tr>
+                    <td><strong>${c.nombre}</strong></td>
+                    <td>${rolBadge(c.rol)}</td>
+                    <td>${c.servicio}</td>
+                    <td>${c.fecha || '-'}</td>
+                    <td>${c.hora || '-'}</td>
+                    <td>${c.telefono || '-'}</td>
+                    <td>
+                        <button class="action-btn btn-wa" onclick="enviarWhatsApp('${c.id}')" title="Enviar WhatsApp">📱</button>
+                        <button class="action-btn btn-edit" onclick="editarCreativo('${c.id}')" title="Editar">✏️</button>
+                        <button class="action-btn btn-del" onclick="eliminarCreativo('${c.id}')" title="Eliminar">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('formCreativo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                nombre: document.getElementById('creNombre').value.trim(),
+                rol: document.getElementById('creRol').value,
+                servicio: document.getElementById('creServicio').value,
+                fecha: document.getElementById('creFecha').value || '',
+                hora: document.getElementById('creHora').value || '',
+                telefono: document.getElementById('creTelefono').value.trim() || '',
+                timestamp: new Date().toISOString()
+            };
+
+            if (editandoId) {
+                await dbCreativos.doc(editandoId).update(data);
+                toast('✅ Creativo actualizado');
+            } else {
+                await dbCreativos.add(data);
+                toast('✅ Creativo agregado');
+            }
+            cerrarModal();
+            cargarCreativos();
+        });
+
+        function abrirModal() {
+            editandoId = null;
+            document.getElementById('formCreativo').reset();
+            document.getElementById('modalTitle').innerText = 'Nuevo Creativo';
+            document.getElementById('modalCreativo').style.display = 'flex';
+        }
+
+        async function editarCreativo(id) {
+            const doc = await dbCreativos.doc(id).get();
+            const c = doc.data();
+            editandoId = id;
+            document.getElementById('creNombre').value = c.nombre;
+            document.getElementById('creRol').value = c.rol;
+            document.getElementById('creServicio').value = c.servicio;
+            document.getElementById('creFecha').value = c.fecha || '';
+            document.getElementById('creHora').value = c.hora || '';
+            document.getElementById('creTelefono').value = c.telefono || '';
+            document.getElementById('modalTitle').innerText = 'Editar Creativo';
+            document.getElementById('modalCreativo').style.display = 'flex';
+        }
+
+        async function eliminarCreativo(id) {
+            if (confirm('¿Eliminar a este creativo?')) {
+                await dbCreativos.doc(id).delete();
+                toast('🗑️ Creativo eliminado');
+                cargarCreativos();
+            }
+        }
+
+        function enviarWhatsApp(id) {
+            dbCreativos.doc(id).get().then(doc => {
+                const c = doc.data();
+                if (!c.telefono) { toast('❌ No hay teléfono registrado'); return; }
+                const msg = `🙏 RECORDATORIO IGLESIA AGUA VIVA 🙏\n\nHola ${c.nombre}, este es tu recordatorio para el servicio ${c.servicio}.\n\n🎭 Tu rol: ${c.rol}\n\n📅 Fecha: ${c.fecha || 'Próximo servicio'}\n⏰ Hora de llegada: 60 min antes\n\n¡Llegar puntual! ⛪`;
+                window.open(`https://wa.me/${c.telefono}?text=${encodeURIComponent(msg)}`, '_blank');
+            });
+        }
+
+        function toast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast toast-success';
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, 3000);
+        }
+
+        function cerrarModal() { document.getElementById('modalCreativo').style.display = 'none'; }
+        function cerrarSesion() { localStorage.removeItem('usuarioActual'); window.location.href = 'index.html'; }
+
+        cargarCreativos();
+    </script>
+</body>
+</html>

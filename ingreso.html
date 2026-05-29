@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
+    <script src="firebase-auth.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #1a3a5c, #2a5298); min-height: 100vh; padding: 20px; }
@@ -18,133 +19,91 @@
         .logo-icon { font-size: 56px; margin-bottom: 12px; }
         .logo h1 { font-size: 24px; font-weight: 800; color: #1a3a5c; }
         .logo p { color: #6c7a8a; font-size: 13px; margin-top: 6px; }
-        
+
         .section-title {
-            font-size: 20px;
-            font-weight: 800;
-            margin: 28px 0 20px 0;
+            font-size: 20px; font-weight: 800; margin: 28px 0 20px 0;
             background: linear-gradient(135deg, #1a3a5c, #2a5298);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; gap: 10px;
         }
         .section-title:first-of-type { margin-top: 0; }
-        
+
         .double-input { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .form-group { margin-bottom: 20px; }
         .form-group label { font-size: 12px; font-weight: 700; color: #1a2a3a; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px; }
         .form-control, .form-select {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e2e8f0;
-            border-radius: 28px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            transition: all 0.3s;
+            width: 100%; padding: 14px 18px; border: 2px solid #e2e8f0; border-radius: 28px;
+            font-family: 'Inter', sans-serif; font-size: 15px; transition: all 0.3s;
         }
         .form-control:focus, .form-select:focus { outline: none; border-color: #2a5298; box-shadow: 0 0 0 4px rgba(42,82,152,0.1); }
-        
+
         .ministerio-card {
-            background: #f8fafd;
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 16px;
-            transition: all 0.3s;
-            border: 1px solid #e2e8f0;
+            background: #f8fafd; border-radius: 24px; padding: 20px; margin-bottom: 16px;
+            transition: all 0.3s; border: 1px solid #e2e8f0;
         }
         .ministerio-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .ministerio-nombre { font-weight: 800; margin-bottom: 16px; color: #1a3a5c; font-size: 16px; display: flex; align-items: center; gap: 8px; }
-        
+
+        .count-col label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 8px; text-align: center; }
+
         .number-control {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: white;
-            border-radius: 60px;
-            border: 2px solid #e2e8f0;
-            padding: 4px;
-            transition: all 0.3s;
+            display: flex; align-items: center; gap: 12px; background: white;
+            border-radius: 60px; border: 2px solid #e2e8f0; padding: 4px; transition: all 0.3s;
         }
         .number-control:focus-within { border-color: #2a5298; box-shadow: 0 0 0 3px rgba(42,82,152,0.1); }
         .number-control input {
-            flex: 1;
-            border: none;
-            text-align: center;
-            font-size: 18px;
-            font-weight: 700;
-            padding: 10px 0;
-            background: transparent;
-            font-family: 'Inter', sans-serif;
-            color: #1a2a3a;
+            flex: 1; border: none; text-align: center; font-size: 18px; font-weight: 700;
+            padding: 10px 0; background: transparent; font-family: 'Inter', sans-serif; color: #1a2a3a;
         }
         .number-control input:focus { outline: none; }
         .number-control input[type="number"] { -moz-appearance: textfield; }
         .number-control input::-webkit-inner-spin-button,
         .number-control input::-webkit-outer-spin-button { display: none; }
         .number-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: none;
-            background: #f1f5f9;
-            font-size: 24px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #475569;
+            width: 44px; height: 44px; border-radius: 50%; border: none; background: #f1f5f9;
+            font-size: 24px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; color: #475569;
         }
         .number-btn:hover { background: linear-gradient(135deg, #2a5298, #1a3a5c); color: white; transform: scale(1.05); }
-        
+
         .btn-save {
-            width: 100%;
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            padding: 18px;
-            border-radius: 60px;
-            font-size: 18px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-top: 32px;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none;
+            padding: 18px; border-radius: 60px; font-size: 18px; font-weight: 800; cursor: pointer;
+            margin-top: 32px; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
         }
         .btn-save:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -10px rgba(16,185,129,0.5); }
+        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .btn-back {
-            width: 100%;
-            background: white;
-            border: 2px solid #e2e8f0;
-            padding: 14px;
-            border-radius: 60px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 12px;
-            transition: all 0.3s;
+            width: 100%; background: white; border: 2px solid #e2e8f0; padding: 14px; border-radius: 60px;
+            font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 12px; transition: all 0.3s;
         }
         .btn-back:hover { background: #f8fafc; transform: translateY(-2px); }
-        
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 24px;
-            right: 24px;
-            padding: 14px;
-            border-radius: 60px;
-            color: white;
-            text-align: center;
-            background: linear-gradient(135deg, #10b981, #059669);
-            animation: slideUp 0.3s;
-            font-weight: 500;
+
+        .guest-banner {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 2px solid #6ee7b7;
+            border-radius: 20px;
+            padding: 14px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
         }
+        .guest-banner p { font-size: 14px; color: #065f46; font-weight: 600; margin: 0; }
+        .guest-banner a { font-size: 13px; color: #1a3a5c; font-weight: 600; text-decoration: none; }
+        .guest-banner a:hover { text-decoration: underline; }
+
+        .toast {
+            position: fixed; bottom: 24px; left: 24px; right: 24px; padding: 14px;
+            border-radius: 60px; color: white; text-align: center; font-weight: 500; z-index: 1100;
+            animation: slideUp 0.3s;
+        }
+        .toast-success { background: linear-gradient(135deg, #10b981, #059669); }
+        .toast-error { background: linear-gradient(135deg, #ef4444, #dc2626); }
         @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
+
         @media (max-width: 600px) {
             .form-card { padding: 24px; }
             .double-input { grid-template-columns: 1fr; gap: 12px; }
@@ -156,12 +115,20 @@
 <body>
     <div class="form-container">
         <div class="form-card">
+            <div id="guestBanner" class="guest-banner" style="display:none;">
+                <p>👤 Modo invitado — solo puedes registrar asistencia</p>
+                <a href="index.html">Salir</a>
+            </div>
             <div class="logo">
                 <div class="logo-icon">⛪</div>
                 <h1>Registrar Servicio</h1>
-                <p>Complete todos los datos del servicio</p>
+                <p id="subtituloForm">Complete todos los datos del servicio</p>
             </div>
             <form id="registroForm">
+                <div class="form-group" id="groupNombreInvitado" style="display:none;">
+                    <label>👤 TU NOMBRE</label>
+                    <input type="text" id="nombreInvitado" class="form-control" placeholder="Nombre del líder que registra">
+                </div>
                 <div class="double-input">
                     <div class="form-group">
                         <label>📅 FECHA</label>
@@ -191,13 +158,30 @@
                 <div class="section-title">👥 ASISTENTES</div>
                 <div id="asistentesContainer"></div>
 
-                <button type="submit" class="btn-save">💾 GUARDAR REGISTRO</button>
-                <button type="button" class="btn-back" onclick="window.location.href='dashboard.html'">← VOLVER</button>
+                <button type="submit" class="btn-save" id="btnGuardar">💾 GUARDAR REGISTRO</button>
+                <button type="button" class="btn-back" id="btnVolver">← VOLVER</button>
             </form>
         </div>
     </div>
 
+    <script src="auth.js"></script>
     <script>
+        Auth.permitirRegistro();
+        const esInvitado = Auth.esInvitado();
+        const esAdmin = Auth.esAdmin();
+        const usuario = Auth.getUsuario();
+
+        if (esInvitado) {
+            document.getElementById('guestBanner').style.display = 'flex';
+            document.getElementById('groupNombreInvitado').style.display = 'block';
+            document.getElementById('nombreInvitado').value = usuario.nombre !== 'Invitado' ? usuario.nombre : '';
+            document.getElementById('subtituloForm').textContent = 'Registra la asistencia de tu servicio';
+            document.getElementById('btnVolver').onclick = () => { Auth.cerrarSesion(); };
+        } else if (esAdmin) {
+            document.getElementById('subtituloForm').textContent = 'Registro como administrador';
+            document.getElementById('btnVolver').onclick = () => { window.location.href = 'dashboard.html'; };
+        }
+
         const ministerios = [
             { nombre: 'Alabanza', id: 'alabanza', icono: '🎸' },
             { nombre: 'Producción', id: 'produccion', icono: '🎛️' },
@@ -211,165 +195,175 @@
             { nombre: 'Kids (Niños)', id: 'kids', icono: '🧒' }
         ];
 
-        // Firebase reference
-        const dbFirebase = firebase.firestore();
+        function crearControlNumerico(id, etiqueta) {
+            const col = document.createElement('div');
+            col.className = 'count-col';
+            col.innerHTML = `<label>${etiqueta}</label>`;
 
-        function crearControlNumerico(id) {
             const div = document.createElement('div');
             div.className = 'number-control';
-            
+
             const btnMinus = document.createElement('button');
             btnMinus.type = 'button';
             btnMinus.className = 'number-btn';
             btnMinus.textContent = '−';
-            
+
             const input = document.createElement('input');
             input.type = 'number';
             input.id = id;
             input.value = '0';
             input.min = '0';
             input.setAttribute('inputmode', 'numeric');
-            
+
             input.addEventListener('keydown', (e) => {
                 if (e.key === '-' || e.key === 'e' || (isNaN(Number(e.key)) && e.key !== 'Backspace' && e.key !== 'Tab' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) {
                     e.preventDefault();
                 }
             });
-            
             input.addEventListener('change', () => {
                 let val = parseInt(input.value);
                 if (isNaN(val) || val < 0) input.value = 0;
             });
-            
             input.addEventListener('click', () => input.select());
-            
+
             const btnPlus = document.createElement('button');
             btnPlus.type = 'button';
             btnPlus.className = 'number-btn';
             btnPlus.textContent = '+';
-            
-            btnMinus.onclick = () => {
-                let val = parseInt(input.value) || 0;
-                if (val > 0) input.value = val - 1;
-            };
-            
-            btnPlus.onclick = () => {
-                let val = parseInt(input.value) || 0;
-                input.value = val + 1;
-            };
-            
+
+            btnMinus.onclick = () => { let val = parseInt(input.value) || 0; if (val > 0) input.value = val - 1; };
+            btnPlus.onclick = () => { let val = parseInt(input.value) || 0; input.value = val + 1; };
+
             div.appendChild(btnMinus);
             div.appendChild(input);
             div.appendChild(btnPlus);
-            return div;
+            col.appendChild(div);
+            return col;
         }
 
         function cargarFormulario() {
             const ministeriosContainer = document.getElementById('ministeriosContainer');
             ministeriosContainer.innerHTML = '';
-            
             ministerios.forEach(m => {
                 const card = document.createElement('div');
                 card.className = 'ministerio-card';
                 card.innerHTML = `<div class="ministerio-nombre">${m.icono} ${m.nombre}</div><div class="double-input"></div>`;
                 const doubleDiv = card.querySelector('.double-input');
-                doubleDiv.appendChild(crearControlNumerico(`${m.id}V`));
-                doubleDiv.appendChild(crearControlNumerico(`${m.id}M`));
+                doubleDiv.appendChild(crearControlNumerico(`${m.id}V`, '👨 Hombres'));
+                doubleDiv.appendChild(crearControlNumerico(`${m.id}M`, '👩 Mujeres'));
                 ministeriosContainer.appendChild(card);
             });
-            
+
             const asistentesContainer = document.getElementById('asistentesContainer');
             asistentesContainer.innerHTML = '';
-            
             asistentes.forEach(a => {
                 const card = document.createElement('div');
                 card.className = 'ministerio-card';
+                const labels = a.id === 'kids' ? ['👦 Niños', '👧 Niñas'] : ['👨 Hombres', '👩 Mujeres'];
                 card.innerHTML = `<div class="ministerio-nombre">${a.icono} ${a.nombre}</div><div class="double-input"></div>`;
                 const doubleDiv = card.querySelector('.double-input');
-                doubleDiv.appendChild(crearControlNumerico(`${a.id}V`));
-                doubleDiv.appendChild(crearControlNumerico(`${a.id}M`));
+                doubleDiv.appendChild(crearControlNumerico(`${a.id}V`, labels[0]));
+                doubleDiv.appendChild(crearControlNumerico(`${a.id}M`, labels[1]));
                 asistentesContainer.appendChild(card);
             });
         }
 
         function obtenerDatos() {
-            const datos = {
-                fecha: document.getElementById('fecha').value,
-                sede: document.getElementById('sede').value,
-                ministerios: {},
-                asistentes: {}
-            };
-            
+            const datos = { fecha: document.getElementById('fecha').value, sede: document.getElementById('sede').value, ministerios: {}, asistentes: {} };
             ministerios.forEach(m => {
                 datos.ministerios[m.id] = {
                     v: Number(document.getElementById(`${m.id}V`)?.value) || 0,
                     m: Number(document.getElementById(`${m.id}M`)?.value) || 0
                 };
             });
-            
             asistentes.forEach(a => {
                 datos.asistentes[a.id] = {
                     v: Number(document.getElementById(`${a.id}V`)?.value) || 0,
                     m: Number(document.getElementById(`${a.id}M`)?.value) || 0
                 };
             });
-            
             return datos;
         }
 
         function obtenerSemana(fecha) {
-            let d = new Date(fecha);
-            let year = d.getFullYear();
-            let start = new Date(year, 0, 1);
-            let days = Math.floor((d - start) / (24 * 60 * 60 * 1000));
-            let week = Math.ceil((days + start.getDay() + 1) / 7);
-            return `${year}-W${week.toString().padStart(2, '0')}`;
+            if (!fecha) return '';
+            const d = new Date(fecha + 'T12:00:00');
+            const dayNum = d.getDay() || 7;
+            d.setDate(d.getDate() + 4 - dayNum);
+            const yearStart = new Date(d.getFullYear(), 0, 1);
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return `${d.getFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
         }
 
-        async function guardarRegistroFirebase(registro) {
-            await dbFirebase.collection('registros').add(registro);
-        }
-
-        function toast(msg) {
+        function toast(msg, tipo = 'success') {
             let t = document.createElement('div');
-            t.className = 'toast';
+            t.className = 'toast toast-' + tipo;
             t.innerText = msg;
             document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+            setTimeout(() => t.remove(), 4000);
         }
 
         document.getElementById('registroForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+            const btn = document.getElementById('btnGuardar');
             const datos = obtenerDatos();
-            if (!datos.fecha) { toast('❌ Seleccione una fecha'); return; }
-            if (!datos.sede) { toast('❌ Seleccione una sede'); return; }
-            
+
+            if (!datos.fecha) { toast('❌ Seleccione una fecha', 'error'); return; }
+            if (!datos.sede) { toast('❌ Seleccione una sede', 'error'); return; }
+
+            let nombreRegistro = esAdmin ? (usuario.nombre || 'Administrador') : document.getElementById('nombreInvitado').value.trim();
+            if (esInvitado && !nombreRegistro) {
+                toast('❌ Escribe tu nombre para identificar el registro', 'error');
+                return;
+            }
+            if (esInvitado) Auth.entrarComoInvitado(nombreRegistro);
+
             const totalMinisteriosV = Object.values(datos.ministerios).reduce((s, m) => s + m.v, 0);
             const totalMinisteriosM = Object.values(datos.ministerios).reduce((s, m) => s + m.m, 0);
             const totalAdultosV = datos.asistentes.adultos.v;
             const totalAdultosM = datos.asistentes.adultos.m;
             const totalKidsV = datos.asistentes.kids.v;
             const totalKidsM = datos.asistentes.kids.m;
-            
+
             const nuevoRegistro = {
                 fecha: datos.fecha,
                 sede: datos.sede,
                 semana: obtenerSemana(datos.fecha),
+                mes: datos.fecha.substring(0, 7),
                 totalGeneral: totalMinisteriosV + totalMinisteriosM + totalAdultosV + totalAdultosM + totalKidsV + totalKidsM,
                 totalVarones: totalMinisteriosV + totalAdultosV + totalKidsV,
                 totalMujeres: totalMinisteriosM + totalAdultosM + totalKidsM,
                 totalKV: totalKidsV,
                 totalKM: totalKidsM,
                 ministerios: datos.ministerios,
-                asistentes: datos.asistentes
+                asistentes: datos.asistentes,
+                registradoPor: nombreRegistro,
+                origen: esInvitado ? 'invitado' : 'admin',
+                creadoEn: new Date().toISOString()
             };
-            
-            await guardarRegistroFirebase(nuevoRegistro);
-            toast('✅ Registro guardado exitosamente');
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1500);
+
+            btn.disabled = true;
+            btn.innerText = 'Guardando...';
+
+            try {
+                await firebaseReady;
+                await db.collection('registros').add(nuevoRegistro);
+                toast('✅ Registro guardado exitosamente');
+                if (esInvitado) {
+                    document.getElementById('registroForm').reset();
+                    document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+                    cargarFormulario();
+                    btn.disabled = false;
+                    btn.innerText = '💾 GUARDAR REGISTRO';
+                } else {
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+                }
+            } catch (err) {
+                console.error('Error Firebase:', err);
+                toast('❌ Error al guardar: ' + err.message, 'error');
+                btn.disabled = false;
+                btn.innerText = '💾 GUARDAR REGISTRO';
+            }
         });
 
         document.getElementById('fecha').value = new Date().toISOString().split('T')[0];

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EDL - Escuela de Liderazgo | Iglesia Agua Viva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-auth.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f2f8; color: #1a2a3a; min-height: 100vh; }
+
+        .app-layout { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a3a5c 0%, #2a5298 100%);
+            color: white;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+        .sidebar-logo { padding: 0 12px; margin-bottom: 40px; }
+        .sidebar-logo h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .sidebar-logo p { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 18px;
+            color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.2s;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
+        .nav-link.active { background: white; color: #1a3a5c; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-x: hidden; }
+
+        .header {
+            background: white; color: #1a3a5c; padding: 20px 32px; display: flex;
+            justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 10;
+        }
+        .user-area { display: flex; align-items: center; gap: 20px; background: #f8fafd; padding: 8px 24px; border-radius: 60px; border: 1px solid #e2e8f0; }
+        .logout-btn { background: #1a3a5c; border: none; padding: 8px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; }
+
+        .container { max-width: 1400px; width: 100%; margin: 0 auto; padding: 32px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 32px; }
+        .stat-card {
+            background: white; border-radius: 28px; padding: 24px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03);
+        }
+        .stat-value { font-size: 32px; font-weight: 800; color: #1a3a5c; }
+        .stat-label { font-size: 13px; color: #6c7a8a; margin-top: 8px; font-weight: 500; }
+
+        .content-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; margin-bottom: 32px; }
+        .info-card {
+            background: linear-gradient(135deg, #1a3a5c, #2a5298);
+            color: white; border-radius: 28px; padding: 28px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 13px; line-height: 1.7;
+        }
+        .info-card h3 { font-size: 16px; margin-bottom: 16px; font-weight: 700; }
+
+        .filters-bar {
+            background: white; border-radius: 28px; padding: 20px 24px; margin-bottom: 24px;
+            display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .filter-group { flex: 1; min-width: 160px; }
+        .filter-group label { font-size: 11px; font-weight: 700; color: #6c7a8a; text-transform: uppercase; display: block; margin-bottom: 6px; }
+        .filter-input, .filter-select {
+            width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 20px;
+            font-family: inherit; font-size: 14px;
+        }
+        .filter-input:focus, .filter-select:focus { outline: none; border-color: #2a5298; }
+
+        .btn-primary { background: linear-gradient(135deg, #2a5298, #1a3a5c); color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; }
+        .btn-secondary { background: white; border: 2px solid #e2e8f0; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; }
+
+        .section-card { background: white; border-radius: 28px; padding: 28px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .section-title { font-size: 20px; font-weight: 700; color: #1a2a3a; }
+
+        .table-container { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .data-table th { text-align: left; padding: 12px 10px; background: #f8fafd; font-weight: 600; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+        .data-table td { padding: 12px 10px; border-bottom: 1px solid #eef2f8; vertical-align: middle; }
+
+        .estado-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .estado-pagado { background: #dcfce7; color: #166534; }
+        .estado-debe { background: #fef3c7; color: #92400e; }
+
+        .action-btn { border: none; padding: 6px 10px; border-radius: 20px; cursor: pointer; font-size: 11px; margin-right: 4px; }
+        .btn-edit { background: #2a5298; color: white; }
+        .btn-del { background: #dc2626; color: white; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 40px; max-width: 650px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative; }
+        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; background: none; border: none; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 700; color: #1a2a3a; text-transform: uppercase; margin-bottom: 6px; }
+        .form-control { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 24px; font-family: inherit; font-size: 14px; }
+        .form-control:focus { outline: none; border-color: #2a5298; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .curso-info { background: #f8fafd; border-radius: 16px; padding: 16px; margin-bottom: 16px; font-size: 13px; color: #475569; display: none; }
+        .curso-info.visible { display: block; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); padding: 14px 32px; border-radius: 60px; color: white; font-weight: 600; z-index: 2000; max-width: 90%; text-align: center; }
+        .toast-success { background: #10b981; }
+        .toast-warning { background: #f59e0b; }
+
+        @media (max-width: 1100px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .info-card { order: -1; }
+        }
+        @media (max-width: 992px) {
+            .app-layout { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; position: sticky; top: 0; padding: 12px 20px; }
+            .sidebar-logo { display: none; }
+            .nav-link { white-space: nowrap; padding: 10px 16px; border-radius: 12px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .container { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>⛪ Agua Viva</h2>
+                <p>Gestión Ministerial</p>
+            </div>
+            <a href="dashboard.html" class="nav-link">📊 Reporte de Asistencia</a>
+            <a href="predicadores.html" class="nav-link">🎤 Anfitriones y Predicadores</a>
+            <a href="creativos.html" class="nav-link">🎨 Creativos</a>
+            <a href="edl.html" class="nav-link active">🎓 EDL (Escuela de Liderazgo)</a>
+        </aside>
+
+        <div class="main-content">
+            <div class="header">
+                <div style="font-weight: 800; font-size: 20px; color: #1a3a5c;">🎓 EDL – Escuela de Liderazgo</div>
+                <div class="user-area">
+                    <div id="userName" style="font-weight: 600; font-size: 14px;">Administrador</div>
+                    <button class="logout-btn" onclick="cerrarSesion()">Salir</button>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div style="font-size: 28px;">📝</div>
+                        <div class="stat-value" id="statInscripciones">0</div>
+                        <div class="stat-label">Total inscripciones</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 28px;">✅</div>
+                        <div class="stat-value" id="statPagado">S/0</div>
+                        <div class="stat-label">Total pagado</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 28px;">⏳</div>
+                        <div class="stat-value" id="statPendiente">S/0</div>
+                        <div class="stat-label">Total pendiente</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 28px;">💰</div>
+                        <div class="stat-value" id="statEsperado">S/0</div>
+                        <div class="stat-label">Recaudación esperada</div>
+                    </div>
+                </div>
+
+                <div class="content-grid">
+                    <div>
+                        <div class="filters-bar">
+                            <div class="filter-group">
+                                <label>🔍 Buscar</label>
+                                <input type="text" id="filtroBusqueda" class="filter-input" placeholder="Nombre o DNI...">
+                            </div>
+                            <div class="filter-group">
+                                <label>📚 Curso</label>
+                                <select id="filtroCurso" class="filter-select">
+                                    <option value="">Todos los cursos</option>
+                                </select>
+                            </div>
+                            <button class="btn-primary" onclick="aplicarFiltros()">🔍 Filtrar</button>
+                            <button class="btn-secondary" onclick="exportarExcel()">📎 Exportar a Excel</button>
+                            <button class="btn-primary" onclick="abrirModal()">➕ Nueva inscripción</button>
+                        </div>
+
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="section-title">📋 Inscripciones</div>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombres</th><th>DNI</th><th>Celular</th><th>Correo</th><th>Líder</th>
+                                            <th>Curso</th><th>Fecha/Horario</th><th>Monto</th><th>Estado pago</th><th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaInscripciones">
+                                        <tr><td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">Cargando...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>📢 Información EDL</h3>
+                        <p>Buen día amados hermanos 😃, no es tiempo de detenernos, es necesario seguir avanzando y seguir preparándote, por ello te animamos a inscribirte ✏️🖊️ en los cursos y seminarios que tenemos este ciclo en la EDL. 🤓.</p>
+                        <p style="margin-top:12px;">🔥El requisito para el seminario de Int. Dones del Espíritu Santo es haber aprobado el Discipulado 3.</p>
+                        <p style="margin-top:8px;">🔥El seminario de Apologética no tiene requisito.</p>
+                        <p style="margin-top:12px;">📒🖊️Inscripciones en oficina, o al yape o Plin al número <strong>964940579</strong> y enviar la captura.</p>
+                        <p style="margin-top:12px;">👉🏻 Costo :<br>
+                        Discipulado 1: S/30.00<br>
+                        Discipulado 2 y 3: S/ 50.00<br>
+                        Lidere 1,2 y 3: S/ 50.00<br>
+                        Seminarios : S/ 50.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalInscripcion" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            <h2 style="margin-bottom: 24px; color: #1a3a5c;" id="modalTitle">Nueva Inscripción</h2>
+            <form id="formInscripcion">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Nombres y apellidos completos *</label>
+                    <input type="text" id="insNombres" class="form-control" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>DNI *</label>
+                        <input type="text" id="insDni" class="form-control" required maxlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label>Celular *</label>
+                        <input type="tel" id="insCelular" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Correo personal *</label>
+                    <input type="email" id="insCorreo" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Líder (quien inscribe) *</label>
+                    <input type="text" id="insLider" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Curso *</label>
+                    <select id="insCurso" class="form-control" required></select>
+                </div>
+                <div class="curso-info" id="cursoInfo"></div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Monto</label>
+                        <input type="text" id="insMonto" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado de pago *</label>
+                        <select id="insEstado" class="form-control" required>
+                            <option value="Debe">Debe (adeuda)</option>
+                            <option value="Canceló">Canceló (pagó)</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%;margin-top:10px;">💾 Guardar inscripción</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual'));
+        if (!usuarioActual || usuarioActual.rol !== 'admin') { window.location.href = 'index.html'; }
+        document.getElementById('userName').innerText = usuarioActual.nombre;
+
+        const CURSOS = [
+            { id: 'disc1_next', nombre: 'Discipulado 1 NEXT', inicio: '20 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 30 },
+            { id: 'disc2_next', nombre: 'Discipulado 2 NEXT', inicio: '20 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 50 },
+            { id: 'disc1', nombre: 'Discipulado 1', inicio: '20 de junio', dia: 'Sábado', hora: '5:30 PM', monto: 30 },
+            { id: 'disc2', nombre: 'Discipulado 2', inicio: '18 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50 },
+            { id: 'disc3', nombre: 'Discipulado 3', inicio: '18 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50 },
+            { id: 'lidere1', nombre: 'Lidere 1', inicio: '17 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
+            { id: 'lidere2', nombre: 'Lidere 2', inicio: '17 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
+            { id: 'lidere3', nombre: 'Lidere 3', inicio: '17 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
+            { id: 'sem_apologetica', nombre: 'Seminario: Apologética', inicio: '20 de junio', dia: 'Sábado', hora: '5:30 PM', monto: 50 },
+            { id: 'sem_dones', nombre: 'Seminario: Int. Dones del Espíritu Santo', inicio: '18 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50, requiereDisc3: true }
+        ];
+
+        const dbIns = db.collection('inscripciones');
+        let inscripciones = [];
+        let inscripcionesFiltradas = [];
+        let editandoId = null;
+
+        function initCursosSelect() {
+            const selModal = document.getElementById('insCurso');
+            const selFiltro = document.getElementById('filtroCurso');
+            CURSOS.forEach(c => {
+                selModal.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
+                selFiltro.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
+            });
+        }
+
+        function getCurso(id) { return CURSOS.find(c => c.id === id); }
+
+        function formatMonto(n) { return 'S/' + n.toFixed(2); }
+
+        document.getElementById('insCurso').addEventListener('change', function() {
+            const curso = getCurso(this.value);
+            const info = document.getElementById('cursoInfo');
+            if (!curso) { info.classList.remove('visible'); return; }
+
+            document.getElementById('insMonto').value = formatMonto(curso.monto);
+            info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}`;
+            info.classList.add('visible');
+
+            if (curso.requiereDisc3) {
+                toast('El alumno debe haber aprobado Discipulado 3. Verifique que cumpla el requisito.', 'warning');
+            }
+        });
+
+        async function cargarInscripciones() {
+            await firebaseReady;
+            const snapshot = await dbIns.get();
+            inscripciones = [];
+            snapshot.forEach(doc => inscripciones.push({ id: doc.id, ...doc.data() }));
+            inscripciones.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+            aplicarFiltros();
+        }
+
+        function aplicarFiltros() {
+            const busqueda = document.getElementById('filtroBusqueda').value.trim().toLowerCase();
+            const curso = document.getElementById('filtroCurso').value;
+
+            inscripcionesFiltradas = inscripciones.filter(i => {
+                if (curso && i.cursoId !== curso) return false;
+                if (busqueda) {
+                    const match = (i.nombres || '').toLowerCase().includes(busqueda) || (i.dni || '').includes(busqueda);
+                    if (!match) return false;
+                }
+                return true;
+            });
+
+            actualizarStats(inscripcionesFiltradas);
+            renderTabla();
+        }
+
+        function actualizarStats(data) {
+            document.getElementById('statInscripciones').innerText = data.length;
+            const pagado = data.filter(i => i.estadoPago === 'Canceló').reduce((s, i) => s + (i.monto || 0), 0);
+            const pendiente = data.filter(i => i.estadoPago === 'Debe').reduce((s, i) => s + (i.monto || 0), 0);
+            const esperado = data.reduce((s, i) => s + (i.monto || 0), 0);
+            document.getElementById('statPagado').innerText = formatMonto(pagado);
+            document.getElementById('statPendiente').innerText = formatMonto(pendiente);
+            document.getElementById('statEsperado').innerText = formatMonto(esperado);
+        }
+
+        function renderTabla() {
+            const tbody = document.getElementById('tablaInscripciones');
+            if (inscripcionesFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">No hay inscripciones</td></tr>';
+                return;
+            }
+            tbody.innerHTML = inscripcionesFiltradas.map(i => {
+                const curso = getCurso(i.cursoId);
+                const horario = curso ? `${curso.dia} ${curso.hora}` : (i.fechaHorario || '-');
+                const estadoCls = i.estadoPago === 'Canceló' ? 'estado-pagado' : 'estado-debe';
+                return `<tr>
+                    <td><strong>${i.nombres}</strong></td>
+                    <td>${i.dni}</td>
+                    <td>${i.celular}</td>
+                    <td>${i.correo}</td>
+                    <td>${i.lider}</td>
+                    <td>${i.cursoNombre || curso?.nombre || '-'}</td>
+                    <td>${horario}</td>
+                    <td>${formatMonto(i.monto || 0)}</td>
+                    <td><span class="estado-badge ${estadoCls}">${i.estadoPago}</span></td>
+                    <td>
+                        <button class="action-btn btn-edit" onclick="editarInscripcion('${i.id}')">✏️</button>
+                        <button class="action-btn btn-del" onclick="eliminarInscripcion('${i.id}')">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        document.getElementById('formInscripcion').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const cursoId = document.getElementById('insCurso').value;
+            const curso = getCurso(cursoId);
+            if (!curso) return;
+
+            const data = {
+                nombres: document.getElementById('insNombres').value.trim(),
+                dni: document.getElementById('insDni').value.trim(),
+                celular: document.getElementById('insCelular').value.trim(),
+                correo: document.getElementById('insCorreo').value.trim(),
+                lider: document.getElementById('insLider').value.trim(),
+                cursoId: cursoId,
+                cursoNombre: curso.nombre,
+                fechaHorario: `${curso.dia} ${curso.hora} (Inicio: ${curso.inicio})`,
+                monto: curso.monto,
+                estadoPago: document.getElementById('insEstado').value,
+                timestamp: new Date().toISOString()
+            };
+
+            if (editandoId) {
+                await dbIns.doc(editandoId).update(data);
+                toast('✅ Inscripción actualizada');
+            } else {
+                await dbIns.add(data);
+                toast('✅ Inscripción registrada');
+            }
+            cerrarModal();
+            cargarInscripciones();
+        });
+
+        function abrirModal() {
+            editandoId = null;
+            document.getElementById('formInscripcion').reset();
+            document.getElementById('insEstado').value = 'Debe';
+            document.getElementById('cursoInfo').classList.remove('visible');
+            document.getElementById('insMonto').value = '';
+            document.getElementById('modalTitle').innerText = 'Nueva Inscripción';
+            document.getElementById('modalInscripcion').style.display = 'flex';
+        }
+
+        async function editarInscripcion(id) {
+            const doc = await dbIns.doc(id).get();
+            const i = doc.data();
+            editandoId = id;
+            document.getElementById('insNombres').value = i.nombres;
+            document.getElementById('insDni').value = i.dni;
+            document.getElementById('insCelular').value = i.celular;
+            document.getElementById('insCorreo').value = i.correo;
+            document.getElementById('insLider').value = i.lider;
+            document.getElementById('insCurso').value = i.cursoId;
+            document.getElementById('insEstado').value = i.estadoPago;
+            document.getElementById('insCurso').dispatchEvent(new Event('change'));
+            document.getElementById('modalTitle').innerText = 'Editar Inscripción';
+            document.getElementById('modalInscripcion').style.display = 'flex';
+        }
+
+        async function eliminarInscripcion(id) {
+            if (confirm('¿Eliminar esta inscripción?')) {
+                await dbIns.doc(id).delete();
+                toast('🗑️ Inscripción eliminada');
+                cargarInscripciones();
+            }
+        }
+
+        function exportarExcel() {
+            const datos = inscripcionesFiltradas.map(i => {
+                const curso = getCurso(i.cursoId);
+                return {
+                    Nombres: i.nombres, DNI: i.dni, Celular: i.celular, Correo: i.correo,
+                    Lider: i.lider, Curso: i.cursoNombre || curso?.nombre,
+                    'Fecha/Horario': i.fechaHorario || (curso ? `${curso.dia} ${curso.hora}` : ''),
+                    Monto: i.monto, 'Estado pago': i.estadoPago
+                };
+            });
+            const ws = XLSX.utils.json_to_sheet(datos);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Inscripciones EDL');
+            XLSX.writeFile(wb, `edl_inscripciones_${new Date().toISOString().split('T')[0]}.xlsx`);
+            toast('📎 Excel exportado');
+        }
+
+        function toast(msg, tipo = 'success') {
+            const t = document.createElement('div');
+            t.className = 'toast toast-' + tipo;
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, tipo === 'warning' ? 5000 : 3000);
+        }
+
+        function cerrarModal() { document.getElementById('modalInscripcion').style.display = 'none'; }
+        function cerrarSesion() { localStorage.removeItem('usuarioActual'); window.location.href = 'index.html'; }
+
+        document.getElementById('filtroBusqueda').addEventListener('input', aplicarFiltros);
+        document.getElementById('filtroCurso').addEventListener('change', aplicarFiltros);
+
+        initCursosSelect();
+        cargarInscripciones();
+    </script>
+</body>
+</html>
