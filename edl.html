@@ -170,6 +170,12 @@
             .app-layout { flex-direction: column; }
             .main-content { width: 100%; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .content-grid { grid-template-columns: 1fr; }
+            .info-card { margin-top: 0; }
+            .filters-bar { flex-direction: column; }
+            .filters-bar .filter-group { width: 100%; }
+            .filters-bar input, .filters-bar select { width: 100%; }
+            .filters-bar .btn-primary, .filters-bar .btn-secondary { width: 100%; text-align: center; }
         }
         @media (max-width: 600px) {
             .stats-grid { grid-template-columns: 1fr; gap: 12px; }
