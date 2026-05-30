@@ -260,7 +260,7 @@
                         <div>📂 Carga masiva (Excel, Word, PDF, CSV, imagen)</div>
                         <div style="font-size: 12px; margin-top: 8px;">Arrastra un archivo aquí o haz clic para seleccionar</div>
                         <div class="upload-filename" id="uploadFilename"></div>
-                        <input type="file" id="bulkUpload" style="display: none;" accept=".xlsx,.xls,.csv,.doc,.docx,.pdf,.png,.jpg,.jpeg,.gif,.webp">
+                        <input type="file" id="bulkUpload" style="display: none;" accept="*">
                         <button class="btn-template" style="margin-top:12px;" onclick="abrirPegarTexto()">📝 Pegar texto de la tabla</button>
                     </div>
 
@@ -853,23 +853,26 @@
         function mostrarArchivo(file) {
             uploadFilename.innerText = '📄 ' + file.name;
             const ext = file.name.split('.').pop().toLowerCase();
-            const isDoc = ext === 'doc';
+            const type = file.type;
 
-            if (ext === 'xlsx' || ext === 'xls') {
+            if (ext === 'xlsx' || ext === 'xls' || type.includes('spreadsheet') || type.includes('excel')) {
                 procesarExcel(file);
-            } else if (ext === 'csv') {
+            } else if (ext === 'csv' || type === 'text/csv') {
                 procesarCSV(file);
-            } else if (ext === 'docx') {
+            } else if (ext === 'docx' || (ext === 'doc' && type.includes('word')) || type.includes('word')) {
                 procesarWord(file);
-            } else if (isDoc) {
-                toast('⚠️ Formato .doc no soportado. Guarda como .docx o copia y pega el contenido con "Pegar texto"', 'warning');
-            } else if (ext === 'pdf') {
+            } else if (ext === 'pdf' || type === 'application/pdf') {
                 procesarPDF(file);
-            } else if (file.type.startsWith('image/')) {
+            } else if (ext === 'doc') {
+                toast('⚠️ .doc antiguo no soportado. Abre en Word y guarda como .docx, o copia y pega.', 'warning');
+                abrirPegarTexto();
+            } else if (type.startsWith('image/')) {
                 procesarImagenOCR(file);
             } else {
-                toast('Formato no soportado: ' + ext);
+                toast('Formato no reconocido. Usa "Pegar texto" o sube Excel/Word/PDF/imagen.', 'warning');
+                abrirPegarTexto();
             }
+        }
         }
 
         async function procesarExcel(file) {
@@ -902,24 +905,32 @@
             toast('📝 Procesando Word...');
             try {
                 if (typeof mammoth === 'undefined') {
-                    toast('⚠️ Biblioteca Word no cargada. Copia y pega el contenido manualmente.', 'warning');
+                    toast('⚠️ Biblioteca Word no disponible. Pega el contenido manualmente.', 'warning');
+                    abrirPegarTexto();
                     return;
                 }
                 const arrayBuffer = await file.arrayBuffer();
                 const result = await mammoth.extractRawText({ arrayBuffer });
                 if (!result.value || result.value.trim().length < 5) {
-                    toast('⚠️ El Word no contiene texto. Copia y pega manualmente.', 'warning');
+                    toast('⚠️ El Word no contiene texto. Pega el contenido manualmente.', 'warning');
+                    abrirPegarTexto();
                     return;
                 }
                 procesarTextoExtraido(result.value);
             } catch (e) {
-                toast('❌ Error al leer Word: ' + e.message + '. Copia y pega el contenido.', 'warning');
+                toast('❌ ' + e.message + '. Pega el contenido manualmente.', 'warning');
+                abrirPegarTexto();
             }
         }
 
         async function procesarPDF(file) {
             toast('📕 Procesando PDF...');
             try {
+                if (typeof pdfjsLib === 'undefined') {
+                    toast('⚠️ Biblioteca PDF no disponible. Pega el contenido manualmente.', 'warning');
+                    abrirPegarTexto();
+                    return;
+                }
                 const data = await file.arrayBuffer();
                 const pdf = await pdfjsLib.getDocument({ data }).promise;
                 let fullText = '';
@@ -930,22 +941,25 @@
                 }
                 procesarTextoExtraido(fullText);
             } catch (e) {
-                toast('❌ No se pudo leer el PDF. Copia y pega el contenido manualmente.', 'warning');
-                console.error(e);
+                toast('❌ No se pudo leer el PDF. Pega el contenido manualmente.', 'warning');
+                abrirPegarTexto();
             }
         }
 
         function procesarTextoExtraido(text) {
             if (!text || text.trim().length < 10) {
-                toast('⚠️ No se encontraron datos en el archivo', 'warning');
+                toast('⚠️ No se encontraron datos en el archivo. Pega el texto manualmente.', 'warning');
+                abrirPegarTexto();
                 return;
             }
             const records = parsearTextoOCR(text);
             if (records.length === 0) {
-                toast('⚠️ No se pudieron extraer registros. Revisa el texto crudo.', 'warning');
+                toast('⚠️ No se pudieron extraer registros. Pega el texto manualmente.', 'warning');
                 document.getElementById('ocrRawText').innerText = text;
                 document.getElementById('ocrRawText').style.display = 'block';
-                document.getElementById('ocrPreviewBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">Sin registros detectados</td></tr>';
+                document.getElementById('ocrPasteArea').style.display = 'block';
+                document.getElementById('ocrPasteInput').value = text;
+                document.getElementById('ocrPreviewBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;font-size:13px;">No se detectaron registros automáticamente.<br>Edita el texto arriba y presiona "Procesar", o corrige manualmente.</td></tr>';
                 document.getElementById('modalOCR').style.display = 'flex';
                 return;
             }
