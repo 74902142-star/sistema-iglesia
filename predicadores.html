@@ -563,7 +563,6 @@
 
             const predicadores = participantesCache.filter(p => p.rol === 'Predicador');
             const anfitriones = participantesCache.filter(p => p.rol === 'Anfitrión');
-            const hoy = hoyStr();
 
             renderTabla(predicadores, 'tablaPredicadores');
             renderTabla(anfitriones, 'tablaAnfitriones');
@@ -737,13 +736,22 @@
 
         async function revisarRecordatoriosAutomaticos() {
             const now = new Date();
-            // Solo enviar viernes entre 10pm y 11pm
             if (now.getDay() !== 5 || now.getHours() < 22 || now.getHours() >= 23) return;
+
+            const day = now.getDay();
+            const monday = new Date(now);
+            monday.setDate(now.getDate() + (day === 0 ? -6 : 1 - day));
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            const weekStart = monday.toISOString().split('T')[0];
+            const weekEnd = sunday.toISOString().split('T')[0];
+
             try {
                 const snapshot = await dbPart.where('enviado', '==', false).get();
                 snapshot.forEach(doc => {
                     const p = doc.data();
-                    if (esEnviado(p)) return;
+                    if (esEnviado(p) || !p.fecha) return;
+                    if (p.fecha < weekStart || p.fecha > weekEnd) return;
                     const telefono = '51' + p.telefono;
                     const msg = construirMensaje(p);
                     window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
