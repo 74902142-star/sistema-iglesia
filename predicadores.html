@@ -872,96 +872,115 @@
         }
 
         function parsearTextoOCR(text) {
-            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 5);
             const records = [];
             const meses = { 'enero':'01','febrero':'02','marzo':'03','abril':'04','mayo':'05','junio':'06','julio':'07','agosto':'08','septiembre':'09','octubre':'10','noviembre':'11','diciembre':'12' };
 
-            for (const line of lines) {
+            let headerIdx = -1;
+            for (let i = 0; i < lines.length; i++) {
+                const l = lines[i].toLowerCase();
+                if ((l.includes('anuncio') || l.includes('presentac')) && l.includes('predicador')) {
+                    headerIdx = i;
+                    break;
+                }
+                if (l.includes('anuncio') || l.includes('presentac') || l.includes('predicador')) {
+                    headerIdx = i;
+                }
+            }
+
+            const dataLines = headerIdx >= 0 ? lines.slice(headerIdx + 1) : lines;
+            const servicios = [
+                { re: /next\s*plus|nextplus/i, key: 'NEXT_PLUS' },
+                { re: /\bnext\b/i, key: 'NEXT' },
+                { re: /domingo.*10.*(huancayo|hyo)|10\s*am.*(huancayo|hyo)/i, key: 'DOMINGO_10_HYO' },
+                { re: /domingo.*12.*(huancayo|hyo)|12\s*pm.*(huancayo|hyo)/i, key: 'DOMINGO_12_HYO' },
+                { re: /domingo.*12.*tambo|12\s*pm.*tambo/i, key: 'DOMINGO_12_TAMBO' },
+                { re: /domingo.*(18|6).*tambo|(18|6)\s*pm.*tambo/i, key: 'DOMINGO_18_TAMBO' },
+                { re: /jauja/i, key: 'JAUJA' },
+                { re: /chupaca|s.bado.*(18|6).*chupaca/i, key: 'CHUPACA' },
+            ];
+
+            const semanaMap = { 'domingo':0,'lunes':1,'martes':2,'miercoles':3,'miércoles':3,'jueves':4,'viernes':5,'sabado':6,'sábado':6 };
+
+            function parseFecha(str) {
+                const parts = str.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
+                if (parts) {
+                    let d = parts[1].padStart(2,'0'), m = parts[2].padStart(2,'0'), y = parts[3] || new Date().getFullYear();
+                    if (y.length === 2) y = '20' + y;
+                    const parsed = new Date(y + '-' + m + '-' + d);
+                    if (!isNaN(parsed.getTime())) return y + '-' + m + '-' + d;
+                }
+                const diaMatch = str.match(/(\d{1,2})\s*de\s*([a-záéíóú]+)/i);
+                if (diaMatch) {
+                    const d = diaMatch[1].padStart(2,'0'), m = meses[diaMatch[2].toLowerCase()];
+                    if (m) return new Date().getFullYear() + '-' + m + '-' + d;
+                }
+                return '';
+            }
+
+            function cleanName(n) {
+                return n.replace(/^[:\-•·\d.\s]+/, '').replace(/[^a-záéíóúñ\s]/gi, '').trim();
+            }
+
+            for (const line of dataLines) {
+                if (!line || line.match(/^[-=+_*]+$/) || line.length < 5) continue;
                 const lower = line.toLowerCase();
-                if (lower.includes('predicador') || lower.includes('anfitrión') || lower.includes('anfitrion') ||
-                    lower.includes('fecha') || lower.includes('servicio') || lower.includes('nombre') ||
-                    lower.includes('día') || lower.includes('dia') || lower.includes('horario') ||
-                    lower.includes('sede') || line.match(/^[-=+*_]+$/) || line.length < 5) continue;
+                if (lower.includes('predicador') || lower.includes('anfitri') || lower.includes('fecha') ||
+                    lower.includes('servicio') || lower.includes('nombre') || lower.includes('día') ||
+                    lower.includes('dia') || lower.includes('horario') || lower.includes('sede') ||
+                    lower.includes('anuncio') || lower.includes('presentac') || lower.includes('ofrenda')) continue;
 
-                let nombre = '', fecha = '', servicio = '', rol = '';
+                const cols = line.split(/\s{2,}|\t+| (?=\d)/);
+                while (cols.length > 0 && cols[0].trim().length === 0) cols.shift();
+                if (cols.length < 3) continue;
 
-                const roles = line.split(/\s{2,}|\t+|(?:\s*[|]\s*)/);
-                if (roles.length < 2) continue;
+                let fechaVal = '', servicioVal = '';
 
-                const words = line.split(/\s+/);
-
-                const servicios = [
-                    { re: /next\s*plus/i, key: 'NEXT_PLUS' },
-                    { re: /next/i, key: 'NEXT' },
-                    { re: /domingo.*10.*huancayo|domingo.*10.*hyo|10am.*huancayo|10.*hyo/i, key: 'DOMINGO_10_HYO' },
-                    { re: /domingo.*12.*huancayo|domingo.*12.*hyo|12pm.*huancayo|12.*hyo/i, key: 'DOMINGO_12_HYO' },
-                    { re: /domingo.*12.*tambo|12pm.*tambo|12.*tambo/i, key: 'DOMINGO_12_TAMBO' },
-                    { re: /domingo.*18.*tambo|domingo.*6.*tambo|6pm.*tambo/i, key: 'DOMINGO_18_TAMBO' },
-                    { re: /jauja|domingo.*10.*jauja/i, key: 'JAUJA' },
-                    { re: /chupaca|sabado.*6.*chupaca|s.bado.*6.*chupaca|6pm.*chupaca/i, key: 'CHUPACA' },
-                ];
-
-                let foundServicio = false;
-                for (const s of servicios) {
-                    if (s.re.test(line)) {
-                        servicio = s.key;
-                        foundServicio = true;
-                        break;
-                    }
-                }
-
-                const foundRoles = [];
-                if (/\bpredicador\b/i.test(line)) foundRoles.push('Predicador');
-                if (/\banfitri.n\b/i.test(line)) foundRoles.push('Anfitrión');
-                if (foundRoles.length === 0) foundRoles.push('Predicador');
-
-                const fechas = line.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/g);
-                let fechaVal = '';
-                if (fechas) {
-                    for (const f of fechas) {
-                        const parts = f.split(/[\/\-]/);
-                        let d = parts[0].padStart(2,'0'), m = parts[1].padStart(2,'0'), y = parts[2] || new Date().getFullYear();
-                        if (y.length === 2) y = '20' + y;
-                        const parsed = new Date(y + '-' + m + '-' + d);
-                        if (!isNaN(parsed.getTime())) { fechaVal = y + '-' + m + '-' + d; break; }
-                    }
-                }
-                if (!fechaVal) {
-                    const diaMatch = line.match(/\b(\d{1,2})\s*de\s*([a-záéíóú]+)\b/i);
-                    if (diaMatch) {
-                        const d = diaMatch[1].padStart(2,'0');
-                        const m = meses[diaMatch[2].toLowerCase()];
-                        if (m) fechaVal = new Date().getFullYear() + '-' + m + '-' + d;
-                    }
-                }
-
-                const partNames = roles.map(r => r.trim()).filter(r => r.length > 2 && !/\bpredicador\b/i.test(r) && !/\banfitri.n\b/i.test(r) && !/\bfecha\b/i.test(r) && !/\bservicio\b/i.test(r) && !/\bhorario\b/i.test(r) && !/\bsede\b/i.test(r));
-                for (const part of partNames) {
-                    const pLower = part.toLowerCase();
-                    if (!fechaVal) {
-                        const f2 = part.match(/\b(\d{1,2})[\/\-](\d{1,2})\b/);
-                        if (f2) continue;
-                    }
-                    if (foundServicio && /(domingo|s.bado|next|jauja|chupaca|10am|12pm|6pm|hyo|tambo)/i.test(pLower)) continue;
-                    const partsBySpaces = part.split(/\s{2,}|\t+/);
-                    if (partsBySpaces.length >= 2) {
-                        for (const sub of partsBySpaces) {
-                            const s = sub.trim();
-                            if (s.length > 2 && !/^\d/.test(s) && !/(domingo|s.bado|next|jauja|chupaca|10am|12pm|6pm|hyo|tambo)/i.test(s)) {
-                                const name = s.replace(/^[:\-•·\d.\s]+/, '').trim();
-                                if (name.length > 2) {
-                                    records.push({ nombre: name, fecha: fechaVal, servicio: servicio, rol: foundRoles.length > 1 ? 'Predicador' : foundRoles[0] });
-                                }
-                            }
+                for (let c = 0; c < Math.min(cols.length, 4); c++) {
+                    const val = cols[c].trim();
+                    if (!fechaVal) fechaVal = parseFecha(val);
+                    if (!servicioVal) {
+                        for (const s of servicios) {
+                            if (s.re.test(val + ' ' + line)) { servicioVal = s.key; break; }
                         }
-                    } else {
-                        const name = part.replace(/^[:\-•·\d.\s]+/, '').trim();
-                        if (name.length > 2 && !/^\d+$/.test(name)) {
-                            records.push({ nombre: name, fecha: fechaVal, servicio: servicio, rol: foundRoles.length > 1 ? 'Predicador' : foundRoles[0] });
-                        }
+                    }
+                }
+
+                if (!fechaVal) continue;
+
+                const nameCols = [];
+                for (const c of cols) {
+                    const trimmed = c.trim();
+                    if (trimmed.length > 2 && !/^\d/.test(trimmed) && !/(domingo|sabado|sábado|next|jauja|chupaca|10am|12pm|6pm|hyo|tambo)/i.test(trimmed)) {
+                        nameCols.push(trimmed);
+                    }
+                }
+
+                const ultimasTres = cols.slice(-3).map(c => c.trim()).filter(c => c.length > 2 && !/^\d/.test(c) && !/(next|domingo|sabado|sábado|10am|12pm|6pm|hyo|tambo)/i.test(c));
+                if (ultimasTres.length === 0) continue;
+
+                const roles = [];
+                const header = lines[headerIdx] ? lines[headerIdx].toLowerCase() : '';
+                if (header.includes('anuncio') || header.includes('presentac')) roles.push('Anfitrión');
+                if (header.includes('predicador')) roles.push('Predicador');
+
+                if (ultimasTres.length >= 2) {
+                    const nom1 = cleanName(ultimasTres[0]);
+                    const nom2 = ultimasTres.length >= 3 ? cleanName(ultimasTres[1]) : '';
+                    const nom3 = cleanName(ultimasTres[ultimasTres.length - 1]);
+
+                    if (nom1.length > 2 && nom1 !== nom2) records.push({ nombre: nom1, fecha: fechaVal, servicio: servicioVal, rol: 'Anfitrión' });
+                    if (nom2 && nom2.length > 2 && nom2 !== nom1) records.push({ nombre: nom2, fecha: fechaVal, servicio: servicioVal, rol: 'Anfitrión' });
+                    if (nom3 && nom3.length > 2 && nom3 !== nom1 && nom3 !== nom2) records.push({ nombre: nom3, fecha: fechaVal, servicio: servicioVal, rol: 'Predicador' });
+                } else {
+                    const nom = cleanName(ultimasTres[0]);
+                    if (nom.length > 2) {
+                        const rol = roles.length === 1 && roles[0] === 'Predicador' ? 'Predicador' : 'Anfitrión';
+                        records.push({ nombre: nom, fecha: fechaVal, servicio: servicioVal, rol });
                     }
                 }
             }
+
             return unificarRegistros(records);
         }
 
