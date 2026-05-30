@@ -425,8 +425,31 @@
             return 'DOMINGO';
         }
 
+        function abreviar(nombre) {
+            if (!nombre) return '';
+            const first = nombre.split(' ')[0];
+            if (first.length <= 5) return first;
+            const v = 'aeiouáéíóú';
+            let groups = 0;
+            let inV = false;
+            for (let i = 0; i < first.length; i++) {
+                const isV = v.includes(first[i].toLowerCase());
+                if (isV && !inV) {
+                    groups++;
+                    if (groups === 2) {
+                        let consCount = 0;
+                        for (let j = i - 1; j >= 0 && !v.includes(first[j].toLowerCase()); j--) consCount++;
+                        if (consCount > 1) return first.slice(0, i - consCount + 2);
+                        return first.slice(0, i + 1);
+                    }
+                }
+                inV = isV;
+            }
+            return first.slice(0, 5);
+        }
+
         function getFirstName(nombre) {
-            return (nombre || '').split(' ')[0].trim();
+            return abreviar((nombre || '').split(' ')[0].trim());
         }
 
         function construirMensaje(p) {
@@ -454,26 +477,40 @@
 
             switch (servicio) {
                 case 'JAUJA':
-                    if (!horaField.value) horaField.value = '10:00';
+                    horaField.value = '10:00';
                     sedeField.value = 'Jauja';
                     break;
                 case 'CHUPACA':
-                    if (!horaField.value) horaField.value = '18:00';
+                    horaField.value = '18:00';
                     sedeField.value = 'Chupaca';
                     break;
                 case 'DOMINGO_10_HYO':
+                    groupSede.style.display = 'block';
+                    sedeField.required = true;
+                    horaField.value = '10:00';
+                    sedeField.value = 'Huancayo';
+                    break;
                 case 'DOMINGO_12_HYO':
+                    groupSede.style.display = 'block';
+                    sedeField.required = true;
+                    horaField.value = '12:00';
+                    sedeField.value = 'Huancayo';
+                    break;
                 case 'DOMINGO_12_TAMBO':
+                    groupSede.style.display = 'block';
+                    sedeField.required = true;
+                    horaField.value = '12:00';
+                    sedeField.value = 'El Tambo';
+                    break;
                 case 'DOMINGO_18_TAMBO':
                     groupSede.style.display = 'block';
                     sedeField.required = true;
-                    if (servicio === 'DOMINGO_10_HYO') { sedeField.value = 'Huancayo'; if (!horaField.value) horaField.value = '10:00'; }
-                    if (servicio === 'DOMINGO_12_HYO') { sedeField.value = 'Huancayo'; if (!horaField.value) horaField.value = '12:00'; }
-                    if (servicio === 'DOMINGO_12_TAMBO') { sedeField.value = 'El Tambo'; if (!horaField.value) horaField.value = '12:00'; }
-                    if (servicio === 'DOMINGO_18_TAMBO') { sedeField.value = 'El Tambo'; if (!horaField.value) horaField.value = '18:00'; }
+                    horaField.value = '18:00';
+                    sedeField.value = 'El Tambo';
                     break;
                 default:
                     sedeField.value = '';
+                    horaField.value = '';
             }
         }
 
