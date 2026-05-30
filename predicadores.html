@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="firebase-config.js"></script>
     <script src="firebase-auth.js"></script>
     <style>
@@ -372,15 +373,39 @@
         </div>
     </div>
 
+    <div id="modalOCR" class="modal">
+        <div class="modal-content" style="max-width:800px;">
+            <button class="modal-close" onclick="cerrarOCRModal()">&times;</button>
+            <h2 style="margin-bottom:8px;color:#1a3a5c;">📄 Vista previa de datos extraídos</h2>
+            <p style="color:#64748b;font-size:13px;margin-bottom:16px;">Revisa y edita antes de guardar. Los teléfonos se auto-completarán si ya existen.</p>
+            <div id="ocrRawText" style="background:#f1f4f9;border-radius:10px;padding:12px;font-size:12px;max-height:120px;overflow-y:auto;margin-bottom:16px;white-space:pre-wrap;font-family:monospace;display:none;"></div>
+            <div style="overflow-x:auto;margin-bottom:16px;">
+                <table class="data-table" id="ocrPreviewTable">
+                    <thead><tr>
+                        <th>Nombre</th><th>Fecha</th><th>Servicio</th><th>Rol</th><th>Teléfono</th>
+                    </tr></thead>
+                    <tbody id="ocrPreviewBody"></tbody>
+                </table>
+            </div>
+            <div class="wa-actions">
+                <button class="btn-add" onclick="guardarOCRRregistros()">💾 Guardar todos</button>
+                <button class="btn-template" onclick="cerrarOCRModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual'));
         if (!usuarioActual || usuarioActual.rol !== 'admin') { window.location.href = 'index.html'; }
         document.getElementById('userName').innerText = usuarioActual.nombre;
 
         const dbPart = db.collection('participantes');
+        const dbPersonas = db.collection('personas');
         let editandoId = null;
         let participantesCache = [];
+        let personasCache = [];
         let waTargetId = null;
+        let ocrRecords = [];
 
         function esEnviado(p) { return p.enviado === true || p.recordatorioEnviado === true; }
         function hoyStr() { return new Date().toISOString().split('T')[0]; }
@@ -637,6 +662,19 @@
                 await dbPart.add(data);
                 toast('✅ Registro agregado');
             }
+            if (telefono) {
+                const nombreNorm = data.nombre.toLowerCase();
+                const existing = personasCache.find(p => p.nombre.toLowerCase() === nombreNorm);
+                if (existing) {
+                    if (existing.telefono !== telefono) {
+                        await dbPersonas.doc(existing.id).update({ telefono });
+                        existing.telefono = telefono;
+                    }
+                } else {
+                    const ref = await dbPersonas.add({ nombre: data.nombre, telefono });
+                    personasCache.push({ id: ref.id, nombre: data.nombre, telefono });
+                }
+            }
             cerrarModal();
             cargarParticipantes();
         });
@@ -678,7 +716,17 @@
             if (confirm('¿Eliminar este registro?')) {
                 await dbPart.doc(id).delete();
                 toast('🗑️ Registro eliminado');
-                cargarParticipantes();
+        async function cargarPersonas() {
+            await firebaseReady;
+            const snapshot = await dbPersonas.get();
+            personasCache = [];
+            snapshot.forEach(doc => personasCache.push({ id: doc.id, ...doc.data() }));
+        }
+
+        (async () => {
+            await cargarPersonas();
+            cargarParticipantes();
+        })();
             }
         }
 
@@ -792,7 +840,224 @@
 
         function mostrarArchivo(file) {
             uploadFilename.innerText = '📄 ' + file.name;
-            toast('Archivo seleccionado: ' + file.name);
+            if (file.type.startsWith('image/')) {
+                procesarImagenOCR(file);
+            } else {
+                toast('Solo se procesan imágenes por ahora');
+            }
+        }
+
+        async function procesarImagenOCR(file) {
+            toast('🔍 Procesando imagen con OCR...');
+            try {
+                const { data: { text } } = await Tesseract.recognize(file, 'spa', {
+                    logger: m => { if (m.status === 'recognizing text') uploadFilename.innerText = '🔍 OCR: ' + Math.round(m.progress * 100) + '%'; }
+                });
+                uploadFilename.innerText = '✅ OCR completado';
+                const records = parsearTextoOCR(text);
+                if (records.length === 0) {
+                    toast('⚠️ No se pudieron extraer registros. Revisa el texto crudo.', 'warning');
+                    document.getElementById('ocrRawText').innerText = text;
+                    document.getElementById('ocrRawText').style.display = 'block';
+                    document.getElementById('ocrPreviewBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">Sin registros detectados</td></tr>';
+                    document.getElementById('modalOCR').style.display = 'flex';
+                    return;
+                }
+                ocrRecords = records;
+                mostrarPrevisualizacionOCR(records, text);
+            } catch (e) {
+                toast('❌ Error en OCR: ' + e.message, 'warning');
+                console.error(e);
+            }
+        }
+
+        function parsearTextoOCR(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
+            const records = [];
+            const meses = { 'enero':'01','febrero':'02','marzo':'03','abril':'04','mayo':'05','junio':'06','julio':'07','agosto':'08','septiembre':'09','octubre':'10','noviembre':'11','diciembre':'12' };
+
+            for (const line of lines) {
+                const lower = line.toLowerCase();
+                if (lower.includes('predicador') || lower.includes('anfitrión') || lower.includes('anfitrion') ||
+                    lower.includes('fecha') || lower.includes('servicio') || lower.includes('nombre') ||
+                    lower.includes('día') || lower.includes('dia') || lower.includes('horario') ||
+                    lower.includes('sede') || line.match(/^[-=+*_]+$/) || line.length < 5) continue;
+
+                let nombre = '', fecha = '', servicio = '', rol = '';
+
+                const roles = line.split(/\s{2,}|\t+|(?:\s*[|]\s*)/);
+                if (roles.length < 2) continue;
+
+                const words = line.split(/\s+/);
+
+                const servicios = [
+                    { re: /next\s*plus/i, key: 'NEXT_PLUS' },
+                    { re: /next/i, key: 'NEXT' },
+                    { re: /domingo.*10.*huancayo|domingo.*10.*hyo|10am.*huancayo|10.*hyo/i, key: 'DOMINGO_10_HYO' },
+                    { re: /domingo.*12.*huancayo|domingo.*12.*hyo|12pm.*huancayo|12.*hyo/i, key: 'DOMINGO_12_HYO' },
+                    { re: /domingo.*12.*tambo|12pm.*tambo|12.*tambo/i, key: 'DOMINGO_12_TAMBO' },
+                    { re: /domingo.*18.*tambo|domingo.*6.*tambo|6pm.*tambo/i, key: 'DOMINGO_18_TAMBO' },
+                    { re: /jauja|domingo.*10.*jauja/i, key: 'JAUJA' },
+                    { re: /chupaca|sabado.*6.*chupaca|s.bado.*6.*chupaca|6pm.*chupaca/i, key: 'CHUPACA' },
+                ];
+
+                let foundServicio = false;
+                for (const s of servicios) {
+                    if (s.re.test(line)) {
+                        servicio = s.key;
+                        foundServicio = true;
+                        break;
+                    }
+                }
+
+                const foundRoles = [];
+                if (/\bpredicador\b/i.test(line)) foundRoles.push('Predicador');
+                if (/\banfitri.n\b/i.test(line)) foundRoles.push('Anfitrión');
+                if (foundRoles.length === 0) foundRoles.push('Predicador');
+
+                const fechas = line.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/g);
+                let fechaVal = '';
+                if (fechas) {
+                    for (const f of fechas) {
+                        const parts = f.split(/[\/\-]/);
+                        let d = parts[0].padStart(2,'0'), m = parts[1].padStart(2,'0'), y = parts[2] || new Date().getFullYear();
+                        if (y.length === 2) y = '20' + y;
+                        const parsed = new Date(y + '-' + m + '-' + d);
+                        if (!isNaN(parsed.getTime())) { fechaVal = y + '-' + m + '-' + d; break; }
+                    }
+                }
+                if (!fechaVal) {
+                    const diaMatch = line.match(/\b(\d{1,2})\s*de\s*([a-záéíóú]+)\b/i);
+                    if (diaMatch) {
+                        const d = diaMatch[1].padStart(2,'0');
+                        const m = meses[diaMatch[2].toLowerCase()];
+                        if (m) fechaVal = new Date().getFullYear() + '-' + m + '-' + d;
+                    }
+                }
+
+                const partNames = roles.map(r => r.trim()).filter(r => r.length > 2 && !/\bpredicador\b/i.test(r) && !/\banfitri.n\b/i.test(r) && !/\bfecha\b/i.test(r) && !/\bservicio\b/i.test(r) && !/\bhorario\b/i.test(r) && !/\bsede\b/i.test(r));
+                for (const part of partNames) {
+                    const pLower = part.toLowerCase();
+                    if (!fechaVal) {
+                        const f2 = part.match(/\b(\d{1,2})[\/\-](\d{1,2})\b/);
+                        if (f2) continue;
+                    }
+                    if (foundServicio && /(domingo|s.bado|next|jauja|chupaca|10am|12pm|6pm|hyo|tambo)/i.test(pLower)) continue;
+                    const partsBySpaces = part.split(/\s{2,}|\t+/);
+                    if (partsBySpaces.length >= 2) {
+                        for (const sub of partsBySpaces) {
+                            const s = sub.trim();
+                            if (s.length > 2 && !/^\d/.test(s) && !/(domingo|s.bado|next|jauja|chupaca|10am|12pm|6pm|hyo|tambo)/i.test(s)) {
+                                const name = s.replace(/^[:\-•·\d.\s]+/, '').trim();
+                                if (name.length > 2) {
+                                    records.push({ nombre: name, fecha: fechaVal, servicio: servicio, rol: foundRoles.length > 1 ? 'Predicador' : foundRoles[0] });
+                                }
+                            }
+                        }
+                    } else {
+                        const name = part.replace(/^[:\-•·\d.\s]+/, '').trim();
+                        if (name.length > 2 && !/^\d+$/.test(name)) {
+                            records.push({ nombre: name, fecha: fechaVal, servicio: servicio, rol: foundRoles.length > 1 ? 'Predicador' : foundRoles[0] });
+                        }
+                    }
+                }
+            }
+            return unificarRegistros(records);
+        }
+
+        function unificarRegistros(records) {
+            const seen = new Map();
+            for (const r of records) {
+                const key = r.nombre.toLowerCase() + '|' + r.fecha + '|' + r.servicio + '|' + r.rol;
+                if (!seen.has(key)) seen.set(key, r);
+            }
+            return [...seen.values()];
+        }
+
+        function mostrarPrevisualizacionOCR(records, rawText) {
+            const tbody = document.getElementById('ocrPreviewBody');
+            tbody.innerHTML = records.map((r, i) => {
+                const tel = buscarTelefono(r.nombre);
+                return `<tr>
+                    <td><input type="text" value="${r.nombre}" data-idx="${i}" data-field="nombre" class="ocr-edit" style="width:160px;"></td>
+                    <td><input type="date" value="${r.fecha}" data-idx="${i}" data-field="fecha" class="ocr-edit"></td>
+                    <td>
+                        <select data-idx="${i}" data-field="servicio" class="ocr-edit">
+                            <option value="">Seleccionar...</option>
+                            <option value="NEXT" ${r.servicio==='NEXT'?'selected':''}>NEXT (Sábado)</option>
+                            <option value="NEXT_PLUS" ${r.servicio==='NEXT_PLUS'?'selected':''}>NEXT PLUS (Sábado)</option>
+                            <option value="DOMINGO_10_HYO" ${r.servicio==='DOMINGO_10_HYO'?'selected':''}>Domingo 10am - Huancayo</option>
+                            <option value="DOMINGO_12_HYO" ${r.servicio==='DOMINGO_12_HYO'?'selected':''}>Domingo 12pm - Huancayo</option>
+                            <option value="DOMINGO_12_TAMBO" ${r.servicio==='DOMINGO_12_TAMBO'?'selected':''}>Domingo 12pm - El Tambo</option>
+                            <option value="DOMINGO_18_TAMBO" ${r.servicio==='DOMINGO_18_TAMBO'?'selected':''}>Domingo 6pm - El Tambo</option>
+                            <option value="JAUJA" ${r.servicio==='JAUJA'?'selected':''}>Jauja (Domingo 10am)</option>
+                            <option value="CHUPACA" ${r.servicio==='CHUPACA'?'selected':''}>Chupaca (Sábado 6pm)</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select data-idx="${i}" data-field="rol" class="ocr-edit">
+                            <option value="Predicador" ${r.rol==='Predicador'?'selected':''}>Predicador</option>
+                            <option value="Anfitrión" ${r.rol==='Anfitrión'?'selected':''}>Anfitrión</option>
+                        </select>
+                    </td>
+                    <td><input type="text" value="${tel || ''}" placeholder="999888777" data-idx="${i}" data-field="telefono" class="ocr-edit" style="width:120px;"></td>
+                </tr>`;
+            }).join('');
+            if (rawText) {
+                document.getElementById('ocrRawText').innerText = rawText;
+                document.getElementById('ocrRawText').style.display = 'block';
+            }
+            document.getElementById('modalOCR').style.display = 'flex';
+            document.querySelectorAll('.ocr-edit').forEach(el => {
+                el.addEventListener('change', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    const field = this.dataset.field;
+                    ocrRecords[idx][field] = this.value;
+                });
+            });
+        }
+
+        function buscarTelefono(nombre) {
+            if (!nombre) return '';
+            const n = nombre.toLowerCase().trim();
+            const found = personasCache.find(p => p.nombre.toLowerCase().trim() === n);
+            return found ? found.telefono || '' : '';
+        }
+
+        async function guardarOCRRregistros() {
+            const guardados = [];
+            for (const r of ocrRecords) {
+                if (!r.nombre || !r.servicio) continue;
+                const tel = r.telefono || buscarTelefono(r.nombre);
+                const data = {
+                    nombre: r.nombre.trim(),
+                    fecha: r.fecha || '',
+                    hora: '',
+                    telefono: tel,
+                    tipoServicio: r.servicio,
+                    rol: r.rol || 'Predicador',
+                    sede: '',
+                    enviado: false
+                };
+                await dbPart.add(data);
+                if (tel) {
+                    const nombreNorm = r.nombre.trim().toLowerCase();
+                    const existing = personasCache.find(p => p.nombre.toLowerCase() === nombreNorm);
+                    if (!existing) {
+                        await dbPersonas.add({ nombre: r.nombre.trim(), telefono: tel });
+                        personasCache.push({ nombre: r.nombre.trim(), telefono: tel });
+                    }
+                }
+                guardados.push(r.nombre);
+            }
+            toast('✅ ' + guardados.length + ' registros guardados');
+            cerrarOCRModal();
+            cargarParticipantes();
+        }
+
+        function cerrarOCRModal() {
+            document.getElementById('modalOCR').style.display = 'none';
+            ocrRecords = [];
         }
 
         function toast(msg, tipo = 'success') {
