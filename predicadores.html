@@ -385,8 +385,6 @@
         function esEnviado(p) { return p.enviado === true || p.recordatorioEnviado === true; }
         function hoyStr() { return new Date().toISOString().split('T')[0]; }
 
-        const ADMIN_WA = '51928749836';
-
         function getDayName(fecha) {
             if (!fecha) return '';
             const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
@@ -752,9 +750,9 @@
                     if (!p.fecha || !p.hora || esEnviado(p)) return;
                     const sendAt = p.sendAt || (new Date(p.fecha + 'T' + p.hora).getTime() - 48 * 60 * 60 * 1000);
                     if (sendAt <= now) {
+                        const telefono = '51' + p.telefono;
                         const msg = construirMensaje(p);
-                        const adminMsg = `📱 Mensaje para *${p.nombre}* (51${p.telefono}):\n\n${msg}\n\n---\nReenvía este mensaje a ${p.nombre}`;
-                        window.open(`https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(adminMsg)}`, '_blank');
+                        window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
                         dbPart.doc(doc.id).update({ enviado: true, recordatorioEnviado: true });
                         toast('🔔 Mensaje automático enviado a ' + p.nombre);
                     }
