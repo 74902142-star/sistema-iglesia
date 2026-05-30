@@ -7,12 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="firebase-config.js"></script>
     <script src="firebase-auth.js"></script>
+    <script async src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script async src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script async src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f0f2f6; color: #0f172a; min-height: 100vh; }
@@ -404,9 +404,6 @@
     </div>
 
     <script>
-        if (typeof pdfjsLib !== 'undefined') {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        }
         const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual'));
         if (!usuarioActual || usuarioActual.rol !== 'admin') { window.location.href = 'index.html'; }
         document.getElementById('userName').innerText = usuarioActual.nombre;
@@ -873,11 +870,15 @@
                 abrirPegarTexto();
             }
         }
-        }
 
         async function procesarExcel(file) {
             toast('📊 Procesando Excel...');
             try {
+                if (typeof XLSX === 'undefined') {
+                    toast('⚠️ Biblioteca Excel no disponible. Pega el contenido manualmente.', 'warning');
+                    abrirPegarTexto();
+                    return;
+                }
                 const data = await file.arrayBuffer();
                 const wb = XLSX.read(data, { type: 'array' });
                 const ws = wb.Sheets[wb.SheetNames[0]];
@@ -931,6 +932,7 @@
                     abrirPegarTexto();
                     return;
                 }
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
                 const data = await file.arrayBuffer();
                 const pdf = await pdfjsLib.getDocument({ data }).promise;
                 let fullText = '';
@@ -991,6 +993,11 @@
         async function procesarImagenOCR(file) {
             toast('🔍 Procesando imagen con OCR...');
             try {
+                if (typeof Tesseract === 'undefined') {
+                    toast('⚠️ Biblioteca OCR no disponible. Pega el texto manualmente.', 'warning');
+                    abrirPegarTexto();
+                    return;
+                }
                 const { data: { text } } = await Tesseract.recognize(file, 'spa', {
                     logger: m => { if (m.status === 'recognizing text') uploadFilename.innerText = '🔍 OCR: ' + Math.round(m.progress * 100) + '%'; }
                 });
