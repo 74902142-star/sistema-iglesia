@@ -570,7 +570,7 @@
 
             document.getElementById('countPredicadores').innerText = predicadores.length;
             document.getElementById('countAnfitriones').innerText = anfitriones.length;
-            document.getElementById('countPendientes').innerText = participantesCache.filter(p => !esEnviado(p) && p.fecha >= hoy).length;
+            document.getElementById('countPendientes').innerText = participantesCache.filter(p => !esEnviado(p)).length;
         }
 
         function renderTabla(data, elementId) {
@@ -626,12 +626,6 @@
                 enviado: false
             };
             if (foto) data.foto = foto;
-            if (data.fecha && data.hora) {
-                const eventDate = new Date(data.fecha + 'T' + data.hora);
-                data.sendAt = eventDate.getTime() - 48 * 60 * 60 * 1000;
-            } else {
-                data.sendAt = null;
-            }
 
             if (editandoId) {
                 if (foto === undefined) {
@@ -742,22 +736,21 @@
         function cerrarWAModal() { document.getElementById('modalWhatsApp').style.display = 'none'; }
 
         async function revisarRecordatoriosAutomaticos() {
-            const now = Date.now();
+            const now = new Date();
+            // Solo enviar viernes entre 10pm y 11pm
+            if (now.getDay() !== 5 || now.getHours() < 22 || now.getHours() >= 23) return;
             try {
                 const snapshot = await dbPart.where('enviado', '==', false).get();
                 snapshot.forEach(doc => {
                     const p = doc.data();
-                    if (!p.fecha || !p.hora || esEnviado(p)) return;
-                    const sendAt = p.sendAt || (new Date(p.fecha + 'T' + p.hora).getTime() - 48 * 60 * 60 * 1000);
-                    if (sendAt <= now) {
-                        const telefono = '51' + p.telefono;
-                        const msg = construirMensaje(p);
-                        window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
-                        dbPart.doc(doc.id).update({ enviado: true, recordatorioEnviado: true });
-                        toast('🔔 Mensaje automático enviado a ' + p.nombre);
-                    }
+                    if (esEnviado(p)) return;
+                    const telefono = '51' + p.telefono;
+                    const msg = construirMensaje(p);
+                    window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
+                    dbPart.doc(doc.id).update({ enviado: true, recordatorioEnviado: true });
+                    toast('🔔 Mensaje enviado a ' + p.nombre);
                 });
-            } catch (e) { console.error('Error revisando recordatorios:', e); }
+            } catch (e) { console.error('Error:', e); }
         }
 
         setInterval(revisarRecordatoriosAutomaticos, 30000);
