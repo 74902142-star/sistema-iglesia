@@ -8,6 +8,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
     <script src="firebase-config.js"></script>
     <script src="firebase-auth.js"></script>
     <style>
@@ -254,10 +256,11 @@
                     </div>
 
                     <div class="upload-area" id="uploadArea">
-                        <div>📂 Carga masiva (Excel, Word o imagen)</div>
+                        <div>📂 Carga masiva (Excel, Word, PDF, CSV, imagen)</div>
                         <div style="font-size: 12px; margin-top: 8px;">Arrastra un archivo aquí o haz clic para seleccionar</div>
                         <div class="upload-filename" id="uploadFilename"></div>
-                        <input type="file" id="bulkUpload" style="display: none;" accept=".xlsx,.xls,.csv,.doc,.docx,.png,.jpg,.jpeg,.gif,.webp">
+                        <input type="file" id="bulkUpload" style="display: none;" accept=".xlsx,.xls,.csv,.doc,.docx,.pdf,.png,.jpg,.jpeg,.gif,.webp">
+                        <button class="btn-template" style="margin-top:12px;" onclick="abrirPegarTexto()">📝 Pegar texto de la tabla</button>
                     </div>
 
                     <h3 style="margin: 32px 0 16px; color: #1a3a5c;">🎤 Predicadores</h3>
@@ -379,6 +382,11 @@
             <h2 style="margin-bottom:8px;color:#1a3a5c;">📄 Vista previa de datos extraídos</h2>
             <p style="color:#64748b;font-size:13px;margin-bottom:16px;">Revisa y edita antes de guardar. Los teléfonos se auto-completarán si ya existen.</p>
             <div id="ocrRawText" style="background:#f1f4f9;border-radius:10px;padding:12px;font-size:12px;max-height:120px;overflow-y:auto;margin-bottom:16px;white-space:pre-wrap;font-family:monospace;display:none;"></div>
+            <div id="ocrPasteArea" style="display:none;margin-bottom:16px;">
+                <label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:6px;">Pega el texto de la tabla aquí:</label>
+                <textarea id="ocrPasteInput" style="width:100%;min-height:120px;padding:12px;border:1.5px solid #e2e6ec;border-radius:10px;font-family:monospace;font-size:13px;" placeholder="Pega aquí los datos copiados de Excel..."></textarea>
+                <button class="btn-add" style="margin-top:8px;" onclick="procesarTextoPegado()">🔍 Procesar texto</button>
+            </div>
             <div style="overflow-x:auto;margin-bottom:16px;">
                 <table class="data-table" id="ocrPreviewTable">
                     <thead><tr>
@@ -813,7 +821,7 @@
         setTimeout(revisarRecordatoriosAutomaticos, 3000);
 
         function descargarPlantilla() {
-            const csv = 'Nombre,Fecha,Hora,Telefono,Servicio,Rol,Sede\nJuan Perez,2026-06-20,18:00,51999888777,NEXT,Predicador,\nMaria Lopez,2026-06-21,10:00,51999888666,DOMINGO_10_HYO,Anfitrión,Huancayo\n';
+            const csv = 'Nombre,Fecha,Telefono,Servicio,Rol\n,dd/mm/aaaa,999888777,Seleccionar tipo,Seleccionar rol\n';
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -840,11 +848,107 @@
 
         function mostrarArchivo(file) {
             uploadFilename.innerText = '📄 ' + file.name;
-            if (file.type.startsWith('image/')) {
+            const ext = file.name.split('.').pop().toLowerCase();
+
+            if (ext === 'xlsx' || ext === 'xls') {
+                procesarExcel(file);
+            } else if (ext === 'csv') {
+                procesarCSV(file);
+            } else if (ext === 'docx') {
+                procesarWord(file);
+            } else if (ext === 'pdf') {
+                procesarPDF(file);
+            } else if (file.type.startsWith('image/')) {
                 procesarImagenOCR(file);
             } else {
-                toast('Solo se procesan imágenes por ahora');
+                toast('Formato no soportado: ' + ext);
             }
+        }
+
+        async function procesarExcel(file) {
+            toast('📊 Procesando Excel...');
+            try {
+                const data = await file.arrayBuffer();
+                const wb = XLSX.read(data, { type: 'array' });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const html = XLSX.utils.sheet_to_html(ws);
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                const text = div.innerText || div.textContent;
+                procesarTextoExtraido(text);
+            } catch (e) {
+                toast('❌ Error al leer Excel: ' + e.message, 'warning');
+            }
+        }
+
+        async function procesarCSV(file) {
+            toast('📄 Procesando CSV...');
+            try {
+                const text = await file.text();
+                procesarTextoExtraido(text);
+            } catch (e) {
+                toast('❌ Error al leer CSV: ' + e.message, 'warning');
+            }
+        }
+
+        async function procesarWord(file) {
+            toast('📝 Procesando Word...');
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const result = await mammoth.extractRawText({ arrayBuffer });
+                procesarTextoExtraido(result.value);
+            } catch (e) {
+                toast('❌ Error al leer Word: ' + e.message, 'warning');
+            }
+        }
+
+        async function procesarPDF(file) {
+            toast('📕 Procesando PDF...');
+            try {
+                const text = await file.text();
+                procesarTextoExtraido(text);
+            } catch (e) {
+                toast('❌ No se pudo extraer texto del PDF. Copia y pega el contenido manualmente.', 'warning');
+            }
+        }
+
+        function procesarTextoExtraido(text) {
+            if (!text || text.trim().length < 10) {
+                toast('⚠️ No se encontraron datos en el archivo', 'warning');
+                return;
+            }
+            const records = parsearTextoOCR(text);
+            if (records.length === 0) {
+                toast('⚠️ No se pudieron extraer registros. Revisa el texto crudo.', 'warning');
+                document.getElementById('ocrRawText').innerText = text;
+                document.getElementById('ocrRawText').style.display = 'block';
+                document.getElementById('ocrPreviewBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">Sin registros detectados</td></tr>';
+                document.getElementById('modalOCR').style.display = 'flex';
+                return;
+            }
+            ocrRecords = records;
+            mostrarPrevisualizacionOCR(records, text);
+        }
+
+        function abrirPegarTexto() {
+            document.getElementById('ocrPasteArea').style.display = 'block';
+            document.getElementById('ocrPasteInput').value = '';
+            document.getElementById('ocrPreviewBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">Pega el texto y presiona "Procesar"</td></tr>';
+            document.getElementById('modalOCR').style.display = 'flex';
+            document.getElementById('ocrRawText').style.display = 'none';
+        }
+
+        function procesarTextoPegado() {
+            const text = document.getElementById('ocrPasteInput').value;
+            if (!text.trim()) { toast('Pega el texto primero', 'warning'); return; }
+            document.getElementById('ocrPasteArea').style.display = 'none';
+            procesarTextoExtraido(text);
+        }
+
+        function cerrarOCRModal() {
+            document.getElementById('modalOCR').style.display = 'none';
+            document.getElementById('ocrPasteArea').style.display = 'none';
+            ocrRecords = [];
         }
 
         async function procesarImagenOCR(file) {
@@ -1072,11 +1176,6 @@
             toast('✅ ' + guardados.length + ' registros guardados');
             cerrarOCRModal();
             cargarParticipantes();
-        }
-
-        function cerrarOCRModal() {
-            document.getElementById('modalOCR').style.display = 'none';
-            ocrRecords = [];
         }
 
         function toast(msg, tipo = 'success') {
