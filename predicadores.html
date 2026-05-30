@@ -385,6 +385,14 @@
         function esEnviado(p) { return p.enviado === true || p.recordatorioEnviado === true; }
         function hoyStr() { return new Date().toISOString().split('T')[0]; }
 
+        const ADMIN_WA = '51928749836';
+
+        function getDayName(fecha) {
+            if (!fecha) return '';
+            const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+            return days[new Date(fecha + 'T12:00:00').getDay()];
+        }
+
         function formatearHora(hora) {
             if (!hora) return '';
             const [h, m] = hora.split(':');
@@ -396,24 +404,24 @@
 
         const TEMPLATES = {
             NEXT: {
-                predicador: (nombre) => `${nombre}, comentarte que el día de mañana te toca predicar en el culto de *NEXT*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n30 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 20 min de prédica \n✅ 5 min de llamado\n✅ 5 min de ministración \n\nBendiciones, Gracias ☺️`,
-                anfitrion: (nombre, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el día de mañana sábado, eres anfitriona(e) en el culto de NEXT. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
+                predicador: (nombre, dia) => `${nombre}, comentarte que el *${dia}* te toca predicar en el culto de *NEXT*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n30 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 20 min de prédica \n✅ 5 min de llamado\n✅ 5 min de ministración \n\nBendiciones, Gracias ☺️`,
+                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia}, eres anfitriona(e) en el culto de NEXT. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
             },
             NEXT_PLUS: {
-                predicador: (nombre) => `${nombre} buenas noches, recordarte que el día de mañana sábado te toca predicar en el culto de *NEXT PLUS*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n40 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 5 min de ministración \n\nBendiciones, Gracias ☺️`,
-                anfitrion: (nombre, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el día de mañana sábado, eres anfitriona(e) en el culto de NEXT PLUS. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
+                predicador: (nombre, dia) => `${nombre} buenas noches, recordarte que el *${dia}* te toca predicar en el culto de *NEXT PLUS*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n40 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 5 min de ministración \n\nBendiciones, Gracias ☺️`,
+                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia}, eres anfitriona(e) en el culto de NEXT PLUS. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
             },
             DOMINGO: {
-                predicador: (nombre, hora, sede) => `${nombre} buenas noches, recordarte que el día domingo te toca predicar en el culto de las *${hora}*. En la sede de *${sede || 'Huancayo'}*, le envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
-                anfitrion: (nombre, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el día de mañana domingo, eres anfitriona(e) en el culto de las ${hora} en la sede ${sede || 'Huancayo'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
+                predicador: (nombre, dia, hora, sede) => `${nombre} buenas noches, recordarte que el *${dia}* te toca predicar en el culto de las *${hora}*. En la sede de *${sede || 'Huancayo'}*, le envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
+                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia}, eres anfitriona(e) en el culto de las ${hora} en la sede ${sede || 'Huancayo'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
             },
             JAUJA: {
-                predicador: (nombre, hora, sede) => `${nombre} buenas noches, comentarte que el día domingo te toca predicar en el culto de las *${hora}*. En la sede de *${sede || 'JAUJA'}* te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *30 min* antes para coordinar detalles y acercarse a la jefa de Piso *Martha Tapara.*\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
-                anfitrion: (nombre, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el día domingo eres anfitriona(e) en el culto de las ${hora} en la sede de ${sede || 'JAUJA'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 30 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am.\n\nGracias ☺️`
+                predicador: (nombre, dia, hora, sede) => `${nombre} buenas noches, comentarte que el *${dia}* te toca predicar en el culto de las *${hora}*. En la sede de *${sede || 'JAUJA'}* te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *30 min* antes para coordinar detalles y acercarse a la jefa de Piso *Martha Tapara.*\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
+                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia} eres anfitriona(e) en el culto de las ${hora} en la sede de ${sede || 'JAUJA'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 30 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am.\n\nGracias ☺️`
             },
             CHUPACA: {
-                predicador: (nombre, hora, sede) => `${nombre} buenas noches, recordarte que el día de mañana *Sábado* te toca predicar en el culto de las *${hora}*. En la *sede de ${sede || 'Chupaca'}*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
-                anfitrion: (nombre, hora, sede) => `Hola ${nombre} buenas noches, recordarte que el día de mañana sábado eres anfitriona(e) en el culto de las ${hora} en la sede de ${sede || 'Chupaca'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am.\n\nGracias ☺️`
+                predicador: (nombre, dia, hora, sede) => `${nombre} buenas noches, recordarte que el *${dia}* te toca predicar en el culto de las *${hora}*. En la *sede de ${sede || 'Chupaca'}*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
+                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, recordarte que el ${dia} eres anfitriona(e) en el culto de las ${hora} en la sede de ${sede || 'Chupaca'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am.\n\nGracias ☺️`
             }
         };
 
@@ -458,13 +466,14 @@
             const template = TEMPLATES[key];
             if (!template) return '';
 
+            const dia = getDayName(p.fecha);
             const hora = p.hora ? formatearHora(p.hora) : '';
             const sede = p.sede || '';
 
             if (p.rol === 'Anfitrión') {
-                return template.anfitrion(nombre, hora, sede);
+                return template.anfitrion(nombre, dia, hora, sede);
             }
-            return template.predicador(nombre, hora, sede);
+            return template.predicador(nombre, dia, hora, sede);
         }
 
         function autoSetFields(servicio) {
@@ -743,9 +752,9 @@
                     if (!p.fecha || !p.hora || esEnviado(p)) return;
                     const sendAt = p.sendAt || (new Date(p.fecha + 'T' + p.hora).getTime() - 48 * 60 * 60 * 1000);
                     if (sendAt <= now) {
-                        const telefono = '51' + p.telefono;
                         const msg = construirMensaje(p);
-                        window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
+                        const adminMsg = `📱 Mensaje para *${p.nombre}* (51${p.telefono}):\n\n${msg}\n\n---\nReenvía este mensaje a ${p.nombre}`;
+                        window.open(`https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(adminMsg)}`, '_blank');
                         dbPart.doc(doc.id).update({ enviado: true, recordatorioEnviado: true });
                         toast('🔔 Mensaje automático enviado a ' + p.nombre);
                     }
