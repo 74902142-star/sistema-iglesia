@@ -260,8 +260,8 @@
                         <div>📂 Carga masiva (Excel, Word, PDF, CSV, imagen)</div>
                         <div style="font-size: 12px; margin-top: 8px;">Arrastra un archivo aquí o haz clic para seleccionar</div>
                         <div class="upload-filename" id="uploadFilename"></div>
-                        <input type="file" id="bulkUpload" style="display: none;" accept="*">
-                        <button class="btn-template" style="margin-top:12px;" onclick="abrirPegarTexto()">📝 Pegar texto de la tabla</button>
+                        <input type="file" id="bulkUpload" style="display: none;">
+                        <button class="btn-template" style="margin-top:12px;" type="button" onclick="event.stopPropagation();abrirPegarTexto()">📝 Pegar texto de la tabla</button>
                     </div>
 
                     <h3 style="margin: 32px 0 16px; color: #1a3a5c;">🎤 Predicadores</h3>
