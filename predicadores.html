@@ -303,12 +303,12 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Fecha</label>
-                        <input type="date" id="regFecha" class="form-control" required>
+                        <label>Fecha (opcional)</label>
+                        <input type="date" id="regFecha" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Hora</label>
-                        <input type="time" id="regHora" class="form-control" required>
+                        <input type="time" id="regHora" class="form-control">
                     </div>
                 </div>
                 <div class="form-group">
@@ -619,12 +619,17 @@
                 enviado: false
             };
             if (foto) data.foto = foto;
+            if (data.fecha && data.hora) {
+                const eventDate = new Date(data.fecha + 'T' + data.hora);
+                data.sendAt = eventDate.getTime() - 48 * 60 * 60 * 1000;
+            } else {
+                data.sendAt = null;
+            }
 
             if (editandoId) {
-                const prev = participantesCache.find(p => p.id === editandoId);
-                if (prev) {
-                    if (esEnviado(prev)) data.enviado = prev.enviado ?? prev.recordatorioEnviado ?? false;
-                    if (foto === undefined && prev.foto) data.foto = prev.foto;
+                if (foto === undefined) {
+                    const prev = participantesCache.find(p => p.id === editandoId);
+                    if (prev && prev.foto) data.foto = prev.foto;
                 }
                 await dbPart.doc(editandoId).update(data);
                 toast('✅ Registro actualizado');
@@ -656,6 +661,7 @@
             document.getElementById('regTelefono').value = p.telefono;
             document.getElementById('regServicio').value = p.tipoServicio;
             document.getElementById('regServicio').dispatchEvent(new Event('change'));
+            document.getElementById('regHora').value = p.hora;
             document.getElementById('regRol').value = p.rol;
             document.getElementById('regSede').value = p.sede || '';
             document.getElementById('groupSede').style.display = ['DOMINGO_10_HYO','DOMINGO_12_HYO','DOMINGO_12_TAMBO','DOMINGO_18_TAMBO','DOMINGO'].includes(p.tipoServicio) ? 'block' : 'none';
@@ -729,26 +735,26 @@
         function cerrarWAModal() { document.getElementById('modalWhatsApp').style.display = 'none'; }
 
         async function revisarRecordatoriosAutomaticos() {
-            const hoy = new Date();
-            const dosDias = new Date(hoy);
-            dosDias.setDate(hoy.getDate() + 2);
-            const fechaStr = dosDias.toISOString().split('T')[0];
-
-            const snapshot = await dbPart.where('fecha', '==', fechaStr).get();
-            snapshot.forEach(doc => {
-                const p = doc.data();
-                if (!esEnviado(p)) {
-                    const telefono = '51' + p.telefono;
-                    const msg = construirMensaje(p);
-                    window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
-                    dbPart.doc(doc.id).update({ enviado: true, recordatorioEnviado: true });
-                    toast('🔔 Recordatorio automático enviado a ' + p.nombre);
-                }
-            });
+            const now = Date.now();
+            try {
+                const snapshot = await dbPart.where('enviado', '==', false).get();
+                snapshot.forEach(doc => {
+                    const p = doc.data();
+                    if (!p.fecha || !p.hora || esEnviado(p)) return;
+                    const sendAt = p.sendAt || (new Date(p.fecha + 'T' + p.hora).getTime() - 48 * 60 * 60 * 1000);
+                    if (sendAt <= now) {
+                        const telefono = '51' + p.telefono;
+                        const msg = construirMensaje(p);
+                        window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
+                        dbPart.doc(doc.id).update({ enviado: true, recordatorioEnviado: true });
+                        toast('🔔 Mensaje automático enviado a ' + p.nombre);
+                    }
+                });
+            } catch (e) { console.error('Error revisando recordatorios:', e); }
         }
 
-        setInterval(revisarRecordatoriosAutomaticos, 3600000);
-        revisarRecordatoriosAutomaticos();
+        setInterval(revisarRecordatoriosAutomaticos, 30000);
+        setTimeout(revisarRecordatoriosAutomaticos, 3000);
 
         function descargarPlantilla() {
             const csv = 'Nombre,Fecha,Hora,Telefono,Servicio,Rol,Sede\nJuan Perez,2026-06-20,18:00,51999888777,NEXT,Predicador,\nMaria Lopez,2026-06-21,10:00,51999888666,DOMINGO_10_HYO,Anfitrión,Huancayo\n';
