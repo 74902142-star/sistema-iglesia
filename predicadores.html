@@ -123,17 +123,24 @@
         .upload-area:hover, .upload-area.dragover { border-color: #2d5aa0; background: #f8fafc; color: #0f172a; }
         .upload-filename { margin-top: 12px; font-weight: 600; color: #0f172a; font-size: 14px; }
 
+        .photo-upload-group { margin-top: 12px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e6ec; }
+        .photo-upload-group label { font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 8px; }
+        .photo-preview { max-width: 160px; max-height: 120px; border-radius: 10px; margin-top: 8px; border: 1px solid #e2e6ec; object-fit: cover; cursor: pointer; }
+        .photo-indicator { font-size: 13px; color: #2d5aa0; cursor: pointer; }
+        .photo-indicator:hover { text-decoration: underline; }
+
+        .wa-modal-body { padding: 20px 0; }
+        .wa-msg-preview { background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 13px; line-height: 1.7; white-space: pre-wrap; border: 1px solid #e2e6ec; max-height: 280px; overflow-y: auto; }
+        .wa-photo-preview { text-align: center; margin-bottom: 16px; }
+        .wa-photo-preview img { max-width: 100%; max-height: 200px; border-radius: 12px; border: 1px solid #e2e6ec; }
+        .wa-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .wa-actions button { flex: 1; min-width: 120px; justify-content: center; }
+
         .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 60px; color: white; font-weight: 500; font-size: 14px; z-index: 2000; animation: toastIn 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
         .toast-success { background: #10b981; }
         .toast-warning { background: #f59e0b; }
         @keyframes toastIn { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
 
-        .sidebar-mobile-toggle {
-            display: none; position: fixed; top: 12px; left: 12px; z-index: 101;
-            background: #0f172a; border: none; color: white; width: 40px; height: 40px;
-            border-radius: 12px; font-size: 20px; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
         .sidebar-mobile-toggle {
             display: none; position: fixed; top: 12px; left: 12px; z-index: 101;
             background: #0f172a; border: none; color: white; width: 40px; height: 40px;
@@ -313,9 +320,15 @@
                     <div class="form-group">
                         <label>Tipo de Servicio</label>
                         <select id="regServicio" class="form-control" required>
-                            <option value="NEXT">NEXT</option>
-                            <option value="NEXT PLUS">NEXT PLUS</option>
-                            <option value="DOMINGO">DOMINGO</option>
+                            <option value="">Seleccionar...</option>
+                            <option value="NEXT">NEXT (Sábado)</option>
+                            <option value="NEXT_PLUS">NEXT PLUS (Sábado)</option>
+                            <option value="DOMINGO_10_HYO">Domingo 10am - Huancayo</option>
+                            <option value="DOMINGO_12_HYO">Domingo 12pm - Huancayo</option>
+                            <option value="DOMINGO_12_TAMBO">Domingo 12pm - El Tambo</option>
+                            <option value="DOMINGO_18_TAMBO">Domingo 6pm - El Tambo</option>
+                            <option value="JAUJA">Jauja (Domingo 10am)</option>
+                            <option value="CHUPACA">Chupaca (Sábado 6pm)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -326,12 +339,36 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group" id="groupSede" style="display: none;">
-                    <label>Sede (Solo para Domingo)</label>
-                    <input type="text" id="regSede" class="form-control" placeholder="Ej: San Carlos">
+                <div id="groupSede" class="form-group" style="display:none;">
+                    <label>Sede</label>
+                    <input type="text" id="regSede" class="form-control" placeholder="Ej: Huancayo">
+                </div>
+                <div class="photo-upload-group">
+                    <label>🎨 Paleta de colores (opcional)</label>
+                    <input type="file" id="regFoto" class="form-control" accept="image/png,image/jpeg,image/webp">
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px;">Sube la imagen de la paleta de colores para enviar junto al mensaje</div>
+                    <img id="regFotoPreview" class="photo-preview" style="display:none;">
                 </div>
                 <button type="submit" class="btn-add" style="width: 100%; justify-content: center; margin-top: 10px;">💾 Guardar Registro</button>
             </form>
+        </div>
+    </div>
+
+    <div id="modalWhatsApp" class="modal">
+        <div class="modal-content" style="max-width:500px;">
+            <button class="modal-close" onclick="cerrarWAModal()">&times;</button>
+            <h2 style="margin-bottom: 8px; color: #1a3a5c;">📱 Enviar WhatsApp</h2>
+            <div class="wa-modal-body">
+                <div class="wa-msg-preview" id="waMsgPreview"></div>
+                <div class="wa-photo-preview" id="waPhotoPreview" style="display:none;">
+                    <img id="waPhotoImg">
+                </div>
+                <div class="wa-actions">
+                    <button class="btn-add" onclick="enviarWAAhora()">📤 Enviar ahora</button>
+                    <button class="btn-template" onclick="copiarMensaje()">📋 Copiar mensaje</button>
+                    <button class="btn-template" id="waDownloadBtn" style="display:none;" onclick="descargarFotoWA()">🖼️ Descargar foto</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -343,9 +380,9 @@
         const dbPart = db.collection('participantes');
         let editandoId = null;
         let participantesCache = [];
+        let waTargetId = null;
 
         function esEnviado(p) { return p.enviado === true || p.recordatorioEnviado === true; }
-
         function hoyStr() { return new Date().toISOString().split('T')[0]; }
 
         function formatearHora(hora) {
@@ -357,33 +394,110 @@
             return `${h12}:${m} ${ampm}`;
         }
 
+        const TEMPLATES = {
+            NEXT: {
+                predicador: (nombre) => `Pas, comentarte que el día de mañana te toca predicar en el culto de *NEXT*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n30 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 20 min de prédica \n✅ 5 min de llamado\n✅ 5 min de ministración \n\nBendiciones, Gracias ☺️`,
+                anfitrion: (nombre) => `Hola ${nombre} buenas noches, comentarte que el día de mañana sábado, eres anfitriona(e) en el culto de NEXT. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
+            },
+            NEXT_PLUS: {
+                predicador: (nombre) => `Papeeee buenas noches, recordarte que el día de mañana sábado te toca predicar en el culto de *NEXT PLUS*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n40 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 5 min de ministración \n\nBendiciones, Gracias ☺️`,
+                anfitrion: (nombre) => `Hola ${nombre} buenas noches, comentarte que el día de mañana sábado, eres anfitriona(e) en el culto de NEXT PLUS. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
+            },
+            DOMINGO: {
+                predicador: (nombre, hora, sede) => `${sede && sede.toLowerCase().includes('tambo') ? 'Carmencita' : 'Pas'} buenas noches, recordarte que el día domingo te toca predicar en el culto de las *${hora}*. En la sede de *${sede || 'Huancayo'}*, le envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
+                anfitrion: (nombre, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el día de mañana domingo, eres anfitriona(e) en el culto de las ${hora} en la sede ${sede || 'Huancayo'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
+            },
+            JAUJA: {
+                predicador: (nombre) => `Carito buenas noches, comentarte que el día domingo te toca predicar en el culto de las *10 am*. En la sede de *JAUJA* te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *30 min* antes para coordinar detalles y acercarse a la jefa de Piso *Martha Tapara.*\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
+                anfitrion: (nombre) => `Hola ${nombre} buenas noches, comentarte que el día domingo eres anfitriona(e) en el culto de las 10 am en la sede de JAUJA. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 30 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am.\n\nGracias ☺️`
+            },
+            CHUPACA: {
+                predicador: (nombre) => `Daniiii buenas noches, recordarte que el día de mañana *Sábado* te toca predicar en el culto de las *6pm*. En la *sede de Chupaca*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
+                anfitrion: (nombre) => `Hola ${nombre} buenas noches, recordarte que el día de mañana sábado eres anfitriona(e) en el culto de las 6pm en la sede de Chupaca. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am.\n\nGracias ☺️`
+            }
+        };
+
+        function getServicioKey(tipoServicio) {
+            if (tipoServicio === 'NEXT PLUS' || tipoServicio === 'NEXT_PLUS') return 'NEXT_PLUS';
+            if (tipoServicio === 'NEXT' || tipoServicio === 'NEXT+') return 'NEXT';
+            if (tipoServicio === 'JAUJA') return 'JAUJA';
+            if (tipoServicio === 'CHUPACA') return 'CHUPACA';
+            return 'DOMINGO';
+        }
+
         function construirMensaje(p) {
             const nombre = p.nombre;
-            const hora = formatearHora(p.hora);
+            const key = getServicioKey(p.tipoServicio);
+            const template = TEMPLATES[key];
+            if (!template) return '';
+
+            const hora = p.hora ? formatearHora(p.hora) : '';
             const sede = p.sede || '';
 
             if (p.rol === 'Anfitrión') {
-                if (p.tipoServicio === 'DOMINGO') {
-                    return `Hola ${nombre} buenas noches, comentarte que el día de mañana domingo, eres anfitriona(e) en el culto de las ${hora} en la sede ${sede}. Te envío las indicaciones a tener en cuenta:\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\nGracias ☺️`;
-                }
-                if (p.tipoServicio === 'NEXT PLUS') {
-                    return `Hola ${nombre} buenas noches, comentarte que el día de mañana sábado, eres anfitriona(e) en el culto de NEXT PLUS. Te envío las indicaciones a tener en cuenta:\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\nGracias ☺️`;
-                }
-                return `Hola ${nombre} buenas noches, comentarte que el día de mañana sábado, eres anfitriona(e) en el culto de NEXT. Te envío las indicaciones a tener en cuenta:\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\nGracias ☺️`;
+                return template.anfitrion(nombre, hora, sede);
             }
+            return template.predicador(nombre, hora, sede);
+        }
 
-            if (p.tipoServicio === 'DOMINGO') {
-                return `Pastorcito buenos días, también comentarle que el día domingo le toca predicar en el culto de las ${hora} en la sede ${sede}, le envío las indicaciones a tener en cuenta:\n1. Deberá de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar una vestimenta adecuada.\n3. Los tiempos establecidos son: 45 min de prédica (30 min prédica + 5 min llamado + 10 min ministración)\nBendiciones, Gracias ☺️`;
+        function autoSetFields(servicio) {
+            const sedeField = document.getElementById('regSede');
+            const horaField = document.getElementById('regHora');
+            const groupSede = document.getElementById('groupSede');
+
+            groupSede.style.display = 'none';
+            sedeField.required = false;
+
+            switch (servicio) {
+                case 'JAUJA':
+                    if (!horaField.value) horaField.value = '10:00';
+                    sedeField.value = 'Jauja';
+                    break;
+                case 'CHUPACA':
+                    if (!horaField.value) horaField.value = '18:00';
+                    sedeField.value = 'Chupaca';
+                    break;
+                case 'DOMINGO_10_HYO':
+                case 'DOMINGO_12_HYO':
+                case 'DOMINGO_12_TAMBO':
+                case 'DOMINGO_18_TAMBO':
+                    groupSede.style.display = 'block';
+                    sedeField.required = true;
+                    if (servicio === 'DOMINGO_10_HYO') { sedeField.value = 'Huancayo'; if (!horaField.value) horaField.value = '10:00'; }
+                    if (servicio === 'DOMINGO_12_HYO') { sedeField.value = 'Huancayo'; if (!horaField.value) horaField.value = '12:00'; }
+                    if (servicio === 'DOMINGO_12_TAMBO') { sedeField.value = 'El Tambo'; if (!horaField.value) horaField.value = '12:00'; }
+                    if (servicio === 'DOMINGO_18_TAMBO') { sedeField.value = 'El Tambo'; if (!horaField.value) horaField.value = '18:00'; }
+                    break;
+                default:
+                    sedeField.value = '';
             }
-            if (p.tipoServicio === 'NEXT PLUS') {
-                return `Hola ${nombre}, comentarte que el día de mañana te toca predicar en el culto de NEXT PLUS, te envío las indicaciones a tener en cuenta:\n1. Deberá de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar una vestimenta adecuada.\n3. Los tiempos establecidos son: 40 min de prédica (30 min prédica + 5 min llamado + 5 min ministración)\nBendiciones, Gracias ☺️`;
-            }
-            return `Hola ${nombre}, comentarte que el día de mañana te toca predicar en el culto de NEXT, te envío las indicaciones a tener en cuenta:\n1. Deberá de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar una vestimenta adecuada.\n3. Los tiempos establecidos son: 30 min de prédica (20 min prédica + 5 min llamado + 5 min ministración)\nBendiciones, Gracias ☺️`;
         }
 
         document.getElementById('regServicio').addEventListener('change', function() {
-            document.getElementById('groupSede').style.display = this.value === 'DOMINGO' ? 'block' : 'none';
+            autoSetFields(this.value);
         });
+
+        // Photo preview
+        document.getElementById('regFoto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('regFotoPreview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => { preview.src = ev.target.result; preview.style.display = 'block'; };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
 
         async function cargarParticipantes() {
             await firebaseReady;
@@ -411,15 +525,18 @@
             }
             tbody.innerHTML = data.map(p => {
                 const enviado = esEnviado(p);
+                const servicioLabel = document.querySelector(`#regServicio option[value="${p.tipoServicio}"]`);
+                const servicioTexto = servicioLabel ? servicioLabel.textContent : (p.tipoServicio || '-');
+                const fotoHtml = p.foto ? `<span class="photo-indicator" onclick="window.open('${p.foto}','_blank')">📷</span>` : '';
                 return `<tr>
                     <td><strong>${p.nombre}</strong></td>
-                    <td>${p.tipoServicio}${p.sede ? ' (' + p.sede + ')' : ''}</td>
+                    <td>${servicioTexto}${p.sede ? ' (' + p.sede + ')' : ''}</td>
                     <td>${p.fecha}</td>
-                    <td>${p.hora || '-'}</td>
+                    <td>${p.hora ? formatearHora(p.hora) : '-'}</td>
                     <td>${p.telefono}</td>
                     <td><span class="status-badge ${enviado ? 'status-sent' : 'status-pending'}">${enviado ? 'Enviado' : 'Pendiente'}</span></td>
                     <td>
-                        <button class="action-btn btn-wa" onclick="enviarWhatsApp('${p.id}')" title="Enviar">📱</button>
+                        <button class="action-btn btn-wa" onclick="abrirWAPreview('${p.id}')" title="Enviar">📱</button>
                         <button class="action-btn btn-edit" onclick="editarRegistro('${p.id}')" title="Editar">✏️</button>
                         <button class="action-btn btn-del" onclick="eliminarRegistro('${p.id}')" title="Eliminar">🗑️</button>
                     </td>
@@ -434,6 +551,14 @@
                 toast('❌ Celular debe tener 9 dígitos y comenzar con 9', 'warning');
                 return;
             }
+
+            const fotoFile = document.getElementById('regFoto').files[0];
+            let foto = undefined;
+            if (fotoFile) {
+                if (fotoFile.size > 500000) { toast('❌ La imagen es muy grande (máx 500KB)', 'warning'); return; }
+                foto = await fileToBase64(fotoFile);
+            }
+
             const data = {
                 nombre: document.getElementById('regNombre').value.trim(),
                 fecha: document.getElementById('regFecha').value,
@@ -444,10 +569,14 @@
                 sede: document.getElementById('regSede').value.trim() || '',
                 enviado: false
             };
+            if (foto) data.foto = foto;
 
             if (editandoId) {
                 const prev = participantesCache.find(p => p.id === editandoId);
-                if (prev && esEnviado(prev)) data.enviado = prev.enviado ?? prev.recordatorioEnviado ?? false;
+                if (prev) {
+                    if (esEnviado(prev)) data.enviado = prev.enviado ?? prev.recordatorioEnviado ?? false;
+                    if (foto === undefined && prev.foto) data.foto = prev.foto;
+                }
                 await dbPart.doc(editandoId).update(data);
                 toast('✅ Registro actualizado');
             } else {
@@ -462,6 +591,7 @@
             editandoId = null;
             document.getElementById('formRegistro').reset();
             document.getElementById('groupSede').style.display = 'none';
+            document.getElementById('regFotoPreview').style.display = 'none';
             document.getElementById('modalTitle').innerText = 'Nuevo Registro';
             document.getElementById('modalRegistro').style.display = 'flex';
         }
@@ -470,6 +600,7 @@
             const doc = await dbPart.doc(id).get();
             const p = doc.data();
             editandoId = id;
+
             document.getElementById('regNombre').value = p.nombre;
             document.getElementById('regFecha').value = p.fecha;
             document.getElementById('regHora').value = p.hora;
@@ -477,7 +608,12 @@
             document.getElementById('regServicio').value = p.tipoServicio;
             document.getElementById('regRol').value = p.rol;
             document.getElementById('regSede').value = p.sede || '';
-            document.getElementById('groupSede').style.display = p.tipoServicio === 'DOMINGO' ? 'block' : 'none';
+            document.getElementById('groupSede').style.display = ['DOMINGO_10_HYO','DOMINGO_12_HYO','DOMINGO_12_TAMBO','DOMINGO_18_TAMBO','DOMINGO'].includes(p.tipoServicio) ? 'block' : 'none';
+
+            const preview = document.getElementById('regFotoPreview');
+            if (p.foto) { preview.src = p.foto; preview.style.display = 'block'; }
+            else { preview.style.display = 'none'; }
+
             document.getElementById('modalTitle').innerText = 'Editar Registro';
             document.getElementById('modalRegistro').style.display = 'flex';
         }
@@ -490,16 +626,57 @@
             }
         }
 
-        async function enviarWhatsApp(id, automatico = false) {
+        async function abrirWAPreview(id) {
             const doc = await dbPart.doc(id).get();
             if (!doc.exists) return;
             const p = doc.data();
+            waTargetId = id;
+
             const msg = construirMensaje(p);
-            window.open(`https://wa.me/${p.telefono}?text=${encodeURIComponent(msg)}`, '_blank');
-            await dbPart.doc(id).update({ enviado: true, recordatorioEnviado: true });
-            if (automatico) toast('🔔 Recordatorio automático enviado a ' + p.nombre);
+            document.getElementById('waMsgPreview').innerText = msg;
+
+            const photoPreview = document.getElementById('waPhotoPreview');
+            const downloadBtn = document.getElementById('waDownloadBtn');
+            if (p.foto) {
+                document.getElementById('waPhotoImg').src = p.foto;
+                photoPreview.style.display = 'block';
+                downloadBtn.style.display = 'inline-flex';
+            } else {
+                photoPreview.style.display = 'none';
+                downloadBtn.style.display = 'none';
+            }
+
+            document.getElementById('modalWhatsApp').style.display = 'flex';
+        }
+
+        function enviarWAAhora() {
+            const p = participantesCache.find(x => x.id === waTargetId);
+            if (!p) return;
+            const msg = construirMensaje(p);
+            const telefono = '51' + p.telefono;
+            window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
+            dbPart.doc(waTargetId).update({ enviado: true, recordatorioEnviado: true });
+            cerrarWAModal();
+            toast('✅ Mensaje enviado a ' + p.nombre);
             cargarParticipantes();
         }
+
+        function copiarMensaje() {
+            const msg = document.getElementById('waMsgPreview').innerText;
+            navigator.clipboard.writeText(msg).then(() => toast('📋 Mensaje copiado'));
+        }
+
+        function descargarFotoWA() {
+            const p = participantesCache.find(x => x.id === waTargetId);
+            if (p && p.foto) {
+                const link = document.createElement('a');
+                link.href = p.foto;
+                link.download = 'paleta_colores_' + p.nombre.replace(/\s+/g, '_') + '.jpg';
+                link.click();
+            }
+        }
+
+        function cerrarWAModal() { document.getElementById('modalWhatsApp').style.display = 'none'; }
 
         async function revisarRecordatoriosAutomaticos() {
             const hoy = new Date();
@@ -511,7 +688,11 @@
             snapshot.forEach(doc => {
                 const p = doc.data();
                 if (!esEnviado(p)) {
-                    enviarWhatsApp(doc.id, true);
+                    const telefono = '51' + p.telefono;
+                    const msg = construirMensaje(p);
+                    window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
+                    dbPart.doc(doc.id).update({ enviado: true, recordatorioEnviado: true });
+                    toast('🔔 Recordatorio automático enviado a ' + p.nombre);
                 }
             });
         }
@@ -520,7 +701,7 @@
         revisarRecordatoriosAutomaticos();
 
         function descargarPlantilla() {
-            const csv = 'Nombre,Fecha,Hora,Telefono,Servicio,Rol,Sede\nJuan Perez,2026-06-20,18:00,51999888777,NEXT,Predicador,\nMaria Lopez,2026-06-21,10:00,51999888666,DOMINGO,Anfitrión,San Carlos\n';
+            const csv = 'Nombre,Fecha,Hora,Telefono,Servicio,Rol,Sede\nJuan Perez,2026-06-20,18:00,51999888777,NEXT,Predicador,\nMaria Lopez,2026-06-21,10:00,51999888666,DOMINGO_10_HYO,Anfitrión,Huancayo\n';
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -586,6 +767,7 @@
                 sidebarOverlay.classList.remove('active');
             });
         }
+
         cargarParticipantes();
     </script>
 </body>
