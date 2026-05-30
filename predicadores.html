@@ -725,6 +725,10 @@
             if (confirm('¿Eliminar este registro?')) {
                 await dbPart.doc(id).delete();
                 toast('🗑️ Registro eliminado');
+                cargarParticipantes();
+            }
+        }
+
         async function cargarPersonas() {
             await firebaseReady;
             const snapshot = await dbPersonas.get();
@@ -736,8 +740,6 @@
             await cargarPersonas();
             cargarParticipantes();
         })();
-            }
-        }
 
         async function abrirWAPreview(id) {
             const doc = await dbPart.doc(id).get();
@@ -1259,7 +1261,6 @@
             });
         }
 
-        cargarParticipantes();
     </script>
 </body>
 </html>
