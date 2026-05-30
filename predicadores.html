@@ -850,20 +850,20 @@
         function mostrarArchivo(file) {
             uploadFilename.innerText = '📄 ' + file.name;
             const ext = file.name.split('.').pop().toLowerCase();
-            const type = file.type;
+            const type = (file.type || '').toLowerCase();
 
-            if (ext === 'xlsx' || ext === 'xls' || type.includes('spreadsheet') || type.includes('excel')) {
+            if (ext === 'xlsx' || ext === 'xls') {
                 procesarExcel(file);
-            } else if (ext === 'csv' || type === 'text/csv') {
+            } else if (ext === 'csv') {
                 procesarCSV(file);
-            } else if (ext === 'docx' || (ext === 'doc' && type.includes('word')) || type.includes('word')) {
+            } else if (ext === 'docx') {
                 procesarWord(file);
-            } else if (ext === 'pdf' || type === 'application/pdf') {
+            } else if (ext === 'pdf') {
                 procesarPDF(file);
             } else if (ext === 'doc') {
                 toast('⚠️ .doc antiguo no soportado. Abre en Word y guarda como .docx, o copia y pega.', 'warning');
                 abrirPegarTexto();
-            } else if (type.startsWith('image/')) {
+            } else if (type.startsWith('image/') || ext.match(/^(png|jpg|jpeg|gif|webp|bmp)$/)) {
                 procesarImagenOCR(file);
             } else {
                 toast('Formato no reconocido. Usa "Pegar texto" o sube Excel/Word/PDF/imagen.', 'warning');
