@@ -476,6 +476,14 @@
             sedeField.required = false;
 
             switch (servicio) {
+                case 'NEXT':
+                    horaField.value = '17:00';
+                    sedeField.value = '';
+                    break;
+                case 'NEXT_PLUS':
+                    horaField.value = '19:00';
+                    sedeField.value = '';
+                    break;
                 case 'JAUJA':
                     horaField.value = '10:00';
                     sedeField.value = 'Jauja';
