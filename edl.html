@@ -163,6 +163,12 @@
         .captura-link:hover { text-decoration: underline; }
         .captura-preview { max-width: 180px; max-height: 120px; border-radius: 10px; margin-top: 8px; border: 1px solid #e2e6ec; cursor: pointer; }
 
+        .lightbox-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(6px); }
+        .lightbox-modal.active { display: flex; }
+        .lightbox-modal img { max-width: 100%; max-height: 90vh; border-radius: 12px; box-shadow: 0 12px 48px rgba(0,0,0,0.5); object-fit: contain; }
+        .lightbox-close { position: fixed; top: 16px; right: 24px; background: rgba(0,0,0,0.5); border: none; color: white; width: 44px; height: 44px; border-radius: 50%; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 10000; }
+        .lightbox-close:hover { background: rgba(0,0,0,0.8); }
+
         .sidebar-mobile-toggle {
             display: none; position: fixed; top: 12px; left: 12px; z-index: 101;
             background: #0f172a; border: none; color: white; width: 40px; height: 40px;
@@ -490,7 +496,7 @@
                     </div>
                 </div>
                 <div id="insCapturaPreview" style="display:none;margin-bottom:12px;">
-                    <img id="insCapturaImg" class="captura-preview" onclick="window.open(this.src,'_blank')">
+                    <img id="insCapturaImg" class="captura-preview" onclick="abrirCaptura(this.src)">
                 </div>
                 <button type="submit" class="btn-primary" style="width:100%;margin-top:10px;">💾 Guardar inscripción</button>
             </form>
@@ -755,7 +761,7 @@
                 const horario = curso ? `${curso.dia} ${curso.hora}` : (i.fechaHorario || '-');
                 const estadoCls = i.estadoPago === 'Canceló' ? 'estado-pagado' : 'estado-debe';
                 const metodo = i.metodoPago ? i.metodoPago.charAt(0).toUpperCase() + i.metodoPago.slice(1) : '-';
-                const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" onclick="window.open('${i.pagoCaptura}','_blank')" title="Ver captura">` : '';
+                const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" onclick="abrirCaptura('${i.pagoCaptura}')" title="Ver captura">` : '';
                 return `<tr>
                     <td><strong>${i.nombres}</strong></td>
                     <td>${i.dni}</td>
@@ -937,6 +943,29 @@
         initDocTipo();
         initMetodoPagoToggles();
         if (esAdmin) cargarInscripciones();
+
+        function abrirCaptura(src) {
+            const modal = document.getElementById('lightboxCaptura');
+            const img = modal.querySelector('img');
+            img.src = src;
+            modal.classList.add('active');
+        }
+
+        function cerrarCaptura() {
+            document.getElementById('lightboxCaptura').classList.remove('active');
+        }
+
+        document.getElementById('lightboxCaptura').addEventListener('click', function(e) {
+            if (e.target === this || e.target.classList.contains('lightbox-close')) cerrarCaptura();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') cerrarCaptura();
+        });
     </script>
+
+    <div id="lightboxCaptura" class="lightbox-modal">
+        <button class="lightbox-close" onclick="cerrarCaptura()">&times;</button>
+        <img src="" alt="Captura de pago">
+    </div>
 </body>
 </html>
