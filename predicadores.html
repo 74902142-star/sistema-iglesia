@@ -11,14 +11,14 @@
     <script src="firebase-auth.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f0f2f6; color: #0f172a; min-height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #0a1628; min-height: 100vh; }
 
         .app-layout { display: flex; min-height: 100vh; }
         .sidebar {
-            width: 72px; background: linear-gradient(180deg, #0f172a 0%, #152244 50%, #1e3a5f 100%);
+            width: 72px; background: linear-gradient(180deg, #0a1628 0%, #0f1d3a 50%, #152d50 100%);
             color: white; padding: 24px 12px; display: flex; flex-direction: column; gap: 4px;
             position: sticky; top: 0; height: 100vh; z-index: 100;
-            box-shadow: 2px 0 24px rgba(15,23,42,0.15);
+            box-shadow: 2px 0 24px rgba(10,22,40,0.12);
             transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
         }
@@ -37,7 +37,7 @@
             transition: background 0.2s; white-space: nowrap;
         }
         .nav-link:hover { background: rgba(255,255,255,0.08); color: white; }
-        .nav-link.active { background: rgba(255,255,255,0.95); color: #0f172a; font-weight: 700; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+        .nav-link.active { background: rgba(255,255,255,0.95); color: #0a1628; font-weight: 700; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
         .nav-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
         .nav-text { display: none; }
         .sidebar:hover .nav-text { display: inline; }
@@ -59,39 +59,39 @@
         .nav-section-content { display: flex; flex-direction: column; gap: 2px; }
 
         .header {
-            background: white; color: #0f172a; padding: 18px 32px; display: flex;
+            background: white; color: #0a1628; padding: 18px 32px; display: flex;
             justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-            border-bottom: 1px solid #e8ecf1; position: relative; z-index: 10;
+            border-bottom: 1px solid #e2e8f0; position: relative; z-index: 10;
         }
         .header::after {
             content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, #2d5aa0, #60a5fa, #2d5aa0);
+            background: linear-gradient(90deg, #2563eb, #3b82f6, #2563eb);
         }
-        .user-area { display: flex; align-items: center; gap: 16px; background: #f1f4f9; padding: 6px 18px 6px 20px; border-radius: 60px; border: 1px solid #e2e6ec; }
+        .user-area { display: flex; align-items: center; gap: 16px; background: #f1f4f9; padding: 6px 18px 6px 20px; border-radius: 60px; border: 1px solid #e2e8f0; }
         .user-area span { color: #64748b; font-size: 14px; }
-        .logout-btn { background: #0f172a; border: none; padding: 7px 18px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; font-size: 13px; transition: background 0.2s; }
-        .logout-btn:hover { background: #1e3a5f; }
+        .logout-btn { background: #0a1628; border: none; padding: 7px 18px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; font-size: 13px; transition: background 0.2s; }
+        .logout-btn:hover { background: #152d50; }
 
         .container { max-width: 1400px; width: 100%; margin: 0 auto; padding: 28px 32px; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
-        .stat-card { background: white; border-radius: 16px; padding: 22px; text-align: center; border: 1px solid #e8ecf1; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .stat-value { font-size: 36px; font-weight: 800; color: #0f172a; }
+        .stat-card { background: white; border-radius: 16px; padding: 22px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-value { font-size: 36px; font-weight: 800; color: #0a1628; }
         .stat-label { font-size: 14px; color: #64748b; margin-top: 6px; font-weight: 500; }
 
-        .section-card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid #e8ecf1; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .section-card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-        .section-title { font-size: 18px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 10px; }
+        .section-title { font-size: 18px; font-weight: 700; color: #0a1628; display: flex; align-items: center; gap: 10px; }
 
-        .btn-add { background: #0f172a; color: white; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s; }
-        .btn-add:hover { background: #1e3a5f; }
-        .btn-template { background: white; border: 1.5px solid #e2e6ec; padding: 10px 24px; border-radius: 12px; color: #475569; font-weight: 600; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .btn-add { background: #0a1628; color: white; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s; }
+        .btn-add:hover { background: #152d50; }
+        .btn-template { background: white; border: 1.5px solid #e2e8f0; padding: 10px 24px; border-radius: 12px; color: #475569; font-weight: 600; cursor: pointer; font-size: 13px; transition: all 0.2s; }
         .btn-template:hover { background: #f1f4f9; border-color: #cbd5e1; }
 
         .table-container { overflow-x: auto; }
         .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .data-table th { text-align: left; padding: 12px; background: #f8fafc; font-weight: 600; color: #475569; border-bottom: 1.5px solid #e2e6ec; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
-        .data-table td { padding: 12px; border-bottom: 1px solid #f1f4f9; vertical-align: middle; color: #1e293b; }
+        .data-table th { text-align: left; padding: 12px; background: #f8fafc; font-weight: 600; color: #475569; border-bottom: 1.5px solid #e2e8f0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .data-table td { padding: 12px; border-bottom: 1px solid #f1f4f9; vertical-align: middle; color: #0a1628; }
         .data-table tr:hover td { background: #f8fafc; }
         .status-badge { padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
         .status-pending { background: #fef3c7; color: #92400e; }
@@ -100,7 +100,7 @@
         .action-btn { border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 600; margin-right: 4px; transition: opacity 0.2s; }
         .btn-wa { background: #25D366; color: white; }
         .btn-wa:hover { opacity: 0.85; }
-        .btn-edit { background: #0f172a; color: white; }
+        .btn-edit { background: #0a1628; color: white; }
         .btn-edit:hover { opacity: 0.85; }
         .btn-del { background: #ef4444; color: white; }
         .btn-del:hover { opacity: 0.85; }
@@ -109,30 +109,30 @@
         .modal-content { background: white; border-radius: 20px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 28px; position: relative; animation: modalFadeIn 0.25s ease; }
         @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.96) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         .modal-close { position: absolute; top: 18px; right: 18px; font-size: 22px; cursor: pointer; background: none; border: none; color: #94a3b8; }
-        .modal-close:hover { color: #0f172a; }
+        .modal-close:hover { color: #0a1628; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; }
-        .form-control { width: 100%; padding: 13px 16px; border: 1.5px solid #e2e6ec; border-radius: 10px; font-family: inherit; font-size: 15px; transition: all 0.2s; background: #f8fafc; }
-        .form-control:focus { outline: none; border-color: #2d5aa0; background: white; box-shadow: 0 0 0 3px rgba(45,90,160,0.1); }
+        .form-control { width: 100%; padding: 13px 16px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-family: inherit; font-size: 15px; transition: all 0.2s; background: #f8fafc; }
+        .form-control:focus { outline: none; border-color: #2563eb; background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
         .form-control::placeholder { color: #94a3b8; font-size: 14px; }
         select.form-control { background: #f8fafc; cursor: pointer; }
         select.form-control:focus { background: white; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
         .upload-area { border: 1.5px dashed #d0d5dd; border-radius: 14px; padding: 36px; text-align: center; color: #94a3b8; margin-top: 20px; cursor: pointer; transition: all 0.25s; }
-        .upload-area:hover, .upload-area.dragover { border-color: #2d5aa0; background: #f8fafc; color: #0f172a; }
-        .upload-filename { margin-top: 12px; font-weight: 600; color: #0f172a; font-size: 14px; }
+        .upload-area:hover, .upload-area.dragover { border-color: #2563eb; background: #f8fafc; color: #0a1628; }
+        .upload-filename { margin-top: 12px; font-weight: 600; color: #0a1628; font-size: 14px; }
 
-        .photo-upload-group { margin-top: 12px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e6ec; }
+        .photo-upload-group { margin-top: 12px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
         .photo-upload-group label { font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 8px; }
-        .photo-preview { max-width: 160px; max-height: 120px; border-radius: 10px; margin-top: 8px; border: 1px solid #e2e6ec; object-fit: cover; cursor: pointer; }
-        .photo-indicator { font-size: 13px; color: #2d5aa0; cursor: pointer; }
+        .photo-preview { max-width: 160px; max-height: 120px; border-radius: 10px; margin-top: 8px; border: 1px solid #e2e8f0; object-fit: cover; cursor: pointer; }
+        .photo-indicator { font-size: 13px; color: #2563eb; cursor: pointer; }
         .photo-indicator:hover { text-decoration: underline; }
 
         .wa-modal-body { padding: 20px 0; }
-        .wa-msg-preview { background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 13px; line-height: 1.7; white-space: pre-wrap; border: 1px solid #e2e6ec; max-height: 280px; overflow-y: auto; }
+        .wa-msg-preview { background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 13px; line-height: 1.7; white-space: pre-wrap; border: 1px solid #e2e8f0; max-height: 280px; overflow-y: auto; }
         .wa-photo-preview { text-align: center; margin-bottom: 16px; }
-        .wa-photo-preview img { max-width: 100%; max-height: 200px; border-radius: 12px; border: 1px solid #e2e6ec; }
+        .wa-photo-preview img { max-width: 100%; max-height: 200px; border-radius: 12px; border: 1px solid #e2e8f0; }
         .wa-actions { display: flex; gap: 12px; flex-wrap: wrap; }
         .wa-actions button { flex: 1; min-width: 120px; justify-content: center; }
 
@@ -143,7 +143,7 @@
 
         .sidebar-mobile-toggle {
             display: none; position: fixed; top: 12px; left: 12px; z-index: 101;
-            background: #0f172a; border: none; color: white; width: 40px; height: 40px;
+            background: #0a1628; border: none; color: white; width: 40px; height: 40px;
             border-radius: 12px; font-size: 20px; cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
@@ -217,7 +217,7 @@
 
         <div class="main-content">
             <div class="header">
-                <div style="display:flex;align-items:center;gap:12px;"><div style="font-weight: 800; font-size: 20px; color: #0f172a;">🎤 Anfitriones y Predicadores</div></div>
+                <div style="display:flex;align-items:center;gap:12px;"><div style="font-weight: 800; font-size: 20px; color: #0a1628;">🎤 Anfitriones y Predicadores</div></div>
                 <div class="user-area">
                     <div id="userName" style="font-weight: 600; font-size: 14px;">Administrador</div>
                     <button class="logout-btn" onclick="cerrarSesion()">Salir</button>
@@ -257,7 +257,7 @@
                         <div style="font-size: 12px; margin-top: 8px;">Agrega los registros uno por uno con el botón "Agregar" — los datos se guardan para la próxima vez.</div>
                     </div>
 
-                    <h3 style="margin: 32px 0 16px; color: #1a3a5c;">🎤 Predicadores</h3>
+                    <h3 style="margin: 32px 0 16px; color: #0a1628;">🎤 Predicadores</h3>
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
@@ -271,7 +271,7 @@
                         </table>
                     </div>
 
-                    <h3 style="margin: 40px 0 16px; color: #1a3a5c;">🎙️ Anfitriones</h3>
+                    <h3 style="margin: 40px 0 16px; color: #0a1628;">🎙️ Anfitriones</h3>
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
@@ -292,7 +292,7 @@
     <div id="modalRegistro" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="cerrarModal()">&times;</button>
-            <h2 style="margin-bottom: 24px; color: #1a3a5c;" id="modalTitle">Nuevo Registro</h2>
+            <h2 style="margin-bottom: 24px; color: #0a1628;" id="modalTitle">Nuevo Registro</h2>
             <form id="formRegistro">
                 <input type="hidden" id="editId">
                 <div class="form-group">
@@ -355,7 +355,7 @@
     <div id="modalWhatsApp" class="modal">
         <div class="modal-content" style="max-width:500px;">
             <button class="modal-close" onclick="cerrarWAModal()">&times;</button>
-            <h2 style="margin-bottom: 8px; color: #1a3a5c;">📱 Enviar WhatsApp</h2>
+            <h2 style="margin-bottom: 8px; color: #0a1628;">📱 Enviar WhatsApp</h2>
             <div class="wa-modal-body">
                 <div class="wa-msg-preview" id="waMsgPreview"></div>
                 <div class="wa-photo-preview" id="waPhotoPreview" style="display:none;">
