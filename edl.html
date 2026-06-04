@@ -157,11 +157,30 @@
         .toast-error { background: #ef4444; }
         @keyframes toastIn { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
 
-        .captura-thumb { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 1px solid #e2e6ec; transition: transform 0.2s; }
-        .captura-thumb:hover { transform: scale(1.15); }
+        .captura-thumb { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; cursor: pointer; border: 2px solid #e2e6ec; transition: all 0.25s; }
+        .captura-thumb:hover { transform: scale(1.2); border-color: #2d5aa0; box-shadow: 0 4px 16px rgba(45,90,160,0.25); }
         .captura-link { display: inline-flex; align-items: center; gap: 4px; color: #2d5aa0; font-size: 11px; text-decoration: none; cursor: pointer; }
         .captura-link:hover { text-decoration: underline; }
-        .captura-preview { max-width: 180px; max-height: 120px; border-radius: 10px; margin-top: 8px; border: 1px solid #e2e6ec; cursor: pointer; }
+        .captura-preview { width: 100%; max-height: 220px; border-radius: 12px; object-fit: contain; cursor: pointer; background: #f1f4f9; border: 1.5px solid #e2e6ec; }
+
+        .captura-zone { border: 2px dashed #cbd5e1; border-radius: 16px; padding: 20px; text-align: center; background: #fafbfc; transition: all 0.25s; cursor: pointer; }
+        .captura-zone:hover { border-color: #2d5aa0; background: #f0f4ff; }
+        .captura-zone.has-file { border-style: solid; border-color: #10b981; background: #f0fdf4; }
+        .captura-zone-icon { font-size: 36px; margin-bottom: 8px; }
+        .captura-zone-title { font-weight: 600; font-size: 14px; color: #0f172a; margin-bottom: 4px; }
+        .captura-zone-sub { font-size: 12px; color: #94a3b8; margin-bottom: 14px; }
+        .captura-zone-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .captura-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e6ec; background: white; color: #0f172a; transition: all 0.2s; }
+        .captura-btn:hover { border-color: #2d5aa0; background: #f0f4ff; }
+        .captura-btn-cam { background: #0f172a; color: white; border-color: #0f172a; }
+        .captura-btn-cam:hover { background: #1e3a5f; border-color: #1e3a5f; }
+        .captura-filename { font-size: 12px; color: #10b981; margin-top: 10px; font-weight: 500; display: none; }
+        .captura-filename.visible { display: block; }
+        .captura-preview-wrap { display: none; margin-top: 12px; position: relative; border-radius: 12px; overflow: hidden; border: 1.5px solid #e2e6ec; background: #f1f4f9; }
+        .captura-preview-wrap.visible { display: block; }
+        .captura-preview-img { width: 100%; max-height: 220px; object-fit: contain; display: block; cursor: pointer; }
+        .captura-preview-remove { position: absolute; top: 8px; right: 8px; background: rgba(239,68,68,0.9); border: none; color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .captura-preview-remove:hover { background: #ef4444; }
 
         .lightbox-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(6px); }
         .lightbox-modal.active { display: flex; }
@@ -391,16 +410,22 @@
                                     </div>
                     <div class="form-group" id="guestCapturaGroup" style="display:none;">
                         <label>Captura de pago</label>
-                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <button type="button" class="btn-template" onclick="document.getElementById('guestPagoCaptura').click()" style="display:inline-flex;align-items:center;gap:6px;">📁 Elegir imagen</button>
-                            <button type="button" class="btn-template" onclick="document.getElementById('guestPagoCapturaCam').click()" style="display:inline-flex;align-items:center;gap:6px;">📷 Tomar foto</button>
+                        <div class="captura-zone" id="guestCapturaZone" onclick="document.getElementById('guestPagoCaptura').click()">
+                            <div class="captura-zone-icon">🖼️</div>
+                            <div class="captura-zone-title">Sube tu comprobante de pago</div>
+                            <div class="captura-zone-sub">Yape, Plin o Transferencia — máximo 5MB</div>
+                            <div class="captura-zone-actions">
+                                <button type="button" class="captura-btn" onclick="event.stopPropagation();document.getElementById('guestPagoCaptura').click()">📁 Elegir imagen</button>
+                                <button type="button" class="captura-btn captura-btn-cam" onclick="event.stopPropagation();document.getElementById('guestPagoCapturaCam').click()">📷 Tomar foto</button>
+                            </div>
+                            <div class="captura-filename" id="guestCapturaFilename"></div>
                         </div>
                         <input type="file" id="guestPagoCaptura" accept="image/*" style="display:none;">
                         <input type="file" id="guestPagoCapturaCam" accept="image/*" capture="environment" style="display:none;">
-                        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">Máx 5MB. Sube la captura de tu Yape/Plin/Transferencia</div>
-                    </div>
-                    <div id="guestCapturaPreview" style="display:none;margin-bottom:12px;">
-                        <img id="guestCapturaImg" class="captura-preview" onclick="abrirCaptura(this.src)" style="max-width:200px;">
+                        <div class="captura-preview-wrap" id="guestCapturaPreview">
+                            <button type="button" class="captura-preview-remove" onclick="removerCaptura('guest')">✕</button>
+                            <img id="guestCapturaImg" class="captura-preview-img" onclick="abrirCaptura(this.src)" alt="Vista previa">
+                        </div>
                     </div>
                                 </div>
                                 <button type="submit" class="btn-primary" style="width:100%;">📝 Inscribirme</button>
@@ -500,17 +525,23 @@
                     </div>
                     <div class="form-group" id="insCapturaGroup" style="display:none;">
                         <label>Captura de pago</label>
-                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <button type="button" class="btn-template" onclick="document.getElementById('insPagoCaptura').click()" style="display:inline-flex;align-items:center;gap:6px;">📁 Elegir imagen</button>
-                            <button type="button" class="btn-template" onclick="document.getElementById('insPagoCapturaCam').click()" style="display:inline-flex;align-items:center;gap:6px;">📷 Tomar foto</button>
+                        <div class="captura-zone" id="insCapturaZone" onclick="document.getElementById('insPagoCaptura').click()">
+                            <div class="captura-zone-icon">🖼️</div>
+                            <div class="captura-zone-title">Sube tu comprobante de pago</div>
+                            <div class="captura-zone-sub">Yape, Plin o Transferencia — máximo 5MB</div>
+                            <div class="captura-zone-actions">
+                                <button type="button" class="captura-btn" onclick="event.stopPropagation();document.getElementById('insPagoCaptura').click()">📁 Elegir imagen</button>
+                                <button type="button" class="captura-btn captura-btn-cam" onclick="event.stopPropagation();document.getElementById('insPagoCapturaCam').click()">📷 Tomar foto</button>
+                            </div>
+                            <div class="captura-filename" id="insCapturaFilename"></div>
                         </div>
                         <input type="file" id="insPagoCaptura" accept="image/*" style="display:none;">
                         <input type="file" id="insPagoCapturaCam" accept="image/*" capture="environment" style="display:none;">
-                        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">Máx 5MB. Sube la captura de tu Yape/Plin/Transferencia</div>
+                        <div class="captura-preview-wrap" id="insCapturaPreview">
+                            <button type="button" class="captura-preview-remove" onclick="removerCaptura('ins')">✕</button>
+                            <img id="insCapturaImg" class="captura-preview-img" onclick="abrirCaptura(this.src)" alt="Vista previa">
+                        </div>
                     </div>
-                </div>
-                <div id="insCapturaPreview" style="display:none;margin-bottom:12px;">
-                    <img id="insCapturaImg" class="captura-preview" onclick="abrirCaptura(this.src)">
                 </div>
                 <button type="submit" class="btn-primary" style="width:100%;margin-top:10px;">💾 Guardar inscripción</button>
             </form>
@@ -579,13 +610,30 @@
             const file = getCapturaFile(prefix);
             const preview = document.getElementById(prefix + 'CapturaImg');
             const container = document.getElementById(prefix + 'CapturaPreview');
+            const zone = document.getElementById(prefix + 'CapturaZone');
+            const filename = document.getElementById(prefix + 'CapturaFilename');
             if (file) {
                 const reader = new FileReader();
-                reader.onload = (e) => { preview.src = e.target.result; container.style.display = 'block'; };
+                reader.onload = (e) => { preview.src = e.target.result; };
                 reader.readAsDataURL(file);
-            } else {
-                container.style.display = 'none';
+                container.classList.add('visible');
+                zone.classList.add('has-file');
+                filename.textContent = '✅ ' + file.name;
+                filename.classList.add('visible');
             }
+        }
+
+        function removerCaptura(prefix) {
+            const g = document.getElementById(prefix + 'PagoCaptura');
+            const c = document.getElementById(prefix + 'PagoCapturaCam');
+            g.value = '';
+            c.value = '';
+            const container = document.getElementById(prefix + 'CapturaPreview');
+            const zone = document.getElementById(prefix + 'CapturaZone');
+            const filename = document.getElementById(prefix + 'CapturaFilename');
+            container.classList.remove('visible');
+            zone.classList.remove('has-file');
+            filename.classList.remove('visible');
         }
 
         ['ins', 'guest'].forEach(p => {
@@ -801,7 +849,7 @@
                 const horario = curso ? `${curso.dia} ${curso.hora}` : (i.fechaHorario || '-');
                 const estadoCls = i.estadoPago === 'Canceló' ? 'estado-pagado' : 'estado-debe';
                 const metodo = i.metodoPago ? i.metodoPago.charAt(0).toUpperCase() + i.metodoPago.slice(1) : '-';
-                const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" onclick="abrirCaptura('${i.pagoCaptura}')" title="Ver captura">` : '';
+                const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" onclick="abrirCaptura('${i.pagoCaptura}')" title="Ver captura de pago">` : '<span style="color:#94a3b8;font-size:11px;">—</span>';
                 return `<tr>
                     <td><strong>${i.nombres}</strong></td>
                     <td>${i.dni}</td>
@@ -880,7 +928,9 @@
             document.getElementById('insEstado').value = 'Debe';
             document.getElementById('insMetodoPago').value = '';
             document.getElementById('insCapturaGroup').style.display = 'none';
-            document.getElementById('insCapturaPreview').style.display = 'none';
+            document.getElementById('insCapturaPreview').classList.remove('visible');
+            document.getElementById('insCapturaZone').classList.remove('has-file');
+            document.getElementById('insCapturaFilename').classList.remove('visible');
             document.getElementById('cursoInfo').classList.remove('visible');
             document.getElementById('insMonto').value = '';
             document.getElementById('modalTitle').innerText = 'Nueva Inscripción';
@@ -907,9 +957,9 @@
             const preview = document.getElementById('insCapturaPreview');
             if (i.pagoCaptura) {
                 document.getElementById('insCapturaImg').src = i.pagoCaptura;
-                preview.style.display = 'block';
+                preview.classList.add('visible');
             } else {
-                preview.style.display = 'none';
+                preview.classList.remove('visible');
             }
             document.getElementById('modalTitle').innerText = 'Editar Inscripción';
             document.getElementById('modalInscripcion').style.display = 'flex';
