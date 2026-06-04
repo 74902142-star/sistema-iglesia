@@ -389,11 +389,19 @@
                                             <option value="transferencia">Transferencia Bancaria</option>
                                         </select>
                                     </div>
-                                    <div class="form-group" id="guestCapturaGroup" style="display:none;">
-                                        <label>Captura de pago</label>
-                                        <input type="file" id="guestPagoCaptura" class="form-control" accept="image/png,image/jpeg,image/webp">
-                                        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">Sube la captura de tu Yape/Plin/Transferencia</div>
-                                    </div>
+                    <div class="form-group" id="guestCapturaGroup" style="display:none;">
+                        <label>Captura de pago</label>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button type="button" class="btn-template" onclick="document.getElementById('guestPagoCaptura').click()" style="display:inline-flex;align-items:center;gap:6px;">📁 Elegir imagen</button>
+                            <button type="button" class="btn-template" onclick="document.getElementById('guestPagoCapturaCam').click()" style="display:inline-flex;align-items:center;gap:6px;">📷 Tomar foto</button>
+                        </div>
+                        <input type="file" id="guestPagoCaptura" accept="image/*" style="display:none;">
+                        <input type="file" id="guestPagoCapturaCam" accept="image/*" capture="environment" style="display:none;">
+                        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">Máx 5MB. Sube la captura de tu Yape/Plin/Transferencia</div>
+                    </div>
+                    <div id="guestCapturaPreview" style="display:none;margin-bottom:12px;">
+                        <img id="guestCapturaImg" class="captura-preview" onclick="abrirCaptura(this.src)" style="max-width:200px;">
+                    </div>
                                 </div>
                                 <button type="submit" class="btn-primary" style="width:100%;">📝 Inscribirme</button>
                             </form>
@@ -492,7 +500,13 @@
                     </div>
                     <div class="form-group" id="insCapturaGroup" style="display:none;">
                         <label>Captura de pago</label>
-                        <input type="file" id="insPagoCaptura" class="form-control" accept="image/png,image/jpeg,image/webp">
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button type="button" class="btn-template" onclick="document.getElementById('insPagoCaptura').click()" style="display:inline-flex;align-items:center;gap:6px;">📁 Elegir imagen</button>
+                            <button type="button" class="btn-template" onclick="document.getElementById('insPagoCapturaCam').click()" style="display:inline-flex;align-items:center;gap:6px;">📷 Tomar foto</button>
+                        </div>
+                        <input type="file" id="insPagoCaptura" accept="image/*" style="display:none;">
+                        <input type="file" id="insPagoCapturaCam" accept="image/*" capture="environment" style="display:none;">
+                        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">Máx 5MB. Sube la captura de tu Yape/Plin/Transferencia</div>
                     </div>
                 </div>
                 <div id="insCapturaPreview" style="display:none;margin-bottom:12px;">
@@ -554,6 +568,32 @@
                 reader.readAsDataURL(file);
             });
         }
+
+        function getCapturaFile(prefix) {
+            const g = document.getElementById(prefix + 'PagoCaptura');
+            const c = document.getElementById(prefix + 'PagoCapturaCam');
+            return (g.files && g.files[0]) ? g.files[0] : (c.files && c.files[0]) ? c.files[0] : null;
+        }
+
+        function previewCapturaFile(prefix) {
+            const file = getCapturaFile(prefix);
+            const preview = document.getElementById(prefix + 'CapturaImg');
+            const container = document.getElementById(prefix + 'CapturaPreview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { preview.src = e.target.result; container.style.display = 'block'; };
+                reader.readAsDataURL(file);
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        ['ins', 'guest'].forEach(p => {
+            const g = document.getElementById(p + 'PagoCaptura');
+            const c = document.getElementById(p + 'PagoCapturaCam');
+            if (g) g.addEventListener('change', () => previewCapturaFile(p));
+            if (c) c.addEventListener('change', () => previewCapturaFile(p));
+        });
 
         function initMetodoPagoToggles() {
             const pairs = [
@@ -660,12 +700,12 @@
                 if (!metodoPago) { toast('❌ Selecciona un método de pago', 'warning'); return; }
 
                 const isDigital = ['yape','plin','transferencia'].includes(metodoPago);
-                const capturaFile = document.getElementById('guestPagoCaptura').files[0];
+                const capturaFile = getCapturaFile('guest');
                 if (isDigital && !capturaFile) { toast('❌ Sube la captura de tu pago', 'warning'); return; }
 
                 let pagoCaptura = '';
                 if (capturaFile) {
-                    if (capturaFile.size > 500000) { toast('❌ La imagen es muy grande (máx 500KB)', 'warning'); return; }
+                    if (capturaFile.size > 5000000) { toast('❌ La imagen es muy grande (máx 5MB)', 'warning'); return; }
                     pagoCaptura = await fileToBase64(capturaFile);
                 }
 
@@ -800,8 +840,8 @@
                 return;
             }
 
-            const capturaFile = document.getElementById('insPagoCaptura').files[0];
-            if (capturaFile && capturaFile.size > 500000) { toast('❌ La imagen es muy grande (máx 500KB)', 'warning'); return; }
+            const capturaFile = getCapturaFile('ins');
+            if (capturaFile && capturaFile.size > 5000000) { toast('❌ La imagen es muy grande (máx 5MB)', 'warning'); return; }
             let pagoCaptura = editandoId ? undefined : '';
             if (capturaFile) pagoCaptura = await fileToBase64(capturaFile);
 
