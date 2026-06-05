@@ -5,77 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invitado | Iglesia Agua Viva</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Inter', sans-serif;
-            background: #f0f9ff;
+            background: radial-gradient(circle at center, #1b3d70 0%, #0c1a2d 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            color: #1e293b;
         }
-        .guest-container { max-width: 480px; width: 100%; }
-        .guest-header { text-align: center; margin-bottom: 28px; }
-        .guest-header .icon { font-size: 44px; margin-bottom: 10px; }
-        .guest-header h1 { font-size: 24px; font-weight: 800; color: #0c4a6e; }
-        .guest-header p { font-size: 14px; color: #64748b; margin-top: 4px; }
-        .guest-header .user-name { font-weight: 600; color: #0284c7; }
+
+        .guest-container {
+            max-width: 480px;
+            width: 100%;
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .guest-header {
+            text-align: center;
+            margin-bottom: 32px;
+            color: #ffffff;
+        }
+
+        .guest-header .logo-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border-radius: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .guest-header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .guest-header p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .guest-header .user-name {
+            font-weight: 700;
+            color: #10b981;
+        }
 
         .module-card {
             background: white;
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 24px;
-            margin-bottom: 14px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1.5px solid #bae6fd;
-            transition: all 0.2s;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.25s ease;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 20px;
             text-decoration: none;
             color: inherit;
         }
+
         .module-card:hover {
-            border-color: #0284c7;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            border-color: #1b4570;
         }
+
         .module-icon {
-            width: 56px; height: 56px;
-            background: #0c4a6e;
-            border-radius: 14px;
+            width: 56px;
+            height: 56px;
+            background: #1b4570;
+            color: #ffffff;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
             flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(27, 69, 112, 0.2);
         }
-        .module-info h3 { font-size: 17px; font-weight: 700; color: #0c4a6e; }
-        .module-info p { font-size: 13px; color: #64748b; margin-top: 3px; line-height: 1.4; }
+
+        .module-info h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .module-info p {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
 
         .btn-logout {
-            display: block; width: 100%; padding: 12px;
-            border: 1.5px solid #bae6fd; border-radius: 12px;
-            background: white; color: #64748b;
-            font-weight: 600; font-size: 14px; cursor: pointer;
-            transition: all 0.2s; margin-top: 8px;
-            text-align: center; font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 13px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+            backdrop-filter: blur(4px);
         }
-        .btn-logout:hover { background: #f1f4f9; color: #ef4444; border-color: #ef4444; }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-color: #ef4444;
+        }
     </style>
 </head>
 <body>
     <div class="guest-container">
         <div class="guest-header">
-            <div class="icon">⛪</div>
+            <div class="logo-icon">
+                <i data-lucide="church" style="width: 28px; height: 28px;"></i>
+            </div>
             <h1>Iglesia Agua Viva</h1>
             <p>Bienvenido, <span class="user-name" id="userName">Invitado</span></p>
         </div>
 
         <a href="ingreso.html" class="module-card">
-            <div class="module-icon">📊</div>
+            <div class="module-icon">
+                <i data-lucide="clipboard-list" style="width: 24px; height: 24px;"></i>
+            </div>
             <div class="module-info">
                 <h3>Reporte de Asistencia</h3>
                 <p>Registra la asistencia de los servicios. Llena los conteos por ministerio y asistentes.</p>
@@ -83,18 +165,25 @@
         </a>
 
         <a href="edl.html" class="module-card">
-            <div class="module-icon">🎓</div>
+            <div class="module-icon">
+                <i data-lucide="graduation-cap" style="width: 24px; height: 24px;"></i>
+            </div>
             <div class="module-info">
                 <h3>EDL — Escuela de Liderazgo</h3>
                 <p>Inscríbete a los cursos y seminarios disponibles. Completa tus datos para matricularte.</p>
             </div>
         </a>
 
-        <button class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
+        <button class="btn-logout" onclick="cerrarSesion()">
+            <i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Cerrar sesión
+        </button>
     </div>
 
     <script src="auth.js"></script>
     <script>
+        // Init Lucide
+        lucide.createIcons();
+
         const user = Auth.getUsuario();
         if (!user || user.rol !== 'invitado') {
             window.location.href = 'index.html';

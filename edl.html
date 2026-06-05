@@ -5,342 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>EDL - Escuela de Liderazgo | Iglesia Agua Viva</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="firebase-config.js"></script>
     <script src="auth.js"></script>
     <script src="firebase-auth.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f0f9ff; color: #0c4a6e; min-height: 100vh; }
-
-        .app-layout { display: flex; min-height: 100vh; }
-        .sidebar {
-            width: 72px; background: linear-gradient(180deg, #0c4a6e 0%, #075985 50%, #0369a1 100%);
-            color: white; padding: 24px 12px; display: flex; flex-direction: column; gap: 4px;
-            position: sticky; top: 0; height: 100vh; z-index: 100;
-            box-shadow: 2px 0 24px rgba(12,74,110,0.12);
-            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
-        @media (hover:hover) { .sidebar:hover { width: 260px; } }
-
-        .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 0; margin-bottom: 32px; white-space: nowrap; }
-        .sidebar-logo .logo-icon { font-size: 24px; flex-shrink: 0; width: 24px; text-align: center; }
-        .sidebar-logo .logo-text { display: none; }
-        .sidebar:hover .sidebar-logo .logo-text { display: block; }
-        .sidebar-logo .logo-text h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
-        .sidebar-logo .logo-text p { font-size: 11px; opacity: 0.5; margin-top: 0; }
-
-        .nav-link {
-            display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px;
-            color: rgba(255,255,255,0.6); text-decoration: none; font-weight: 500; font-size: 14px;
-            transition: background 0.2s; white-space: nowrap;
-        }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: white; }
-        .nav-link.active { background: rgba(255,255,255,0.95); color: #0c4a6e; font-weight: 700; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
-        .nav-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
-        .nav-text { display: none; }
-        .sidebar:hover .nav-text { display: inline; }
-        .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-
-        .sidebar-toggle { display: none; }
-        .sidebar-header { margin-bottom: 4px; padding: 0; }
-        .sidebar-close { display: none; }
-        .sidebar-overlay { display: none; }
-        .sidebar-overlay.active { display: block; }
-
-        .nav-section { display: flex; flex-direction: column; gap: 2px; }
-        .nav-section-title {
-            padding: 12px 12px 4px;
-            color: rgba(255,255,255,0.3); font-size: 10px; font-weight: 700;
-            letter-spacing: 1.2px; text-transform: uppercase; display: none;
-        }
-        .sidebar:hover .nav-section-title { display: block; }
-        .nav-section-content { display: flex; flex-direction: column; gap: 2px; }
-
-        .header {
-            background: white; color: #0c4a6e; padding: 18px 32px; display: flex;
-            justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-            border-bottom: 1px solid #bae6fd; position: relative; z-index: 10;
-        }
-        .header::after {
-            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, #0284c7, #38bdf8, #0284c7);
-        }
-        .header-title { font-size: 18px; font-weight: 700; color: #0c4a6e; }
-        .user-area { display: flex; align-items: center; gap: 16px; background: #f1f4f9; padding: 6px 18px 6px 20px; border-radius: 60px; border: 1px solid #bae6fd; }
-        .user-area span { color: #64748b; font-size: 14px; }
-        .logout-btn { background: #0c4a6e; border: none; padding: 7px 18px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; font-size: 13px; transition: background 0.2s; }
-        .logout-btn:hover { background: #0369a1; }
-
-        .container { max-width: 1400px; width: 100%; margin: 0 auto; padding: 28px 32px; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-        .stat-card {
-            background: white; border-radius: 16px; padding: 20px 16px; text-align: center;
-            border: 1px solid #bae6fd; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-            position: relative; overflow: hidden;
-        }
-        .stat-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-        }
-        .stat-card:nth-child(1)::before { background: #0284c7; }
-        .stat-card:nth-child(2)::before { background: #10b981; }
-        .stat-card:nth-child(3)::before { background: #f59e0b; }
-        .stat-card:nth-child(4)::before { background: #8b5cf6; }
-        .stat-icon-card { font-size: 24px; margin-bottom: 6px; }
-        .stat-value { font-size: 28px; font-weight: 800; color: #0c4a6e; }
-        .stat-label { font-size: 12px; color: #64748b; margin-top: 4px; font-weight: 500; }
-
-        .content-grid { margin-bottom: 28px; }
-        .info-card {
-            background: linear-gradient(135deg, #f8fafc, #f1f4f9); color: #0c4a6e;
-            border-radius: 16px; padding: 24px; font-size: 13px; line-height: 1.7;
-            border: 1px solid #bae6fd; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-        .info-card h3 { font-size: 16px; margin-bottom: 14px; font-weight: 700; color: #0369a1; }
-        .info-card strong { color: #0284c7; }
-        .info-card .prices { margin-top: 12px; padding: 12px 16px; background: white; border-radius: 12px; border: 1px solid #bae6fd; }
-
-        .filters-bar { background: white; border-radius: 16px; padding: 18px 20px; margin-bottom: 24px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; border: 1px solid #bae6fd; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .filter-group { flex: 1; min-width: 140px; }
-        .filter-group label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 5px; }
-        .filter-input, .filter-select { width: 100%; padding: 10px 14px; border: 1.5px solid #bae6fd; border-radius: 10px; font-family: inherit; font-size: 13px; background: #f8fafc; transition: all 0.2s; }
-        .filter-input:focus, .filter-select:focus { outline: none; border-color: #0284c7; background: white; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
-
-        .btn-primary { background: #0c4a6e; color: white; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; transition: background 0.2s; }
-        .btn-primary:hover { background: #0369a1; }
-        .btn-secondary { background: white; border: 1.5px solid #bae6fd; padding: 10px 24px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; color: #475569; }
-        .btn-secondary:hover { background: #f1f4f9; border-color: #cbd5e1; }
-
-        .section-card { background: white; border-radius: 16px; padding: 24px; border: 1px solid #bae6fd; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .guest-only { display: none; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-        .section-title { font-size: 18px; font-weight: 700; color: #0c4a6e; }
-
-        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid #bae6fd; }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .data-table th { text-align: left; padding: 12px; background: #f8fafc; font-weight: 600; color: #475569; border-bottom: 1.5px solid #bae6fd; white-space: nowrap; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
-        .data-table td { padding: 12px; border-bottom: 1px solid #f1f4f9; vertical-align: middle; color: #0c4a6e; }
-        .data-table tr:nth-child(even) td { background: #fafbfc; }
-        .data-table tr:hover td { background: #f1f4f9; }
-        .data-table tr:last-child td { border-bottom: none; }
-
-        .estado-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .estado-pagado { background: #dcfce7; color: #166534; }
-        .estado-debe { background: #fef3c7; color: #92400e; }
-
-        .action-btn { border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; margin-right: 4px; transition: opacity 0.2s; }
-        .btn-edit { background: #0c4a6e; color: white; }
-        .btn-edit:hover { opacity: 0.85; }
-        .btn-del { background: #ef4444; color: white; }
-        .btn-del:hover { opacity: 0.85; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; border-radius: 20px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 28px; position: relative; animation: modalFadeIn 0.25s ease; }
-        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.96) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .modal-close { position: absolute; top: 18px; right: 18px; font-size: 22px; cursor: pointer; background: none; border: none; color: #94a3b8; }
-        .modal-close:hover { color: #0c4a6e; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; }
-        .form-control { width: 100%; padding: 13px 16px; border: 1.5px solid #bae6fd; border-radius: 10px; font-family: inherit; font-size: 15px; transition: all 0.2s; background: #f8fafc; }
-        .form-control:focus { outline: none; border-color: #0284c7; background: white; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
-        .form-control::placeholder { color: #94a3b8; font-size: 14px; }
-        select.form-control { background: #f8fafc; cursor: pointer; }
-        select.form-control:focus { background: white; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 60px; color: white; font-weight: 500; font-size: 14px; z-index: 2000; animation: toastIn 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-        .toast-success { background: #10b981; }
-        .toast-error { background: #ef4444; }
-        @keyframes toastIn { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
-
-        .captura-thumb { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; cursor: pointer; border: 2px solid #bae6fd; transition: all 0.25s; }
-        .captura-thumb:hover { transform: scale(1.2); border-color: #0284c7; box-shadow: 0 4px 16px rgba(2,132,199,0.25); }
-        .captura-link { display: inline-flex; align-items: center; gap: 4px; color: #0284c7; font-size: 11px; text-decoration: none; cursor: pointer; }
-        .captura-link:hover { text-decoration: underline; }
-        .captura-preview { width: 100%; max-height: 220px; border-radius: 12px; object-fit: contain; cursor: pointer; background: #f1f4f9; border: 1.5px solid #bae6fd; }
-
-        .captura-zone { border: 2px dashed #cbd5e1; border-radius: 16px; padding: 20px; text-align: center; background: #fafbfc; transition: all 0.25s; cursor: pointer; }
-        .captura-zone:hover { border-color: #0284c7; background: #f0f4ff; }
-        .captura-zone.has-file { border-style: solid; border-color: #10b981; background: #f0fdf4; }
-        .captura-zone-icon { font-size: 36px; margin-bottom: 8px; }
-        .captura-zone-title { font-weight: 600; font-size: 14px; color: #0c4a6e; margin-bottom: 4px; }
-        .captura-zone-sub { font-size: 12px; color: #94a3b8; margin-bottom: 14px; }
-        .captura-zone-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .captura-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid #bae6fd; background: white; color: #0c4a6e; transition: all 0.2s; }
-        .captura-btn:hover { border-color: #0284c7; background: #f0f4ff; }
-        .captura-btn-cam { background: #0c4a6e; color: white; border-color: #0c4a6e; }
-        .captura-btn-cam:hover { background: #0369a1; border-color: #0369a1; }
-        .captura-filename { font-size: 12px; color: #10b981; margin-top: 10px; font-weight: 500; display: none; }
-        .captura-filename.visible { display: block; }
-        .captura-preview-wrap { display: none; margin-top: 12px; position: relative; border-radius: 12px; overflow: hidden; border: 1.5px solid #bae6fd; background: #f1f4f9; }
-        .captura-preview-wrap.visible { display: block; }
-        .captura-preview-img { width: 100%; max-height: 220px; object-fit: contain; display: block; cursor: pointer; }
-        .captura-preview-remove { position: absolute; top: 8px; right: 8px; background: rgba(239,68,68,0.9); border: none; color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-        .captura-preview-remove:hover { background: #ef4444; }
-
-        .lightbox-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(6px); }
-        .lightbox-modal.active { display: flex; }
-        .lightbox-modal img { max-width: 100%; max-height: 90vh; border-radius: 12px; box-shadow: 0 12px 48px rgba(0,0,0,0.5); object-fit: contain; }
-        .lightbox-close { position: fixed; top: 16px; right: 24px; background: rgba(0,0,0,0.5); border: none; color: white; width: 44px; height: 44px; border-radius: 50%; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 10000; }
-        .lightbox-close:hover { background: rgba(0,0,0,0.8); }
-
-        .sidebar-mobile-toggle {
-            display: none; position: fixed; top: 12px; left: 12px; z-index: 101;
-            background: #0c4a6e; border: none; color: white; width: 40px; height: 40px;
-            border-radius: 12px; font-size: 20px; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        @media (max-width: 992px) {
-            .sidebar-mobile-toggle { display: flex; align-items: center; justify-content: center; }
-            .sidebar { display: none; }
-            .sidebar.open { display: flex; }
-            .sidebar {
-                position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
-                padding: 24px 16px; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                z-index: 100; flex-direction: column; overflow-y: auto;
-            }
-            .sidebar.open { left: 0; }
-            .sidebar .nav-text,
-            .sidebar .nav-section-title,
-            .sidebar .logo-text { display: block; }
-            .sidebar-close { display: block; }
-            .sidebar .sidebar-logo { padding: 0; }
-            .sidebar-logo { display: flex; margin-bottom: 24px; }
-            .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 99; }
-            .sidebar-overlay.active { display: block; }
-            .app-layout { flex-direction: column; }
-            .main-content { width: 100%; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .content-grid { grid-template-columns: 1fr; }
-            .info-card { margin-top: 0; }
-            .filters-bar { flex-direction: column; }
-            .filters-bar .filter-group { width: 100%; }
-            .filters-bar input, .filters-bar select { width: 100%; }
-            .filters-bar .btn-primary, .filters-bar .btn-secondary { width: 100%; text-align: center; }
-        }
-        @media (max-width: 600px) {
-            .stats-grid { grid-template-columns: 1fr; gap: 12px; }
-            .form-row { grid-template-columns: 1fr; }
-            .container { padding: 16px; }
-            .header { padding: 14px 16px; }
-            .section-card { padding: 16px; border-radius: 14px; }
-            .data-table { font-size: 11px; }
-            .data-table th:nth-child(3),
-            .data-table td:nth-child(3),
-            .data-table th:nth-child(4),
-            .data-table td:nth-child(4) { display: none; }
-            .modal-content { padding: 20px; border-radius: 16px; }
-            .header-title { font-size: 16px; }
-        }
-        @media (max-width: 400px) {
-            .data-table th:nth-child(7),
-            .data-table td:nth-child(7) { display: none; }
-        }
-    </style>
 </head>
 <body>
     <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
     <div class="app-layout">
+        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <span class="logo-icon">⛪</span>
+                    <span class="logo-icon"><i data-lucide="church" style="width: 24px; height: 24px;"></i></span>
                     <div class="logo-text">
                         <h2>Agua Viva</h2>
-                        <p>Gestión Ministerial</p>
+                        <p>Administración</p>
                     </div>
                 </div>
                 <button class="sidebar-close" id="sidebarClose">&times;</button>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Reportes</div>
-                <div class="nav-section-content">
-                    <a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span><span class="nav-text">Reporte de Asistencia</span></a>
-                </div>
+            <!-- Unified Sidebar Links -->
+            <div class="nav-section-content">
+                <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
+                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i data-lucide="clipboard-list"></i></span><span>Registro</span></a>
+                <a href="predicadores.html" class="nav-link nav-admin" id="nav-anfitriones" style="display:none;"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
+                <a href="creativos.html" class="nav-link nav-admin" id="nav-creativos" style="display:none;"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
+                <a href="edl.html" class="nav-link active nav-admin" id="nav-edl" style="display:none;"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Servicio</div>
-                <div class="nav-section-content">
-                    <a href="ingreso.html" class="nav-link"><span class="nav-icon">📝</span><span class="nav-text">Registrar Servicio</span></a>
-                </div>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Ministerios</div>
-                <div class="nav-section-content">
-                    <a href="predicadores.html" class="nav-link"><span class="nav-icon">🎤</span><span class="nav-text">Anfitriones y Predicadores</span></a>
-                    <a href="creativos.html" class="nav-link"><span class="nav-icon">🎨</span><span class="nav-text">Creativos</span></a>
-                </div>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Formación</div>
-                <div class="nav-section-content">
-                    <a href="edl.html" class="nav-link active"><span class="nav-icon">🎓</span><span class="nav-text">EDL (Escuela de Liderazgo)</span></a>
-                </div>
-            </div>
-            <div class="nav-section" style="margin-top: auto;">
-                <div class="nav-section-content">
-                    <a href="#" class="nav-link"><span class="nav-icon">⚙️</span><span class="nav-text">Configuración</span></a>
-                    <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon">🚪</span><span class="nav-text">Cerrar Sesión</span></a>
-                </div>
-            </div>
-            </div>
-            <div class="nav-section admin-only">
-                <div class="nav-section-title">Ministerios</div>
-                <div class="nav-section-content">
-                    <a href="predicadores.html" class="nav-link"><span class="nav-icon">🎤</span><span class="nav-text">Anfitriones y Predicadores</span></a>
-                    <a href="creativos.html" class="nav-link"><span class="nav-icon">🎨</span><span class="nav-text">Creativos</span></a>
-                </div>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Formación</div>
-                <div class="nav-section-content">
-                    <a href="edl.html" class="nav-link active"><span class="nav-icon">🎓</span><span class="nav-text">EDL (Escuela de Liderazgo)</span></a>
-                </div>
+            <div class="nav-section-content" style="margin-top: auto;">
+                <a href="#" class="nav-link"><span class="nav-icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
+                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
             </div>
         </aside>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+        <!-- Main Content -->
         <div class="main-content">
+            <!-- Header -->
             <div class="header">
-                <div style="display:flex;align-items:center;gap:12px;"><div style="font-weight: 800; font-size: 20px; color: #0c4a6e;">🎓 EDL – Escuela de Liderazgo</div></div>
-                <div class="user-area">
-                    <div id="userName" style="font-weight: 600; font-size: 14px;">Administrador</div>
-                    <button class="logout-btn" onclick="cerrarSesion()">Salir</button>
+                <div class="header-left">
+                    <div class="header-title">🎓 EDL – Escuela de Liderazgo</div>
+                </div>
+                <div class="header-right">
+                    <div class="user-area">
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Cargando...</div>
+                            <div class="user-role" id="userRole"></div>
+                        </div>
+                        <div class="user-avatar" id="userAvatar">A</div>
+                    </div>
                 </div>
             </div>
 
+            <!-- Container -->
             <div class="container">
                 <div class="admin-only">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon-card">📝</div>
-                        <div class="stat-value" id="statInscripciones">0</div>
-                        <div class="stat-label">Total inscripciones</div>
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-details">
+                                <h4>Total Inscripciones</h4>
+                                <div class="stat-value" id="statInscripciones">0</div>
+                                <div class="stat-trend up"><i data-lucide="trending-up" style="width:14px; height:14px; vertical-align:middle;"></i> +12%</div>
+                            </div>
+                            <div class="stat-card-icon"><i data-lucide="user-plus"></i></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-details">
+                                <h4>Total Pagado</h4>
+                                <div class="stat-value" id="statPagado">S/ 0</div>
+                                <div class="stat-trend up" style="color:var(--success-text);"><i data-lucide="check" style="width:14px; height:14px; vertical-align:middle;"></i> Cancelado</div>
+                            </div>
+                            <div class="stat-card-icon" style="background-color:var(--success-bg); color:var(--success);"><i data-lucide="circle-dollar-sign"></i></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-details">
+                                <h4>Total Pendiente</h4>
+                                <div class="stat-value" id="statPendiente">S/ 0</div>
+                                <div class="stat-trend down" style="color:var(--warning-text);"><i data-lucide="clock" style="width:14px; height:14px; vertical-align:middle;"></i> Por cobrar</div>
+                            </div>
+                            <div class="stat-card-icon" style="background-color:var(--warning-bg); color:var(--warning);"><i data-lucide="clock"></i></div>
+                        </div>
+                        <!-- Dark Blue Progress Card -->
+                        <div class="stat-card" style="background-color: var(--sidebar-bg); color: #ffffff;">
+                            <div class="stat-card-details" style="width: 100%;">
+                                <h4 style="color: rgba(255,255,255,0.7);">Recaudación Esperada</h4>
+                                <div class="stat-value" id="statEsperado" style="color: #ffffff; margin-bottom: 8px;">S/ 0</div>
+                                <div class="progress-container" style="background: rgba(255,255,255,0.15); border-radius: 10px; height: 6px; width: 100%; overflow: hidden; margin-top: 12px; margin-bottom: 6px;">
+                                    <div id="statMetaProgress" style="background: #3b82f6; width: 0%; height: 100%; transition: width 0.3s;"></div>
+                                </div>
+                                <div style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500;" id="statMetaText">0% de la meta alcanzada</div>
+                            </div>
+                            <div class="stat-card-icon" style="background-color: rgba(255,255,255,0.08); color: #ffffff;"><i data-lucide="bar-chart-3"></i></div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon-card">✅</div>
-                        <div class="stat-value" id="statPagado">S/0</div>
-                        <div class="stat-label">Total pagado</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon-card">⏳</div>
-                        <div class="stat-value" id="statPendiente">S/0</div>
-                        <div class="stat-label">Total pendiente</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon-card">💰</div>
-                        <div class="stat-value" id="statEsperado">S/0</div>
-                        <div class="stat-label">Recaudación esperada</div>
-                    </div>
-                </div>
                 </div>
 
                 <div class="content-grid">
-                        <div class="admin-only">
+                    <div class="admin-only">
+                        <!-- Filters Bar -->
                         <div class="filters-bar">
                             <div class="filter-group">
                                 <label>🔍 Buscar</label>
@@ -352,129 +120,138 @@
                                     <option value="">Todos los cursos</option>
                                 </select>
                             </div>
-                            <button class="btn-primary" onclick="aplicarFiltros()">🔍 Filtrar</button>
-                            <button class="btn-secondary" onclick="exportarExcel()">📎 Exportar a Excel</button>
-                            <button class="btn-primary" onclick="abrirModal()">➕ Nueva inscripción</button>
-                        </div>
+                            <button class="btn btn-primary" onclick="aplicarFiltros()"><i data-lucide="search" style="width:16px; height:16px;"></i> Filtrar</button>
+                            <button class="btn btn-secondary" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width:16px; height:16px;"></i> Exportar a Excel</button>
+                            <button class="btn btn-primary" onclick="abrirModal()"><i data-lucide="plus" style="width:16px; height:16px;"></i> Nueva inscripción</button>
                         </div>
 
-                        <div class="admin-only">
+                        <!-- Table -->
                         <div class="section-card">
                             <div class="section-header">
-                                <div class="section-title">📋 Inscripciones</div>
+                                <div class="section-title"><i data-lucide="graduation-cap" style="width: 20px; height: 20px; color: var(--brand-blue);"></i> Inscripciones</div>
                             </div>
                             <div class="table-container">
                                 <table class="data-table">
                                     <thead>
                                         <tr>
-                                            <th>Nombres</th><th>DNI</th><th>Celular</th><th>Correo</th><th>Líder</th>
-                                            <th>Curso</th><th>Fecha/Horario</th><th>Monto</th><th>Estado</th><th>Método</th><th>Acciones</th>
+                                            <th>Nombres</th>
+                                            <th>DNI</th>
+                                            <th>Celular</th>
+                                            <th>Correo</th>
+                                            <th>Líder</th>
+                                            <th>Curso</th>
+                                            <th>Fecha/Horario</th>
+                                            <th>Monto</th>
+                                            <th>Estado</th>
+                                            <th>Método</th>
+                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tablaInscripciones">
-                                        <tr><td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">Cargando...</td></tr>
+                                        <tr><td colspan="11" style="text-align:center;padding:48px;color:var(--text-muted);">Cargando...</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        </div>
+                    </div>
 
-                        <!-- Guest EDL form -->
-                        <div class="section-card guest-only">
-                            <div class="section-header">
-                                <div class="section-title">✏️ Inscríbete a la EDL</div>
-                            </div>
-                            <p style="color:#6c7a8a;font-size:14px;margin-bottom:20px;">Completa tus datos para inscribirte a un curso o seminario.</p>
-                            <form id="formInscripcionGuest">
-                                <div class="form-group">
-                                    <label>Nombres y apellidos completos *</label>
-                                    <input type="text" id="guestNombres" class="form-control" required placeholder="Ej: Juan Pérez López">
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Tipo doc. *</label>
-                                        <select id="guestDocTipo" class="form-control" required>
-                                            <option value="DNI">DNI</option>
-                                            <option value="CE">Carnet Extranjería</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label id="guestDocLabel">N° DNI *</label>
-                                        <input type="text" id="guestDocNum" class="form-control" required maxlength="8" placeholder="12345678" inputmode="numeric" pattern="[0-9]*">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Celular *</label>
-                                        <input type="tel" id="guestCelular" class="form-control" required placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
-                                        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">9 dígitos, debe comenzar con 9</div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Correo personal *</label>
-                                        <input type="email" id="guestCorreo" class="form-control" required placeholder="correo@ejemplo.com">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Líder (quien te inscribe) *</label>
-                                    <input type="text" id="guestLider" class="form-control" required placeholder="Nombre del líder">
-                                </div>
-                                <div class="form-group">
-                                    <label>Curso *</label>
-                                    <select id="guestCurso" class="form-control" required></select>
-                                </div>
-                                <div class="curso-info" id="guestCursoInfo"></div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Método de pago *</label>
-                                        <select id="guestMetodoPago" class="form-control" required>
-                                            <option value="">Seleccionar...</option>
-                                            <option value="efectivo">Efectivo</option>
-                                            <option value="yape">Yape</option>
-                                            <option value="plin">Plin</option>
-                                            <option value="transferencia">Transferencia Bancaria</option>
-                                        </select>
-                                    </div>
-                    <div class="form-group" id="guestCapturaGroup" style="display:none;">
-                        <label>Captura de pago</label>
-                        <div class="captura-zone" id="guestCapturaZone" onclick="document.getElementById('guestPagoCaptura').click()">
-                            <div class="captura-zone-icon">🖼️</div>
-                            <div class="captura-zone-title">Sube tu comprobante de pago</div>
-                            <div class="captura-zone-sub">Yape, Plin o Transferencia — máximo 5MB</div>
-                            <div class="captura-zone-actions">
-                                <button type="button" class="captura-btn" onclick="event.stopPropagation();document.getElementById('guestPagoCaptura').click()">📁 Elegir imagen</button>
-                                <button type="button" class="captura-btn captura-btn-cam" onclick="event.stopPropagation();document.getElementById('guestPagoCapturaCam').click()">📷 Tomar foto</button>
-                            </div>
-                            <div class="captura-filename" id="guestCapturaFilename"></div>
+                    <!-- Guest EDL form -->
+                    <div class="section-card guest-only">
+                        <div class="section-header">
+                            <div class="section-title">✏️ Inscríbete a la EDL</div>
                         </div>
-                        <input type="file" id="guestPagoCaptura" accept="image/*" style="display:none;">
-                        <input type="file" id="guestPagoCapturaCam" accept="image/*" capture="environment" style="display:none;">
-                        <div class="captura-preview-wrap" id="guestCapturaPreview">
-                            <button type="button" class="captura-preview-remove" onclick="removerCaptura('guest')">✕</button>
-                            <img id="guestCapturaImg" class="captura-preview-img" onclick="abrirCaptura(this.src)" alt="Vista previa">
+                        <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Completa tus datos para inscribirte a un curso o seminario.</p>
+                        <form id="formInscripcionGuest">
+                            <div class="form-group">
+                                <label>Nombres y apellidos completos *</label>
+                                <input type="text" id="guestNombres" class="form-control" required placeholder="Ej: Juan Pérez López">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Tipo doc. *</label>
+                                    <select id="guestDocTipo" class="form-control" required>
+                                        <option value="DNI">DNI</option>
+                                        <option value="CE">Carnet Extranjería</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label id="guestDocLabel">N° DNI *</label>
+                                    <input type="text" id="guestDocNum" class="form-control" required maxlength="8" placeholder="12345678" inputmode="numeric" pattern="[0-9]*">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Celular *</label>
+                                    <input type="tel" id="guestCelular" class="form-control" required placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe comenzar con 9</div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Correo personal *</label>
+                                    <input type="email" id="guestCorreo" class="form-control" required placeholder="correo@ejemplo.com">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Líder (quien te inscribe) *</label>
+                                <input type="text" id="guestLider" class="form-control" required placeholder="Nombre del líder">
+                            </div>
+                            <div class="form-group">
+                                <label>Curso *</label>
+                                <select id="guestCurso" class="form-control" required></select>
+                            </div>
+                            <div class="curso-info" id="guestCursoInfo" style="display:none; padding:16px; background:#f8fafc; border:1px solid var(--border-light); border-radius:12px; margin-bottom:20px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);"></div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Método de pago *</label>
+                                    <select id="guestMetodoPago" class="form-control" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="efectivo">Efectivo</option>
+                                        <option value="yape">Yape</option>
+                                        <option value="plin">Plin</option>
+                                        <option value="transferencia">Transferencia Bancaria</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="guestCapturaGroup" style="display:none;">
+                                    <label>Captura de pago</label>
+                                    <div class="captura-zone" id="guestCapturaZone" onclick="document.getElementById('guestPagoCaptura').click()">
+                                        <div class="captura-zone-icon">🖼️</div>
+                                        <div class="captura-zone-title">Sube tu comprobante de pago</div>
+                                        <div class="captura-zone-sub">Yape, Plin o Transferencia — máximo 5MB</div>
+                                        <div class="captura-zone-actions">
+                                            <button type="button" class="captura-btn" onclick="event.stopPropagation();document.getElementById('guestPagoCaptura').click()">📁 Elegir imagen</button>
+                                            <button type="button" class="captura-btn captura-btn-cam" onclick="event.stopPropagation();document.getElementById('guestPagoCapturaCam').click()">📷 Tomar foto</button>
+                                        </div>
+                                        <div class="captura-filename" id="guestCapturaFilename"></div>
+                                    </div>
+                                    <input type="file" id="guestPagoCaptura" accept="image/*" style="display:none;">
+                                    <input type="file" id="guestPagoCapturaCam" accept="image/*" capture="environment" style="display:none;">
+                                    <div class="captura-preview-wrap" id="guestCapturaPreview">
+                                        <button type="button" class="captura-preview-remove" onclick="removerCaptura('guest')">✕</button>
+                                        <img id="guestCapturaImg" class="captura-preview-img" onclick="abrirCaptura(this.src)" alt="Vista previa">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width:100%; justify-content: center;"><i data-lucide="check" style="width:16px; height:16px;"></i> Inscribirme</button>
+                        </form>
+                        <div id="guestSuccess" style="display:none;background:#dcfce7;border-radius:24px;padding:32px;text-align:center;margin-top:16px;">
+                            <div style="font-size:48px;margin-bottom:12px;">✅</div>
+                            <h3 style="color:#166534;margin-bottom:8px;">¡Inscripción enviada!</h3>
+                            <p style="color:#065f46;">Tu inscripción ha sido registrada. El administrador revisará y confirmará tu pago.</p>
                         </div>
                     </div>
-                                </div>
-                                <button type="submit" class="btn-primary" style="width:100%;">📝 Inscribirme</button>
-                            </form>
-                            <div id="guestSuccess" style="display:none;background:#dcfce7;border-radius:24px;padding:32px;text-align:center;margin-top:16px;">
-                                <div style="font-size:48px;margin-bottom:12px;">✅</div>
-                                <h3 style="color:#166534;margin-bottom:8px;">¡Inscripción enviada!</h3>
-                                <p style="color:#065f46;">Tu inscripción ha sido registrada. El administrador revisará y confirmará tu pago.</p>
-                            </div>
-                        </div>
 
-                    <div class="info-card">
-                        <h3>📢 Información EDL</h3>
-                        <p>Buen día amados hermanos 😃, no es tiempo de detenernos, es necesario seguir avanzando y seguir preparándote, por ello te animamos a inscribirte ✏️🖊️ en los cursos y seminarios que tenemos este ciclo en la EDL. 🤓.</p>
-                        <p style="margin-top:12px;">🔥 El requisito para el seminario de Int. Dones del Espíritu Santo es haber aprobado el Discipulado 3.</p>
-                        <p style="margin-top:8px;">🔥 El seminario de Apologética no tiene requisito.</p>
-                        <p style="margin-top:12px;">📒🖊️ Inscripciones en oficina, o al Yape o Plin al número <strong>964940579</strong> y enviar la captura.</p>
-                        <div class="prices">
-                            <strong>💰 Costos:</strong><br>
-                            Discipulado 1: S/30.00<br>
-                            Discipulado 2 y 3: S/50.00<br>
-                            Lidere 1,2 y 3: S/50.00<br>
-                            Seminarios: S/50.00
+                    <!-- Info card -->
+                    <div class="section-card" style="background: linear-gradient(135deg, #f8fafc, #f1f4f9); border: 1px solid var(--border-light); margin-top:24px;">
+                        <h3 style="font-size:16px; font-weight:700; color:var(--brand-blue); margin-bottom:12px;">📢 Información EDL</h3>
+                        <p style="font-size:13.5px; line-height:1.6; color:var(--text-secondary);">Buen día amados hermanos 😃, no es tiempo de detenernos, es necesario seguir avanzando y seguir preparándote, por ello te animamos a inscribirte ✏️ en los cursos y seminarios que tenemos este ciclo en la EDL. 🤓.</p>
+                        <p style="margin-top:12px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">🔥 El requisito para el seminario de Int. Dones del Espíritu Santo es haber aprobado el Discipulado 3.</p>
+                        <p style="margin-top:8px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">🔥 El seminario de Apologética no tiene requisito.</p>
+                        <p style="margin-top:12px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">📒🖊️ Inscripciones en oficina, o al Yape o Plin al número <strong>964940579</strong> y enviar la captura.</p>
+                        <div style="margin-top:16px; padding:16px; background:#ffffff; border-radius:12px; border:1.5px solid var(--border-light); font-size:13.5px; line-height:1.6;">
+                            <strong style="color:var(--brand-blue);">💰 Costos:</strong><br>
+                            Discipulado 1: S/ 30.00<br>
+                            Discipulado 2 y 3: S/ 50.00<br>
+                            Lidere 1,2 y 3: S/ 50.00<br>
+                            Seminarios: S/ 50.00
                         </div>
                     </div>
                 </div>
@@ -482,95 +259,100 @@
         </div>
     </div>
 
+    <!-- Modal Admin -->
     <div id="modalInscripcion" class="modal">
         <div class="modal-content">
-            <button class="modal-close" onclick="cerrarModal()">&times;</button>
-            <h2 style="margin-bottom: 24px; color: #0c4a6e;" id="modalTitle">Nueva Inscripción</h2>
-            <form id="formInscripcion">
-                <input type="hidden" id="editId">
-                <div class="form-group">
-                    <label>Nombres y apellidos completos *</label>
-                    <input type="text" id="insNombres" class="form-control" required>
-                </div>
-                <div class="form-row">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nueva Inscripción</h3>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formInscripcion">
+                    <input type="hidden" id="editId">
                     <div class="form-group">
-                        <label>Tipo doc. *</label>
-                        <select id="insDocTipo" class="form-control" required>
-                            <option value="DNI">DNI</option>
-                            <option value="CE">Carnet Extranjería</option>
-                        </select>
+                        <label>Nombres y apellidos completos *</label>
+                        <input type="text" id="insNombres" class="form-control" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo doc. *</label>
+                            <select id="insDocTipo" class="form-control" required>
+                                <option value="DNI">DNI</option>
+                                <option value="CE">Carnet Extranjería</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="insDocLabel">N° DNI *</label>
+                            <input type="text" id="insDocNum" class="form-control" required maxlength="8" placeholder="12345678" inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Celular *</label>
+                            <input type="tel" id="insCelular" class="form-control" required placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe comenzar con 9</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Correo personal *</label>
+                            <input type="email" id="insCorreo" class="form-control" required>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label id="insDocLabel">N° DNI *</label>
-                        <input type="text" id="insDocNum" class="form-control" required maxlength="8" placeholder="12345678" inputmode="numeric" pattern="[0-9]*">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Celular *</label>
-                        <input type="tel" id="insCelular" class="form-control" required placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
-                        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">9 dígitos, debe comenzar con 9</div>
+                        <label>Líder (quien inscribe) *</label>
+                        <input type="text" id="insLider" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Correo personal *</label>
-                        <input type="email" id="insCorreo" class="form-control" required>
+                        <label>Curso *</label>
+                        <select id="insCurso" class="form-control" required></select>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Líder (quien inscribe) *</label>
-                    <input type="text" id="insLider" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Curso *</label>
-                    <select id="insCurso" class="form-control" required></select>
-                </div>
-                <div class="curso-info" id="cursoInfo"></div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Monto</label>
-                        <input type="text" id="insMonto" class="form-control" readonly>
+                    <div class="curso-info" id="cursoInfo" style="display:none; padding:14px; background:#f8fafc; border:1px solid var(--border-light); border-radius:12px; margin-bottom:20px; font-size:13px; line-height:1.5; color:var(--text-secondary);"></div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Monto</label>
+                            <input type="text" id="insMonto" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado de pago *</label>
+                            <select id="insEstado" class="form-control" required>
+                                <option value="Debe">Debe (adeuda)</option>
+                                <option value="Canceló">Canceló (pagó)</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Estado de pago *</label>
-                        <select id="insEstado" class="form-control" required>
-                            <option value="Debe">Debe (adeuda)</option>
-                            <option value="Canceló">Canceló (pagó)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Método de pago</label>
-                        <select id="insMetodoPago" class="form-control">
-                            <option value="">Seleccionar...</option>
-                            <option value="efectivo">Efectivo</option>
-                            <option value="yape">Yape</option>
-                            <option value="plin">Plin</option>
-                            <option value="transferencia">Transferencia Bancaria</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="insCapturaGroup" style="display:none;">
-                        <label>Captura de pago</label>
-                        <div class="captura-zone" id="insCapturaZone" onclick="document.getElementById('insPagoCaptura').click()">
-                            <div class="captura-zone-icon">🖼️</div>
-                            <div class="captura-zone-title">Sube tu comprobante de pago</div>
-                            <div class="captura-zone-sub">Yape, Plin o Transferencia — máximo 5MB</div>
-                            <div class="captura-zone-actions">
-                                <button type="button" class="captura-btn" onclick="event.stopPropagation();document.getElementById('insPagoCaptura').click()">📁 Elegir imagen</button>
-                                <button type="button" class="captura-btn captura-btn-cam" onclick="event.stopPropagation();document.getElementById('insPagoCapturaCam').click()">📷 Tomar foto</button>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Método de pago</label>
+                            <select id="insMetodoPago" class="form-control">
+                                <option value="">Seleccionar...</option>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="yape">Yape</option>
+                                <option value="plin">Plin</option>
+                                <option value="transferencia">Transferencia Bancaria</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="insCapturaGroup" style="display:none;">
+                            <label>Captura de pago</label>
+                            <div class="captura-zone" id="insCapturaZone" onclick="document.getElementById('insPagoCaptura').click()">
+                                <div class="captura-zone-icon">🖼️</div>
+                                <div class="captura-zone-title">Sube tu comprobante de pago</div>
+                                <div class="captura-zone-sub">Yape, Plin o Transferencia — máximo 5MB</div>
+                                <div class="captura-zone-actions">
+                                    <button type="button" class="captura-btn" onclick="event.stopPropagation();document.getElementById('insPagoCaptura').click()">📁 Elegir imagen</button>
+                                    <button type="button" class="captura-btn captura-btn-cam" onclick="event.stopPropagation();document.getElementById('insPagoCapturaCam').click()">📷 Tomar foto</button>
+                                </div>
+                                <div class="captura-filename" id="insCapturaFilename"></div>
                             </div>
-                            <div class="captura-filename" id="insCapturaFilename"></div>
-                        </div>
-                        <input type="file" id="insPagoCaptura" accept="image/*" style="display:none;">
-                        <input type="file" id="insPagoCapturaCam" accept="image/*" capture="environment" style="display:none;">
-                        <div class="captura-preview-wrap" id="insCapturaPreview">
-                            <button type="button" class="captura-preview-remove" onclick="removerCaptura('ins')">✕</button>
-                            <img id="insCapturaImg" class="captura-preview-img" onclick="abrirCaptura(this.src)" alt="Vista previa">
+                            <input type="file" id="insPagoCaptura" accept="image/*" style="display:none;">
+                            <input type="file" id="insPagoCapturaCam" accept="image/*" capture="environment" style="display:none;">
+                            <div class="captura-preview-wrap" id="insCapturaPreview">
+                                <button type="button" class="captura-preview-remove" onclick="removerCaptura('ins')">✕</button>
+                                <img id="insCapturaImg" class="captura-preview-img" onclick="abrirCaptura(this.src)" alt="Vista previa">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <button type="submit" class="btn-primary" style="width:100%;margin-top:10px;">💾 Guardar inscripción</button>
-            </form>
+                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:20px;"><i data-lucide="save" style="width:16px; height:16px;"></i> Guardar inscripción</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -580,12 +362,17 @@
         const esAdmin = usuarioActual.rol === 'admin';
         const esInvitado = usuarioActual.rol === 'invitado';
         if (!esAdmin && !esInvitado) { window.location.href = 'index.html'; }
-        document.getElementById('userName').innerText = esAdmin ? usuarioActual.nombre : '👤 ' + usuarioActual.nombre;
+        document.getElementById('userName').innerText = esAdmin ? usuarioActual.nombre : usuarioActual.nombre;
+        document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : '👥 Invitado';
+        document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
 
         // Show/hide admin and guest sections
         if (esInvitado) {
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'block');
+            document.getElementById('nav-edl').style.display = 'block'; // Make EDL visible for guest
+        } else if (esAdmin) {
+            document.querySelectorAll('.nav-admin').forEach(el => el.style.display = 'block');
         }
 
         const CURSOS = [
@@ -680,40 +467,39 @@
                 sel.addEventListener('change', function() {
                     const isDigital = ['yape','plin','transferencia'].includes(this.value);
                     document.getElementById(p.group).style.display = isDigital ? 'block' : 'none';
-                    if (!isDigital) document.getElementById(p.input).value = '';
+                    if (!isDigital) {
+                        removerCaptura(p.select.startsWith('guest') ? 'guest' : 'ins');
+                    }
                 });
             });
         }
 
         function getCurso(id) { return CURSOS.find(c => c.id === id); }
 
-        function formatMonto(n) { return 'S/' + n.toFixed(2); }
+        function formatMonto(n) { return 'S/ ' + n.toFixed(2); }
 
         document.getElementById('insCurso').addEventListener('change', function() {
             const curso = getCurso(this.value);
             const info = document.getElementById('cursoInfo');
-            if (!curso) { info.classList.remove('visible'); return; }
-
+            if (!curso) { info.style.display = 'none'; return; }
+            info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}<br><strong>💰 Costo:</strong> ${formatMonto(curso.monto)}`;
+            info.style.display = 'block';
             document.getElementById('insMonto').value = formatMonto(curso.monto);
-            info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}`;
-            info.classList.add('visible');
-
             if (curso.requiereDisc3) {
-                toast('El alumno debe haber aprobado Discipulado 3. Verifique que cumpla el requisito.', 'warning');
+                toast('⚠️ Requiere haber aprobado Discipulado 3', 'warning');
             }
         });
 
-        // Document type toggle
         function initDocTipo() {
-            const toggles = [
-                { sel: 'insDocTipo', input: 'insDocNum', label: 'insDocLabel' },
-                { sel: 'guestDocTipo', input: 'guestDocNum', label: 'guestDocLabel' }
+            const pairs = [
+                { select: 'insDocTipo', label: 'insDocLabel', input: 'insDocNum' },
+                { select: 'guestDocTipo', label: 'guestDocLabel', input: 'guestDocNum' }
             ];
-            toggles.forEach(t => {
-                const sel = document.getElementById(t.sel);
-                const input = document.getElementById(t.input);
-                const label = document.getElementById(t.label);
-                if (!sel || !input) return;
+            pairs.forEach(p => {
+                const sel = document.getElementById(p.select);
+                if (!sel) return;
+                const label = document.getElementById(p.label);
+                const input = document.getElementById(p.input);
                 function update() {
                     if (sel.value === 'CE') {
                         input.maxLength = 12;
@@ -732,33 +518,29 @@
             });
         }
 
-        // Phone validation helper
         function validarCelular(val) {
             return /^9\d{8}$/.test(val.replace(/\s/g, ''));
         }
 
-        // Doc number validation
         function validarDocNum(tipo, num) {
             if (tipo === 'DNI') return /^\d{8}$/.test(num);
             return /^[a-zA-Z0-9]{4,12}$/.test(num);
         }
 
-        // Guest course select change
         const guestCurso = document.getElementById('guestCurso');
         if (guestCurso) {
             guestCurso.addEventListener('change', function() {
                 const curso = getCurso(this.value);
                 const info = document.getElementById('guestCursoInfo');
-                if (!curso) { info.classList.remove('visible'); return; }
+                if (!curso) { info.style.display = 'none'; return; }
                 info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}<br><strong>💰 Costo:</strong> ${formatMonto(curso.monto)}`;
-                info.classList.add('visible');
+                info.style.display = 'block';
                 if (curso.requiereDisc3) {
                     toast('El alumno debe haber aprobado Discipulado 3. Verifique que cumpla el requisito.', 'warning');
                 }
             });
         }
 
-        // Guest form submission
         const guestForm = document.getElementById('formInscripcionGuest');
         if (guestForm) {
             guestForm.addEventListener('submit', async (e) => {
@@ -812,7 +594,7 @@
 
                 const btn = guestForm.querySelector('button[type="submit"]');
                 btn.disabled = true;
-                btn.innerText = 'Registrando...';
+                btn.innerHTML = 'Registrando...';
 
                 try {
                     await firebaseReady;
@@ -823,7 +605,8 @@
                 } catch (err) {
                     toast('❌ Error al inscribir: ' + err.message, 'warning');
                     btn.disabled = false;
-                    btn.innerText = '📝 Inscribirme';
+                    btn.innerHTML = '<i data-lucide="check" style="width:16px; height:16px;"></i> Inscribirme';
+                    lucide.createIcons();
                 }
             });
         }
@@ -862,12 +645,23 @@
             document.getElementById('statPagado').innerText = formatMonto(pagado);
             document.getElementById('statPendiente').innerText = formatMonto(pendiente);
             document.getElementById('statEsperado').innerText = formatMonto(esperado);
+
+            // Dynamic progress bar calculation
+            const pct = esperado > 0 ? Math.round((pagado / esperado) * 100) : 0;
+            const progressEl = document.getElementById('statMetaProgress');
+            const textEl = document.getElementById('statMetaText');
+            if (progressEl) progressEl.style.width = `${pct}%`;
+            if (textEl) textEl.innerText = `${pct}% de la meta alcanzada`;
+        }
+
+        function getInitials(name) {
+            return (name || '').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
         }
 
         function renderTabla() {
             const tbody = document.getElementById('tablaInscripciones');
             if (inscripcionesFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px;color:#94a3b8;">No hay inscripciones</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:48px;color:var(--text-muted);">No hay inscripciones</td></tr>';
                 return;
             }
             tbody.innerHTML = inscripcionesFiltradas.map(i => {
@@ -875,24 +669,38 @@
                 const horario = curso ? `${curso.dia} ${curso.hora}` : (i.fechaHorario || '-');
                 const estadoCls = i.estadoPago === 'Canceló' ? 'estado-pagado' : 'estado-debe';
                 const metodo = i.metodoPago ? i.metodoPago.charAt(0).toUpperCase() + i.metodoPago.slice(1) : '-';
-                const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" onclick="abrirCaptura('${i.pagoCaptura}')" title="Ver captura de pago">` : '<span style="color:#94a3b8;font-size:11px;">—</span>';
+                const initials = getInitials(i.nombres);
+                const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" onclick="abrirCaptura('${i.pagoCaptura}')" title="Ver captura de pago">` : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
+                
                 return `<tr>
-                    <td><strong>${i.nombres}</strong></td>
+                    <td>
+                        <div class="student-cell">
+                            <div class="student-avatar">${initials}</div>
+                            <div class="student-info">
+                                <h5>${i.nombres}</h5>
+                            </div>
+                        </div>
+                    </td>
                     <td>${i.dni}</td>
                     <td>${i.celular}</td>
-                    <td>${i.correo}</td>
+                    <td><span style="font-size:11.5px;color:var(--text-secondary);">${i.correo}</span></td>
                     <td>${i.lider}</td>
-                    <td>${i.cursoNombre || curso?.nombre || '-'}</td>
+                    <td><span class="badge rol-badge badge-produccion">${i.cursoNombre || curso?.nombre || '-'}</span></td>
                     <td>${horario}</td>
-                    <td>${formatMonto(i.monto || 0)}</td>
-                    <td><span class="estado-badge ${estadoCls}">${i.estadoPago}</span></td>
-                    <td>${metodo} ${capturaHtml}</td>
+                    <td><strong>${formatMonto(i.monto || 0)}</strong></td>
+                    <td><span class="estado-badge badge ${estadoCls}">${i.estadoPago}</span></td>
                     <td>
-                        <button class="action-btn btn-edit" onclick="editarInscripcion('${i.id}')">✏️</button>
-                        <button class="action-btn btn-del" onclick="eliminarInscripcion('${i.id}')">🗑️</button>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            ${metodo} ${capturaHtml}
+                        </div>
+                    </td>
+                    <td>
+                        <button class="action-btn btn-edit btn" style="padding: 6px; border-radius: 6px;" onclick="editarInscripcion('${i.id}')" title="Editar"><i data-lucide="edit" style="width:14px; height:14px;"></i></button>
+                        <button class="action-btn btn-del btn" style="padding: 6px; border-radius: 6px;" onclick="eliminarInscripcion('${i.id}')" title="Eliminar"><i data-lucide="trash" style="width:14px; height:14px;"></i></button>
                     </td>
                 </tr>`;
             }).join('');
+            lucide.createIcons();
         }
 
         document.getElementById('formInscripcion').addEventListener('submit', async (e) => {
@@ -957,7 +765,7 @@
             document.getElementById('insCapturaPreview').classList.remove('visible');
             document.getElementById('insCapturaZone').classList.remove('has-file');
             document.getElementById('insCapturaFilename').classList.remove('visible');
-            document.getElementById('cursoInfo').classList.remove('visible');
+            document.getElementById('cursoInfo').style.display = 'none';
             document.getElementById('insMonto').value = '';
             document.getElementById('modalTitle').innerText = 'Nueva Inscripción';
             document.getElementById('modalInscripcion').style.display = 'flex';
@@ -1030,6 +838,7 @@
             else { localStorage.removeItem('usuarioActual'); window.location.href = 'index.html'; }
         }
 
+        // Mobile sidebar
         const sidebarMobileToggle = document.getElementById('sidebarMobileToggle');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -1077,6 +886,8 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') cerrarCaptura();
         });
+        
+        lucide.createIcons();
     </script>
 
     <div id="lightboxCaptura" class="lightbox-modal">

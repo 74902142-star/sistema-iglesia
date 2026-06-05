@@ -5,386 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Dashboard | Iglesia Agua Viva</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
     <script src="firebase-auth.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f0f9ff; color: #0c4a6e; min-height: 100vh; }
-
-        /* ── Sidebar ── */
-        .app-layout { display: flex; min-height: 100vh; }
-        .sidebar {
-            width: 72px; background: linear-gradient(180deg, #0c4a6e 0%, #075985 50%, #0369a1 100%);
-            color: white; padding: 24px 12px; display: flex; flex-direction: column; gap: 4px;
-            position: sticky; top: 0; height: 100vh; z-index: 100;
-            box-shadow: 2px 0 24px rgba(12,74,110,0.12);
-            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
-        @media (hover:hover) { .sidebar:hover { width: 260px; } }
-
-        .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 0; margin-bottom: 32px; white-space: nowrap; }
-        .sidebar-logo .logo-icon { font-size: 24px; flex-shrink: 0; width: 24px; text-align: center; }
-        .sidebar-logo .logo-text { display: none; }
-        .sidebar:hover .sidebar-logo .logo-text { display: block; }
-        .sidebar-logo .logo-text h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
-        .sidebar-logo .logo-text p { font-size: 11px; opacity: 0.5; margin-top: 0; }
-
-        .nav-link {
-            display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px;
-            color: rgba(255,255,255,0.6); text-decoration: none; font-weight: 500; font-size: 14px;
-            transition: background 0.2s; white-space: nowrap;
-        }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: white; }
-        .nav-link.active { background: rgba(255,255,255,0.95); color: #0c4a6e; font-weight: 700; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
-        .nav-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
-        .nav-text { display: none; }
-        .sidebar:hover .nav-text { display: inline; }
-        .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-
-        .sidebar-toggle { display: none; }
-        .sidebar-header { margin-bottom: 4px; padding: 0; }
-        .sidebar-close { display: none; }
-        .sidebar-overlay { display: none; }
-        .sidebar-overlay.active { display: block; }
-
-        .nav-section { display: flex; flex-direction: column; gap: 2px; }
-        .nav-section-title {
-            padding: 12px 12px 4px;
-            color: rgba(255,255,255,0.3); font-size: 10px; font-weight: 700;
-            letter-spacing: 1.2px; text-transform: uppercase; display: none;
-        }
-        .sidebar:hover .nav-section-title { display: block; }
-        .nav-section-content { display: flex; flex-direction: column; gap: 2px; }
-
-        /* ── Header ── */
-        .header {
-            background: white; color: #0c4a6e; padding: 18px 32px; display: flex;
-            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-            border-bottom: 1px solid #bae6fd;
-            position: relative;
-        }
-        .header::after {
-            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, #0284c7, #38bdf8, #0284c7);
-        }
-        .logo h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: #0c4a6e; }
-        .logo p { font-size: 12px; color: #64748b; margin-top: 2px; }
-        .user-area {
-            display: flex; align-items: center; gap: 16px;
-            background: #f1f4f9; padding: 6px 18px 6px 20px; border-radius: 60px;
-            border: 1px solid #bae6fd;
-        }
-        .user-name { font-weight: 600; font-size: 14px; color: #0c4a6e; }
-        .user-role { font-size: 11px; color: #64748b; margin-top: 1px; }
-        .logout-btn {
-            background: #0c4a6e; border: none; padding: 7px 18px; border-radius: 40px;
-            color: white; cursor: pointer; font-weight: 500; font-size: 13px;
-            transition: background 0.2s;
-        }
-        .logout-btn:hover { background: #0369a1; }
-
-        /* ── Container ── */
-        .container { max-width: 1400px; margin: 0 auto; padding: 28px 32px; }
-
-        /* ── Stats Grid ── */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 28px; }
-        .stat-card {
-            background: white; border-radius: 16px; padding: 22px; text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #bae6fd;
-            transition: all 0.2s;
-        }
-        .stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.07); border-color: #d0d5dd; }
-        .stat-icon { font-size: 28px; margin-bottom: 10px; }
-        .stat-value { font-size: 36px; font-weight: 800; color: #0c4a6e; line-height: 1.2; }
-        .stat-label { font-size: 13px; color: #64748b; margin-top: 6px; font-weight: 500; }
-
-        /* ── Report Section ── */
-        .report-section {
-            background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px;
-            border: 1px solid #bae6fd;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-        .section-title { font-size: 18px; font-weight: 700; color: #0c4a6e; display: flex; align-items: center; gap: 8px; }
-        .report-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
-        .report-card {
-            background: #f8fafc; border-radius: 16px; padding: 20px;
-            border-left: 4px solid; transition: all 0.2s;
-        }
-        .report-card:hover { background: #f1f4f9; }
-        .report-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .report-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #bae6fd; font-size: 14px; }
-        .report-row:last-child { border-bottom: none; font-weight: 700; margin-top: 6px; padding: 10px; border-radius: 12px; }
-        .btn-whatsapp {
-            background: #25D366; color: white; border: none; padding: 14px; border-radius: 60px;
-            font-weight: 700; font-size: 15px; width: 100%; cursor: pointer; transition: background 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-whatsapp:hover { background: #20bd5a; }
-
-        /* ── Filters ── */
-        .filters-bar {
-            background: white; border-radius: 16px; padding: 18px 20px; margin-bottom: 24px;
-            display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
-            border: 1px solid #bae6fd;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .filter-group { flex: 1; min-width: 130px; }
-        .filter-group label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 5px; }
-        .filter-select, .filter-input {
-            width: 100%; padding: 10px 14px; border: 1.5px solid #bae6fd; border-radius: 10px;
-            font-family: 'Inter', sans-serif; font-size: 13px; background: #f8fafc; transition: all 0.2s;
-        }
-        .filter-select:focus, .filter-input:focus { outline: none; border-color: #0284c7; background: white; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
-        .btn-primary {
-            background: #0c4a6e; color: white; border: none; padding: 10px 24px; border-radius: 12px;
-            font-weight: 600; font-size: 13px; cursor: pointer; transition: background 0.2s;
-        }
-        .btn-primary:hover { background: #0369a1; }
-        .btn-secondary {
-            background: white; border: 1.5px solid #bae6fd; padding: 10px 24px; border-radius: 12px;
-            font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; color: #475569;
-        }
-        .btn-secondary:hover { background: #f1f4f9; border-color: #cbd5e1; }
-
-        /* ── Charts ── */
-        .charts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
-        .chart-card {
-            background: white; border-radius: 16px; padding: 20px;
-            border: 1px solid #bae6fd; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .chart-card h3 { font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 16px; }
-        canvas { max-height: 200px; width: 100%; }
-
-        /* ── Table ── */
-        .table-container {
-            background: white; border-radius: 16px; padding: 20px;
-            border: 1px solid #bae6fd; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            overflow-x: auto;
-        }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .data-table th {
-            text-align: left; padding: 12px; background: #f8fafc;
-            font-weight: 600; color: #475569; border-bottom: 1.5px solid #bae6fd;
-            font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;
-        }
-        .data-table td { padding: 12px; border-bottom: 1px solid #f1f4f9; color: #0c4a6e; }
-        .data-table tr:nth-child(even) td { background: #fafbfc; }
-        .data-table tr:hover td { background: #f1f4f9; }
-        .data-table tr:last-child td { border-bottom: none; }
-        .btn-edit { background: #0c4a6e; color: white; border: none; padding: 5px 14px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 500; margin-right: 6px; transition: opacity 0.2s; }
-        .btn-edit:hover { opacity: 0.85; }
-        .btn-delete { background: #ef4444; color: white; border: none; padding: 5px 14px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 500; transition: opacity 0.2s; }
-        .btn-delete:hover { opacity: 0.85; }
-        .empty-state { text-align: center; padding: 48px; color: #94a3b8; }
-
-        /* ── Modal ── */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
-            justify-content: center; align-items: center; z-index: 1000;
-        }
-        .modal-content {
-            background: white; border-radius: 20px; max-width: 640px; width: 90%;
-            max-height: 85vh; overflow-y: auto; animation: modalFadeIn 0.25s ease;
-        }
-        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.96) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .modal-header {
-            background: #0c4a6e; color: white;
-            padding: 18px 24px; border-radius: 20px 20px 0 0;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 26px; cursor: pointer; }
-        .modal-close:hover { color: white; }
-        .modal-body { padding: 24px; }
-        .double-input { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-        .form-group { margin-bottom: 20px; }
-        .form-control {
-            width: 100%; padding: 13px 16px; border: 1.5px solid #bae6fd; border-radius: 10px;
-            font-family: 'Inter', sans-serif; font-size: 15px; transition: all 0.2s;
-            background: #f8fafc; color: #0c4a6e;
-        }
-        .form-control:focus { outline: none; border-color: #0284c7; background: white; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
-        .form-control::placeholder { color: #94a3b8; font-size: 14px; }
-        select.form-control { background: #f8fafc; cursor: pointer; }
-        select.form-control:focus { background: white; }
-        .form-group label { font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px; }
-
-        /* ── Toast ── */
-        .toast {
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-            padding: 12px 24px; border-radius: 60px; color: white; text-align: center;
-            font-weight: 500; font-size: 14px; z-index: 1100;
-            animation: toastIn 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        }
-        .toast-success { background: #10b981; }
-        .toast-error { background: #ef4444; }
-        @keyframes toastIn { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
-
-        /* ── Perm Alert ── */
-        .perm-alert {
-            display: none; background: #fef2f2; border: 1.5px solid #fecaca;
-            border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; color: #991b1b;
-        }
-        .perm-alert.visible { display: block; }
-        .perm-alert h4 { font-size: 16px; margin-bottom: 10px; }
-        .perm-alert ol { margin: 10px 0 10px 20px; line-height: 1.8; font-size: 14px; }
-        .perm-alert a { color: #0284c7; font-weight: 600; }
-        .perm-alert pre { background: #0c4a6e; color: #bae6fd; padding: 14px; border-radius: 10px; font-size: 11px; overflow-x: auto; margin-top: 12px; max-height: 180px; }
-        .btn-copy { background: #0c4a6e; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; margin-top: 10px; }
-        .btn-copy:hover { background: #0369a1; }
-
-        /* ── Badges ── */
-        .badge-origen { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
-        .badge-inv { background: #d1fae5; color: #065f46; }
-        .badge-adm { background: #dbeafe; color: #0369a1; }
-
-        .sidebar-mobile-toggle {
-            display: none; position: fixed; top: 12px; left: 12px; z-index: 101;
-            background: #0c4a6e; border: none; color: white; width: 40px; height: 40px;
-            border-radius: 12px; font-size: 20px; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        @media (max-width: 992px) {
-            .sidebar-mobile-toggle { display: flex; align-items: center; justify-content: center; }
-            .sidebar { display: none; }
-            .sidebar.open { display: flex; }
-            .sidebar {
-                position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
-                padding: 24px 16px; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                z-index: 100; flex-direction: column; overflow-y: auto;
-            }
-            .sidebar.open { left: 0; }
-            .sidebar .nav-text,
-            .sidebar .nav-section-title,
-            .sidebar .logo-text { display: block; }
-            .sidebar-close { display: block; }
-            .sidebar .sidebar-logo { padding: 0 12px; }
-            .sidebar-logo { display: flex; margin-bottom: 24px; }
-            .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 99; }
-            .sidebar-overlay.active { display: block; }
-            .app-layout { flex-direction: column; }
-            .main-content { width: 100%; }
-        }
-        @media (max-width: 1024px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .report-cards { grid-template-columns: repeat(2, 1fr); }
-            .charts-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 768px) {
-            .container { padding: 16px 20px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .report-cards { grid-template-columns: 1fr; }
-            .charts-grid { grid-template-columns: 1fr; }
-            .filters-bar { flex-direction: column; }
-            .filter-group { width: 100%; }
-            .btn-primary, .btn-secondary { width: 100%; text-align: center; }
-            .header { padding: 14px 16px; }
-            .header .logo h1 { font-size: 17px; }
-            .user-area { padding: 5px 12px; gap: 10px; }
-            .stat-value { font-size: 26px; }
-            .data-table { font-size: 12px; }
-            .data-table th, .data-table td { padding: 8px; }
-            .data-table th:nth-child(3),
-            .data-table td:nth-child(3) { display: none; }
-            .report-section { padding: 16px; }
-        }
-        @media (max-width: 480px) {
-            .container { padding: 12px 14px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-            .stat-card { padding: 14px; border-radius: 14px; }
-            .stat-value { font-size: 22px; }
-            .stat-icon { font-size: 20px; margin-bottom: 6px; }
-            .section-title { font-size: 15px; }
-            .table-container { padding: 12px; border-radius: 14px; }
-            .data-table { font-size: 11px; }
-            .data-table th, .data-table td { padding: 6px 8px; }
-            .data-table th:nth-child(8),
-            .data-table td:nth-child(8) { display: none; }
-            .modal-content { border-radius: 16px; }
-        }
-    </style>
 </head>
 <body>
     <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
     <div class="app-layout">
+        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <span class="logo-icon">⛪</span>
+                    <span class="logo-icon"><i data-lucide="church" style="width: 24px; height: 24px;"></i></span>
                     <div class="logo-text">
                         <h2>Agua Viva</h2>
-                        <p>Gestión Ministerial</p>
+                        <p>Administración</p>
                     </div>
                 </div>
                 <button class="sidebar-close" id="sidebarClose">&times;</button>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Reportes</div>
-                <div class="nav-section-content">
-                    <a href="dashboard.html" class="nav-link active"><span class="nav-icon">📊</span><span class="nav-text">Reporte de Asistencia</span></a>
-                </div>
+            <div class="nav-section-content">
+                <a href="dashboard.html" class="nav-link active" id="nav-dashboard"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
+                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i data-lucide="clipboard-list"></i></span><span>Registro</span></a>
+                <a href="predicadores.html" class="nav-link nav-admin" id="nav-anfitriones" style="display:none;"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
+                <a href="creativos.html" class="nav-link nav-admin" id="nav-creativos" style="display:none;"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
+                <a href="edl.html" class="nav-link nav-admin" id="nav-edl" style="display:none;"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Servicio</div>
-                <div class="nav-section-content">
-                    <a href="ingreso.html" class="nav-link"><span class="nav-icon">📝</span><span class="nav-text">Registrar Servicio</span></a>
-                </div>
-            </div>
-            <div class="nav-section nav-admin" style="display:none;">
-                <div class="nav-section-title">Ministerios</div>
-                <div class="nav-section-content">
-                    <a href="predicadores.html" class="nav-link"><span class="nav-icon">🎤</span><span class="nav-text">Anfitriones y Predicadores</span></a>
-                    <a href="creativos.html" class="nav-link"><span class="nav-icon">🎨</span><span class="nav-text">Creativos</span></a>
-                </div>
-            </div>
-            <div class="nav-section nav-admin" style="display:none;">
-                <div class="nav-section-title">Formación</div>
-                <div class="nav-section-content">
-                    <a href="edl.html" class="nav-link"><span class="nav-icon">🎓</span><span class="nav-text">EDL (Escuela de Liderazgo)</span></a>
-                </div>
-            </div>
-            <div class="nav-section" style="margin-top: auto;">
-                <div class="nav-section-content">
-                    <a href="#" class="nav-link"><span class="nav-icon">⚙️</span><span class="nav-text">Configuración</span></a>
-                    <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon">🚪</span><span class="nav-text">Cerrar Sesión</span></a>
-                </div>
+            <div class="nav-section-content" style="margin-top: auto;">
+                <a href="#" class="nav-link"><span class="nav-icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
+                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
             </div>
         </aside>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+        <!-- Main Content -->
         <div class="main-content">
-        <div class="header">
-        <div class="logo">
-            <h1>⛪ Iglesia Agua Viva</h1>
-            <p>Sistema de Gestión de Servicios</p>
-        </div>
-        <div class="user-area">
-            <div>
-                <div class="user-name" id="userName">Cargando...</div>
-                <div class="user-role" id="userRole"></div>
+            <div class="header">
+                <div class="header-left">
+                    <div class="header-title">📊 Reporte de Asistencia</div>
+                </div>
+                <div class="header-right">
+                    <div class="user-area">
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Cargando...</div>
+                            <div class="user-role" id="userRole"></div>
+                        </div>
+                        <div class="user-avatar" id="userAvatar">A</div>
+                    </div>
+                </div>
             </div>
-            <button class="logout-btn" onclick="cerrarSesion()">Salir</button>
-        </div>
-    </div>
 
-    <div class="container">
-        <div id="permAlert" class="perm-alert">
-            <h4>🔒 Firestore bloqueado — acción requerida (1 sola vez)</h4>
-            <p>Las reglas de Firebase están cerradas. El código está bien; debes publicar las reglas en la consola:</p>
-            <ol>
-                <li>Abre <a href="https://console.firebase.google.com/project/iglesia-agua-viva/firestore/rules" target="_blank">Firebase Console → Reglas</a></li>
-                <li>Borra todo el contenido y pega las reglas de abajo</li>
-                <li>Pulsa <strong>Publicar</strong> y recarga esta página (Ctrl+F5)</li>
-            </ol>
-            <pre id="rulesText">rules_version = '2';
+            <div class="container">
+                <div id="permAlert" class="perm-alert">
+                    <h4>🔒 Firestore bloqueado — acción requerida (1 sola vez)</h4>
+                    <p>Las reglas de Firebase están cerradas. El código está bien; debes publicar las reglas en la consola:</p>
+                    <ol>
+                        <li>Abre <a href="https://console.firebase.google.com/project/iglesia-agua-viva/firestore/rules" target="_blank">Firebase Console → Reglas</a></li>
+                        <li>Borra todo el contenido y pega las reglas de abajo</li>
+                        <li>Pulsa <strong>Publicar</strong> y recarga esta página (Ctrl+F5)</li>
+                    </ol>
+                    <pre id="rulesText">rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /registros/{docId} { allow read, write: if true; }
@@ -393,80 +78,143 @@ service cloud.firestore {
     match /inscripciones/{docId} { allow read, write: if true; }
   }
 }</pre>
-            <button class="btn-copy" onclick="copiarReglas()">📋 Copiar reglas</button>
-        </div>
+                    <button class="btn-copy btn" onclick="copiarReglas()">📋 Copiar reglas</button>
+                </div>
 
-        <div class="filters-bar">
-            <div class="filter-group"><label>📍 SEDE</label><select id="filtroSede" class="filter-select"><option value="todas">Todas las sedes</option></select></div>
-            <div class="filter-group"><label>📅 SEMANA</label><input type="week" id="filtroSemana" class="filter-input"></div>
-            <div class="filter-group"><label>📆 MES</label><select id="filtroMes" class="filter-select"><option value="">Todos</option></select></div>
-            <div class="filter-group"><label>🗓️ AÑO</label><select id="filtroAnio" class="filter-select"><option value="2026" selected>2026</option><option value="2025">2025</option></select></div>
-            <button class="btn-primary" onclick="cargarDatos()">🔍 Filtrar</button>
-            <button class="btn-secondary" onclick="window.location.href='ingreso.html'">➕ Nuevo registro</button>
-            <button class="btn-secondary" onclick="exportarExcel()">📎 Exportar Excel</button>
-        </div>
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label>📍 Sede</label>
+                        <select id="filtroSede" class="filter-select">
+                            <option value="todas">Todas las sedes</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>📅 Semana</label>
+                        <input type="week" id="filtroSemana" class="filter-input">
+                    </div>
+                    <div class="filter-group">
+                        <label>📆 Mes</label>
+                        <select id="filtroMes" class="filter-select">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>🗓️ Año</label>
+                        <select id="filtroAnio" class="filter-select">
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="cargarDatos()"><i data-lucide="search" style="width: 16px; height: 16px;"></i> Filtrar</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='ingreso.html'"><i data-lucide="plus" style="width: 16px; height: 16px;"></i> Nuevo registro</button>
+                    <button class="btn btn-secondary" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width: 16px; height: 16px;"></i> Exportar Excel</button>
+                </div>
 
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value">0</div><div class="stat-label">Total asistentes</div></div>
-            <div class="stat-card"><div class="stat-icon">👨</div><div class="stat-value">0</div><div class="stat-label">Varones</div></div>
-            <div class="stat-card"><div class="stat-icon">👩</div><div class="stat-value">0</div><div class="stat-label">Mujeres</div></div>
-            <div class="stat-card"><div class="stat-icon">🧒</div><div class="stat-value">0</div><div class="stat-label">Kids</div></div>
-        </div>
+                <!-- Stats Grid -->
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-card-details">
+                            <h4>Total asistentes</h4>
+                            <div class="stat-value">0</div>
+                        </div>
+                        <div class="stat-card-icon"><i data-lucide="users"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-details">
+                            <h4>Varones</h4>
+                            <div class="stat-value">0</div>
+                        </div>
+                        <div class="stat-card-icon"><i data-lucide="user"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-details">
+                            <h4>Mujeres</h4>
+                            <div class="stat-value">0</div>
+                        </div>
+                        <div class="stat-card-icon"><i data-lucide="user"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-details">
+                            <h4>Kids</h4>
+                            <div class="stat-value">0</div>
+                        </div>
+                        <div class="stat-card-icon"><i data-lucide="smile"></i></div>
+                    </div>
+                </div>
 
-        <div class="report-section">
-            <div class="section-header">
-                <div class="section-title">📊 REPORTE DE SERVICIOS <span id="filtroInfo" style="font-size:13px;color:#6c7a8a;"></span></div>
+                <!-- Report Section -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i data-lucide="file-text" style="width: 20px; height: 20px; color: var(--brand-blue);"></i> REPORTE DE SERVICIOS <span id="filtroInfo" style="font-size:13px;color:#6c7a8a;margin-left:8px;"></span></div>
+                    </div>
+                    <div class="report-cards" id="reportCards">
+                        <!-- Loaded dynamically -->
+                    </div>
+                    <button class="btn btn-whatsapp" id="whatsappBtn" style="width:100%; margin-top: 10px;">
+                        <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i> ENVIAR REPORTE POR WHATSAPP
+                    </button>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); margin-bottom: 32px;">
+                    <div class="section-card" style="margin-bottom:0;">
+                        <h3 style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:16px;">Asistencia por sede</h3>
+                        <canvas id="chartSedes"></canvas>
+                    </div>
+                    <div class="section-card" style="margin-bottom:0;">
+                        <h3 style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:16px;">Tendencia semanal</h3>
+                        <canvas id="chartTendencia"></canvas>
+                    </div>
+                    <div class="section-card" style="margin-bottom:0;">
+                        <h3 style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:16px;">Varones vs Mujeres</h3>
+                        <canvas id="chartGenero"></canvas>
+                    </div>
+                </div>
+
+                <!-- Historial -->
+                <div class="section-card">
+                    <h3 style="margin-bottom:20px; font-size:18px; font-weight:700;"><i data-lucide="history" style="width: 20px; height: 20px; color: var(--brand-blue); vertical-align: middle; margin-right: 8px;"></i> Historial de registros</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Sede</th>
+                                    <th>Semana</th>
+                                    <th>Total</th>
+                                    <th>Varones</th>
+                                    <th>Mujeres</th>
+                                    <th>Kids</th>
+                                    <th>Registrado por</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaBody">
+                                <tr><td colspan="9" style="text-align:center; padding: 48px; color: var(--text-muted);">Cargando registros...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="report-cards" id="reportCards">
-                <div class="report-card" style="border-left-color:#10b981">
-                    <h3>☀️ DOMINGO</h3>
-                    <div class="report-row"><span>👨 Hombres</span><span>0</span></div>
-                    <div class="report-row"><span>👩 Mujeres</span><span>0</span></div>
-                    <div class="report-row"><span>👥 Total</span><span><strong>0</strong></span></div>
-                </div>
-                <div class="report-card" style="border-left-color:#38bdf8">
-                    <h3>🌙 NEXT (Sábados)</h3>
-                    <div class="report-row"><span>👨 Hombres</span><span>0</span></div>
-                    <div class="report-row"><span>👩 Mujeres</span><span>0</span></div>
-                    <div class="report-row"><span>👥 Total</span><span><strong>0</strong></span></div>
-                </div>
-                <div class="report-card" style="border-left-color:#f59e0b">
-                    <h3>🧒 KIDS</h3>
-                    <div class="report-row"><span>👨 Niños</span><span>0</span></div>
-                    <div class="report-row"><span>👩 Niñas</span><span>0</span></div>
-                    <div class="report-row"><span>👥 Total</span><span><strong>0</strong></span></div>
-                </div>
-            </div>
-            <button class="btn-whatsapp" id="whatsappBtn">📱 ENVIAR REPORTE POR WHATSAPP</button>
-        </div>
-
-        <div class="charts-grid">
-            <div class="chart-card"><h3>📊 Asistencia por sede</h3><canvas id="chartSedes"></canvas></div>
-            <div class="chart-card"><h3>📈 Tendencia semanal</h3><canvas id="chartTendencia"></canvas></div>
-            <div class="chart-card"><h3>👥 Varones vs Mujeres</h3><canvas id="chartGenero"></canvas></div>
-        </div>
-
-        <div class="table-container">
-            <h3 style="margin-bottom:20px;">📋 Historial de registros</h3>
-            <table class="data-table">
-                <thead><tr><th>Fecha</th><th>Sede</th><th>Semana</th><th>Total</th><th>Varones</th><th>Mujeres</th><th>Kids</th><th>Registrado por</th><th>Acciones</th></tr></thead>
-                <tbody id="tablaBody"><tr><td colspan="9" class="empty-state">Cargando registros...</td></tr></tbody>
-            </table>
-        </div>
-    </div>
         </div>
     </div>
 
     <!-- Modal de edición -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header"><h3>✏️ Editar registro</h3><button class="modal-close" onclick="cerrarModal()">&times;</button></div>
+            <div class="modal-header">
+                <h3>✏️ Editar registro</h3>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
             <div class="modal-body" id="editModalBody"></div>
         </div>
     </div>
 
     <script src="auth.js"></script>
     <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
         if (!Auth.esAdmin()) {
             window.location.replace('index.html');
         }
@@ -554,11 +302,40 @@ service cloud.firestore {
                 kids += (d.totalKV || 0) + (d.totalKM || 0);
             }
             document.getElementById('statsGrid').innerHTML = `
-                <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value">${total}</div><div class="stat-label">Total asistentes</div></div>
-                <div class="stat-card"><div class="stat-icon">👨</div><div class="stat-value">${varones}</div><div class="stat-label">Varones</div></div>
-                <div class="stat-card"><div class="stat-icon">👩</div><div class="stat-value">${mujeres}</div><div class="stat-label">Mujeres</div></div>
-                <div class="stat-card"><div class="stat-icon">🧒</div><div class="stat-value">${kids}</div><div class="stat-label">Kids</div></div>
+                <div class="stat-card">
+                    <div class="stat-card-details">
+                        <h4>Total asistentes</h4>
+                        <div class="stat-value">${total}</div>
+                        <div class="stat-trend up"><i data-lucide="trending-up" style="width: 14px; height: 14px; vertical-align: middle;"></i> +12%</div>
+                    </div>
+                    <div class="stat-card-icon"><i data-lucide="users"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-details">
+                        <h4>Varones</h4>
+                        <div class="stat-value">${varones}</div>
+                        <div class="stat-trend neutral">${total > 0 ? Math.round(varones/total*100) : 0}% del total</div>
+                    </div>
+                    <div class="stat-card-icon"><i data-lucide="user"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-details">
+                        <h4>Mujeres</h4>
+                        <div class="stat-value">${mujeres}</div>
+                        <div class="stat-trend neutral">${total > 0 ? Math.round(mujeres/total*100) : 0}% del total</div>
+                    </div>
+                    <div class="stat-card-icon"><i data-lucide="user"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-details">
+                        <h4>Kids</h4>
+                        <div class="stat-value">${kids}</div>
+                        <div class="stat-trend neutral">${total > 0 ? Math.round(kids/total*100) : 0}% del total</div>
+                    </div>
+                    <div class="stat-card-icon"><i data-lucide="smile"></i></div>
+                </div>
             `;
+            lucide.createIcons();
         }
 
         function actualizarReportes() {
@@ -605,7 +382,7 @@ service cloud.firestore {
         function actualizarTabla() {
             let tbody = document.getElementById('tablaBody');
             if (datosFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No hay registros disponibles</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 48px; color: var(--text-muted);">No hay registros disponibles</td></tr>';
                 return;
             }
             let html = '';
@@ -615,10 +392,10 @@ service cloud.firestore {
                 let badge = d.origen === 'invitado'
                     ? '<span class="badge-origen badge-inv">Invitado</span>'
                     : (d.origen === 'admin' ? '<span class="badge-origen badge-adm">Admin</span>' : '');
-                let acciones = `<button class="btn-edit" onclick="abrirEditar('${d.firebaseId}')">✏️ Editar</button>
-                               <button class="btn-delete" onclick="eliminarRegistro('${d.firebaseId}')">🗑️ Eliminar</button>`;
+                let acciones = `<button class="btn btn-secondary" style="padding: 5px 10px; font-size:11px; margin-right:4px;" onclick="abrirEditar('${d.firebaseId}')">✏️ Editar</button>
+                               <button class="btn btn-secondary" style="padding: 5px 10px; font-size:11px; color:var(--danger);" onclick="eliminarRegistro('${d.firebaseId}')">🗑️ Eliminar</button>`;
                 html += `<tr>
-                    <td>${d.fecha}</td>
+                    <td><strong>${d.fecha}</strong></td>
                     <td>${formatearSede(d.sede)}</td>
                     <td>${d.semana}</td>
                     <td><strong>${d.totalGeneral}</strong></td>
@@ -637,7 +414,7 @@ service cloud.firestore {
             for (let d of datosFiltrados) sedesMap[d.sede] = (sedesMap[d.sede] || 0) + d.totalGeneral;
             if (chartSedes) chartSedes.destroy();
             chartSedes = new Chart(document.getElementById('chartSedes'), {
-                type: 'bar', data: { labels: Object.keys(sedesMap).map(s => formatearSede(s)), datasets: [{ label: 'Asistentes', data: Object.values(sedesMap), backgroundColor: '#0284c7', borderRadius: 8 }] },
+                type: 'bar', data: { labels: Object.keys(sedesMap).map(s => formatearSede(s)), datasets: [{ label: 'Asistentes', data: Object.values(sedesMap), backgroundColor: '#1b4570', borderRadius: 8 }] },
                 options: { responsive: true, maintainAspectRatio: true }
             });
             let semanasMap = {};
@@ -645,14 +422,14 @@ service cloud.firestore {
             let semanasOrdenadas = Object.keys(semanasMap).sort();
             if (chartTendencia) chartTendencia.destroy();
             chartTendencia = new Chart(document.getElementById('chartTendencia'), {
-                type: 'line', data: { labels: semanasOrdenadas, datasets: [{ label: 'Asistencia', data: semanasOrdenadas.map(s => semanasMap[s]), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 }] },
+                type: 'line', data: { labels: semanasOrdenadas, datasets: [{ label: 'Asistencia', data: semanasOrdenadas.map(s => semanasMap[s]), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.05)', fill: true, tension: 0.3 }] },
                 options: { responsive: true, maintainAspectRatio: true }
             });
             let totalV = datosFiltrados.reduce((s, d) => s + d.totalVarones, 0);
             let totalM = datosFiltrados.reduce((s, d) => s + d.totalMujeres, 0);
             if (chartGenero) chartGenero.destroy();
             chartGenero = new Chart(document.getElementById('chartGenero'), {
-                type: 'doughnut', data: { labels: ['Varones', 'Mujeres'], datasets: [{ data: [totalV, totalM], backgroundColor: ['#0284c7', '#ec489a'] }] },
+                type: 'doughnut', data: { labels: ['Varones', 'Mujeres'], datasets: [{ data: [totalV, totalM], backgroundColor: ['#3b82f6', '#ec4899'] }] },
                 options: { responsive: true, maintainAspectRatio: true }
             });
         }
@@ -669,7 +446,7 @@ service cloud.firestore {
         function mostrarModalEdicion(reg) {
             let html = `
                 <div class="form-group"><label>📅 FECHA</label><input type="date" id="editFecha" class="form-control" value="${reg.fecha}"></div>
-                <div class="form-group"><label>📍 SEDE</label><select id="editSede" class="form-control">
+                <div class="form-group"><label>📍 SEDE</label><select id="editSede" class="form-select">
                     <option value="san_carlos_10am" ${reg.sede === 'san_carlos_10am' ? 'selected' : ''}>San Carlos 10am</option>
                     <option value="san_carlos_12pm" ${reg.sede === 'san_carlos_12pm' ? 'selected' : ''}>San Carlos 12pm</option>
                     <option value="san_carlos_5pm" ${reg.sede === 'san_carlos_5pm' ? 'selected' : ''}>San Carlos 5pm</option>
@@ -689,7 +466,7 @@ service cloud.firestore {
                     <div class="form-group"><label>👨 VARONES</label><input type="number" id="editVarones" class="form-control" value="${reg.totalVarones}" min="0"></div>
                     <div class="form-group"><label>👩 MUJERES</label><input type="number" id="editMujeres" class="form-control" value="${reg.totalMujeres}" min="0"></div>
                 </div>
-                <button class="btn-primary" style="width:100%; margin-top:20px;" onclick="guardarEdicion()">💾 Guardar cambios</button>
+                <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="guardarEdicion()">💾 Guardar cambios</button>
             `;
             document.getElementById('editModalBody').innerHTML = html;
             document.getElementById('editModal').style.display = 'flex';
@@ -754,7 +531,7 @@ service cloud.firestore {
             t.className = 'toast toast-' + (tipo || 'success');
             t.innerText = msg;
             document.body.appendChild(t);
-            setTimeout(() => t.remove(), 5000);
+            setTimeout(() => t.remove(), 4000);
         }
 
         function copiarReglas() {
@@ -792,11 +569,9 @@ service cloud.firestore {
             });
         }
 
-
-
         function inicializarFiltros() {
-            let sedes = ['san_carlos_10am', 'san_carlos_12pm', 'san_carlos_5pm', 'san_carlos_7pm', 'el_tambo_12pm', 'el_tambo_6pm', 'chupaca_6pm', 'jauja', 'belen', 'transformando_ciudades'];
             let selectSede = document.getElementById('filtroSede');
+            let sedes = ['san_carlos_10am', 'san_carlos_12pm', 'san_carlos_5pm', 'san_carlos_7pm', 'el_tambo_12pm', 'el_tambo_6pm', 'chupaca_6pm', 'jauja', 'belen', 'transformando_ciudades'];
             for (let s of sedes) { let opt = document.createElement('option'); opt.value = s; opt.textContent = formatearSede(s); selectSede.appendChild(opt); }
             let selectMes = document.getElementById('filtroMes');
             for (let i = 1; i <= 12; i++) { let opt = document.createElement('option'); opt.value = `2026-${String(i).padStart(2, '0')}`; opt.textContent = `Mes ${i}`; selectMes.appendChild(opt); }
@@ -806,7 +581,8 @@ service cloud.firestore {
 
         function cargarUsuario() {
             document.getElementById('userName').innerText = usuarioActual.nombre || 'Administrador';
-            document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : '📋 Líder de sede';
+            document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : '📋 Líder de Sede';
+            document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
         }
 
         cargarUsuario();

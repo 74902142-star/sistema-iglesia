@@ -5,235 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Registrar Servicio | Iglesia Agua Viva</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
     <script src="firebase-auth.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f0f9ff; color: #0c4a6e; min-height: 100vh; }
-
-        /* ── Sidebar ── */
-        .app-layout { display: flex; min-height: 100vh; }
-        .sidebar {
-            width: 72px; background: linear-gradient(180deg, #0c4a6e 0%, #075985 50%, #0369a1 100%);
-            color: white; padding: 24px 12px; display: flex; flex-direction: column; gap: 4px;
-            position: sticky; top: 0; height: 100vh; z-index: 100;
-            box-shadow: 2px 0 24px rgba(12,74,110,0.12);
-            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
-        @media (hover:hover) { .sidebar:hover { width: 260px; } }
-
-        .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 0; margin-bottom: 32px; white-space: nowrap; }
-        .sidebar-logo .logo-icon { font-size: 24px; flex-shrink: 0; width: 24px; text-align: center; }
-        .sidebar-logo .logo-text { display: none; }
-        .sidebar:hover .sidebar-logo .logo-text { display: block; }
-        .sidebar-logo .logo-text h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
-        .sidebar-logo .logo-text p { font-size: 11px; opacity: 0.5; margin-top: 0; }
-
-        .nav-link {
-            display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px;
-            color: rgba(255,255,255,0.6); text-decoration: none; font-weight: 500; font-size: 14px;
-            transition: background 0.2s; white-space: nowrap;
-        }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: white; }
-        .nav-link.active { background: rgba(255,255,255,0.95); color: #0c4a6e; font-weight: 700; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
-        .nav-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
-        .nav-text { display: none; }
-        .sidebar:hover .nav-text { display: inline; }
-        .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-
-        .sidebar-toggle { display: none; }
-        .sidebar-header { margin-bottom: 4px; padding: 0; }
-        .sidebar-close { display: none; }
-        .sidebar-overlay { display: none; }
-        .sidebar-overlay.active { display: block; }
-
-        .nav-section { display: flex; flex-direction: column; gap: 2px; }
-        .nav-section-title {
-            padding: 12px 12px 4px;
-            color: rgba(255,255,255,0.3); font-size: 10px; font-weight: 700;
-            letter-spacing: 1.2px; text-transform: uppercase; display: none;
-        }
-        .sidebar:hover .nav-section-title { display: block; }
-        .nav-section-content { display: flex; flex-direction: column; gap: 2px; }
-
-        /* ── Header ── */
-        .header {
-            background: white; color: #0c4a6e; padding: 18px 32px; display: flex;
-            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-            border-bottom: 1px solid #bae6fd;
-            position: relative;
-        }
-        .header::after {
-            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, #0284c7, #38bdf8, #0284c7);
-        }
-        .logo h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: #0c4a6e; }
-        .logo p { font-size: 12px; color: #64748b; margin-top: 2px; }
-        .user-area {
-            display: flex; align-items: center; gap: 16px;
-            background: #f1f4f9; padding: 6px 18px 6px 20px; border-radius: 60px;
-            border: 1px solid #bae6fd;
-        }
-        .user-name { font-weight: 600; font-size: 14px; color: #0c4a6e; }
-        .user-role { font-size: 11px; color: #64748b; margin-top: 1px; }
-        .logout-btn {
-            background: #0c4a6e; border: none; padding: 7px 18px; border-radius: 40px;
-            color: white; cursor: pointer; font-weight: 500; font-size: 13px;
-            transition: background 0.2s;
-        }
-        .logout-btn:hover { background: #0369a1; }
-
-        /* ── Container ── */
-        .container { max-width: 1400px; margin: 0 auto; padding: 28px 32px; }
-
-        /* ── Info Card (Top Card) ── */
-        .info-card {
-            background: white; border-radius: 20px; padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #bae6fd; margin-bottom: 24px;
-            display: flex; justify-content: space-between; align-items: center; gap: 20px;
-        }
-        .info-card-text h3 { font-size: 18px; font-weight: 800; color: #0c4a6e; margin-bottom: 6px; }
-        .info-card-text p { font-size: 14px; color: #64748b; }
-
-        /* ── Form components ── */
-        .double-input { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-        .form-group {
-            background: white; border-radius: 16px; padding: 18px 24px;
-            border: 1px solid #bae6fd; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .form-group label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 10px; }
-        
-        .input-with-icon { position: relative; display: flex; align-items: center; }
-        .input-with-icon .input-icon { position: absolute; left: 16px; font-size: 18px; color: #64748b; }
-        .form-control, .form-select {
-            width: 100%; padding: 13px 16px 13px 44px; border: 1.5px solid #bae6fd; border-radius: 10px;
-            font-family: 'Inter', sans-serif; font-size: 15px; transition: all 0.2s;
-            background: #f8fafc; color: #0c4a6e; font-weight: 500;
-        }
-        .form-control:focus, .form-select:focus { outline: none; border-color: #0284c7; background: white; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
-        .form-control::placeholder { color: #94a3b8; font-size: 14px; }
-        select.form-select { cursor: pointer; }
-
-        /* ── Section title ── */
-        .section-title {
-            font-size: 13px; font-weight: 800; margin: 32px 0 16px 0;
-            color: #0c4a6e; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 12px;
-            text-transform: uppercase; position: relative;
-        }
-        .section-title::before, .section-title::after {
-            content: ''; flex: 1; height: 1.5px; background: #bae6fd;
-        }
-
-        /* ── Grid Container ── */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
-
-        /* ── Ministry Card ── */
-        .ministerio-card {
-            background: white; border-radius: 18px; padding: 20px;
-            transition: all 0.25s; border: 1px solid #bae6fd; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; gap: 14px; border-left: 4px solid #0284c7;
-        }
-        .ministerio-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(12,74,110,0.08); border-left-color: #38bdf8; }
-        .ministerio-nombre { font-weight: 800; color: #0c4a6e; font-size: 16px; display: flex; align-items: center; gap: 10px; }
-
-        /* ── Counter Controls ── */
-        .count-col { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-        .count-col label { font-size: 13px; font-weight: 600; color: #475569; margin: 0; text-transform: capitalize; }
-        
-        .number-control {
-            display: flex; align-items: center; gap: 0; background: #f8fafc;
-            border-radius: 30px; border: 1.5px solid #bae6fd; padding: 2px; transition: all 0.2s;
-            width: 120px; justify-content: space-between;
-        }
-        .number-control:focus-within { border-color: #0284c7; background: white; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
-        .number-control input {
-            width: 32px; border: none; text-align: center; font-size: 15px; font-weight: 700;
-            background: transparent; font-family: 'Inter', sans-serif; color: #0c4a6e;
-        }
-        .number-control input:focus { outline: none; }
-        .number-control input[type="number"] { -moz-appearance: textfield; }
-        .number-control input::-webkit-inner-spin-button,
-        .number-control input::-webkit-outer-spin-button { display: none; }
-        .number-btn {
-            width: 28px; height: 28px; border-radius: 50%; border: none; background: transparent;
-            font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; color: #0284c7;
-        }
-        .number-btn:hover { background: #0c4a6e; color: white; }
-
-        /* ── Buttons ── */
-        .btn-save {
-            background: #0c4a6e; color: white; border: none;
-            padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer;
-            transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(12,74,110,0.15);
-        }
-        .btn-save:hover { background: #0369a1; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(12,74,110,0.2); }
-        .btn-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        
-        .btn-back {
-            background: white; border: 1.5px solid #bae6fd; padding: 13px 28px; border-radius: 12px;
-            font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: #475569;
-            display: inline-flex; align-items: center; gap: 6px;
-        }
-        .btn-back:hover { background: #f1f4f9; border-color: #cbd5e1; }
-
-        .btn-group-bottom { display: flex; justify-content: flex-end; align-items: center; gap: 14px; margin-top: 32px; }
-
-        .guest-banner {
-            background: #f0fdf4; border: 1.5px solid #86efac;
-            border-radius: 16px; padding: 16px 24px; margin-bottom: 24px;
-            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-        .guest-banner p { font-size: 14px; color: #166534; font-weight: 600; margin: 0; }
-        .guest-banner a { font-size: 13px; color: #0284c7; font-weight: 700; text-decoration: none; }
-        .guest-banner a:hover { text-decoration: underline; }
-
-        /* ── Toast ── */
-        .toast {
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 12px 24px;
-            border-radius: 60px; color: white; text-align: center; font-weight: 500; font-size: 14px; z-index: 1100;
-            animation: slideUp 0.3s; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        }
-        .toast-success { background: linear-gradient(135deg, #10b981, #059669); }
-        .toast-error { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        @keyframes slideUp { from { transform: translateY(100px) translateX(-50%); opacity: 0; } to { transform: translateY(0) translateX(-50%); opacity: 1; } }
-
-        .sidebar-mobile-toggle {
-            display: none; position: fixed; top: 12px; left: 12px; z-index: 101;
-            background: #0c4a6e; border: none; color: white; width: 40px; height: 40px;
-            border-radius: 12px; font-size: 20px; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        @media (max-width: 992px) {
-            .sidebar-mobile-toggle { display: flex; align-items: center; justify-content: center; }
-            .sidebar { display: none; }
-            .sidebar.open { display: flex; }
-            .sidebar {
-                position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
-                padding: 24px 16px; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                z-index: 100; flex-direction: column; overflow-y: auto;
-            }
-            .sidebar.open { left: 0; }
-            .sidebar .nav-text,
-            .sidebar .nav-section-title,
-            .sidebar .logo-text { display: block; }
-            .sidebar-close { display: block; }
-            .sidebar .sidebar-logo { padding: 0 12px; }
-            .sidebar-logo { display: flex; margin-bottom: 24px; }
-            .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 99; }
-            .sidebar-overlay.active { display: block; }
-            .app-layout { flex-direction: column; }
-            .main-content { width: 100%; }
-            .container { padding: 16px 20px; }
-            .double-input { grid-template-columns: 1fr; gap: 12px; }
-        }
-    </style>
 </head>
 <body>
     <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
@@ -242,61 +19,43 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <span class="logo-icon">⛪</span>
+                    <span class="logo-icon"><i data-lucide="church" style="width: 24px; height: 24px;"></i></span>
                     <div class="logo-text">
                         <h2>Agua Viva</h2>
-                        <p>Gestión Ministerial</p>
+                        <p>Administración</p>
                     </div>
                 </div>
                 <button class="sidebar-close" id="sidebarClose">&times;</button>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Reportes</div>
-                <div class="nav-section-content">
-                    <a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span><span class="nav-text">Reporte de Asistencia</span></a>
-                </div>
+            <div class="nav-section-content">
+                <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
+                <a href="ingreso.html" class="nav-link active" id="nav-registro"><span class="nav-icon"><i data-lucide="clipboard-list"></i></span><span>Registro</span></a>
+                <a href="predicadores.html" class="nav-link nav-admin" id="nav-anfitriones" style="display:none;"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
+                <a href="creativos.html" class="nav-link nav-admin" id="nav-creativos" style="display:none;"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
+                <a href="edl.html" class="nav-link nav-admin" id="nav-edl" style="display:none;"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Servicio</div>
-                <div class="nav-section-content">
-                    <a href="ingreso.html" class="nav-link active"><span class="nav-icon">📝</span><span class="nav-text">Registrar Servicio</span></a>
-                </div>
-            </div>
-            <div class="nav-section nav-admin" style="display:none;">
-                <div class="nav-section-title">Ministerios</div>
-                <div class="nav-section-content">
-                    <a href="predicadores.html" class="nav-link"><span class="nav-icon">🎤</span><span class="nav-text">Anfitriones y Predicadores</span></a>
-                    <a href="creativos.html" class="nav-link"><span class="nav-icon">🎨</span><span class="nav-text">Creativos</span></a>
-                </div>
-            </div>
-            <div class="nav-section nav-admin" style="display:none;">
-                <div class="nav-section-title">Formación</div>
-                <div class="nav-section-content">
-                    <a href="edl.html" class="nav-link"><span class="nav-icon">🎓</span><span class="nav-text">EDL (Escuela de Liderazgo)</span></a>
-                </div>
-            </div>
-            <div class="nav-section" style="margin-top: auto;">
-                <div class="nav-section-content">
-                    <a href="#" class="nav-link"><span class="nav-icon">⚙️</span><span class="nav-text">Configuración</span></a>
-                    <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon">🚪</span><span class="nav-text">Cerrar Sesión</span></a>
-                </div>
+            <div class="nav-section-content" style="margin-top: auto;">
+                <a href="#" class="nav-link"><span class="nav-icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
+                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
             </div>
         </aside>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+        <!-- Main Content -->
         <div class="main-content">
             <!-- Header -->
             <div class="header">
-                <div class="logo">
-                    <h1>⛪ Iglesia Agua Viva</h1>
-                    <p>Sistema de Gestión de Servicios</p>
+                <div class="header-left">
+                    <div class="header-title">Formulario de Registro</div>
                 </div>
-                <div class="user-area">
-                    <div>
-                        <div class="user-name" id="userName">Cargando...</div>
-                        <div class="user-role" id="userRole"></div>
+                <div class="header-right">
+                    <div class="user-area">
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Cargando...</div>
+                            <div class="user-role" id="userRole"></div>
+                        </div>
+                        <div class="user-avatar" id="userAvatar">A</div>
                     </div>
-                    <button class="logout-btn" onclick="cerrarSesion()">Salir</button>
                 </div>
             </div>
 
@@ -308,19 +67,19 @@
                 </div>
 
                 <!-- Page Header Card -->
-                <div class="info-card">
-                    <div class="info-card-text">
-                        <h3 id="tituloHeaderForm">Nuevo Registro de Servicio</h3>
-                        <p id="subtituloForm">Complete los datos de asistencia y ministerios para el servicio de hoy.</p>
+                <div class="section-card" style="display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 24px;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 800; color: var(--brand-blue); margin-bottom: 6px;" id="tituloHeaderForm">Nuevo Registro de Servicio</h3>
+                        <p style="font-size: 14px; color: var(--text-muted);" id="subtituloForm">Complete los datos de asistencia y ministerios para el servicio de hoy.</p>
                     </div>
-                    <button type="button" class="btn-back" id="btnVolver">← Volver</button>
+                    <button type="button" class="btn btn-secondary" id="btnVolver"><i data-lucide="arrow-left" style="width:16px; height:16px;"></i> Volver</button>
                 </div>
 
                 <form id="registroForm">
-                    <div class="form-group" id="groupNombreInvitado" style="display:none; margin-bottom: 24px;">
-                        <label>👤 Tu Nombre</label>
+                    <div class="section-card" id="groupNombreInvitado" style="display:none; margin-bottom: 24px;">
+                        <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:8px;">👤 Tu Nombre</label>
                         <div class="input-with-icon">
-                            <span class="input-icon">👤</span>
+                            <span class="input-icon"><i data-lucide="user" style="width:18px; height:18px;"></i></span>
                             <input type="text" id="nombreInvitado" class="form-control" placeholder="Nombre del líder que registra">
                         </div>
                     </div>
@@ -329,15 +88,15 @@
                         <div class="form-group">
                             <label>📅 Fecha del Servicio</label>
                             <div class="input-with-icon">
-                                <span class="input-icon">📅</span>
-                                <input type="date" id="fecha" class="form-control" required style="padding-left: 44px;">
+                                <span class="input-icon"><i data-lucide="calendar" style="width:18px; height:18px;"></i></span>
+                                <input type="date" id="fecha" class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>📍 Sede</label>
                             <div class="input-with-icon">
-                                <span class="input-icon">📍</span>
-                                <select id="sede" class="form-select" required style="padding-left: 44px;">
+                                <span class="input-icon"><i data-lucide="map-pin" style="width:18px; height:18px;"></i></span>
+                                <select id="sede" class="form-select" required>
                                     <option value="">Seleccionar</option>
                                     <option value="san_carlos_10am">🏛️ San Carlos - 10am (Domingo)</option>
                                     <option value="san_carlos_12pm">🏛️ San Carlos - 12pm (Domingo)</option>
@@ -354,15 +113,15 @@
                         </div>
                     </div>
 
-                    <div class="section-title">Ministerios</div>
+                    <div class="section-title-divider">Ministerios</div>
                     <div id="ministeriosContainer" class="cards-grid"></div>
 
-                    <div class="section-title">Asistentes</div>
+                    <div class="section-title-divider">Asistentes</div>
                     <div id="asistentesContainer" class="cards-grid"></div>
 
-                    <div class="btn-group-bottom">
-                        <button type="button" class="btn-back" onclick="document.getElementById('btnVolver').click()">Cancelar</button>
-                        <button type="submit" class="btn-save" id="btnGuardar">💾 Guardar Registro</button>
+                    <div style="display: flex; justify-content: flex-end; align-items: center; gap: 14px; margin-top: 32px;">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('btnVolver').click()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="btnGuardar"><i data-lucide="save" style="width: 16px; height: 16px;"></i> Guardar Registro</button>
                     </div>
                 </form>
             </div>
@@ -371,6 +130,9 @@
 
     <script src="auth.js"></script>
     <script>
+        // Init Lucide
+        lucide.createIcons();
+
         Auth.permitirRegistro();
         const esInvitado = Auth.esInvitado();
         const esAdmin = Auth.esAdmin();
@@ -380,6 +142,7 @@
         if (usuario) {
             document.getElementById('userName').innerText = usuario.nombre;
             document.getElementById('userRole').innerText = usuario.rol.toUpperCase();
+            document.getElementById('userAvatar').innerText = (usuario.nombre || 'A').charAt(0).toUpperCase();
         }
 
         // Sidebar display toggle
@@ -399,16 +162,16 @@
         }
 
         const ministerios = [
-            { nombre: 'Alabanza', id: 'alabanza', icono: '🎸' },
-            { nombre: 'Producción', id: 'produccion', icono: '🎛️' },
-            { nombre: 'Servidores', id: 'servidores', icono: '🛡️' },
-            { nombre: 'Conexión', id: 'conexion', icono: '🤝' },
-            { nombre: 'Maestros Kids', id: 'maestros', icono: '👩‍🏫' }
+            { nombre: 'Alabanza', id: 'alabanza', icono: 'music' },
+            { nombre: 'Producción', id: 'produccion', icono: 'video' },
+            { nombre: 'Servidores', id: 'servidores', icono: 'heart' },
+            { nombre: 'Conexión', id: 'conexion', icono: 'users' },
+            { nombre: 'Maestros Kids', id: 'maestros', icono: 'book-open' }
         ];
 
         const asistentes = [
-            { nombre: 'Adultos', id: 'adultos', icono: '👨' },
-            { nombre: 'Kids (Niños)', id: 'kids', icono: '🧒' }
+            { nombre: 'Adultos', id: 'adultos', icono: 'user' },
+            { nombre: 'Kids', id: 'kids', icono: 'smile' }
         ];
 
         function crearControlNumerico(id, etiqueta) {
@@ -457,13 +220,65 @@
             return col;
         }
 
+        function crearControlNumericoAsistente(id, etiqueta, esAdulto) {
+            const col = document.createElement('div');
+            col.className = 'count-col';
+            col.style.justifyContent = 'flex-end';
+            col.style.gap = '8px';
+            col.innerHTML = `<label style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; width: 60px;">${etiqueta}</label>`;
+
+            const div = document.createElement('div');
+            div.className = 'asistente-counter';
+
+            const btnMinus = document.createElement('button');
+            btnMinus.type = 'button';
+            btnMinus.className = 'asistente-counter-btn minus';
+            btnMinus.textContent = '−';
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.id = id;
+            input.value = '0';
+            input.min = '0';
+            input.setAttribute('inputmode', 'numeric');
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === '-' || e.key === 'e' || (isNaN(Number(e.key)) && e.key !== 'Backspace' && e.key !== 'Tab' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) {
+                    e.preventDefault();
+                }
+            });
+            input.addEventListener('change', () => {
+                let val = parseInt(input.value);
+                if (isNaN(val) || val < 0) input.value = 0;
+            });
+            input.addEventListener('click', () => input.select());
+
+            const btnPlus = document.createElement('button');
+            btnPlus.type = 'button';
+            btnPlus.className = 'asistente-counter-btn plus';
+            btnPlus.style.backgroundColor = esAdulto ? 'var(--sidebar-bg)' : 'var(--brand-blue)';
+            btnPlus.textContent = '+';
+
+            btnMinus.onclick = () => { let val = parseInt(input.value) || 0; if (val > 0) input.value = val - 1; };
+            btnPlus.onclick = () => { let val = parseInt(input.value) || 0; input.value = val + 1; };
+
+            div.appendChild(btnMinus);
+            div.appendChild(input);
+            div.appendChild(btnPlus);
+            col.appendChild(div);
+            return col;
+        }
+
         function cargarFormulario() {
             const ministeriosContainer = document.getElementById('ministeriosContainer');
             ministeriosContainer.innerHTML = '';
             ministerios.forEach(m => {
                 const card = document.createElement('div');
                 card.className = 'ministerio-card';
-                card.innerHTML = `<div class="ministerio-nombre">${m.icono} ${m.nombre}</div>`;
+                card.innerHTML = `<div class="ministerio-nombre">
+                    <span class="ministerio-icon-circle"><i data-lucide="${m.icono}" style="width:16px; height:16px;"></i></span>
+                    ${m.nombre}
+                </div>`;
                 card.appendChild(crearControlNumerico(`${m.id}V`, 'Varones'));
                 card.appendChild(crearControlNumerico(`${m.id}M`, 'Mujeres'));
                 ministeriosContainer.appendChild(card);
@@ -473,13 +288,34 @@
             asistentesContainer.innerHTML = '';
             asistentes.forEach(a => {
                 const card = document.createElement('div');
-                card.className = 'ministerio-card';
+                card.className = 'asistente-card';
                 const labels = a.id === 'kids' ? ['Niños', 'Niñas'] : ['Varones', 'Mujeres'];
-                card.innerHTML = `<div class="ministerio-nombre">${a.icono} ${a.nombre}</div>`;
-                card.appendChild(crearControlNumerico(`${a.id}V`, labels[0]));
-                card.appendChild(crearControlNumerico(`${a.id}M`, labels[1]));
+                const subText = a.id === 'kids' ? 'Niños y bebés' : 'Hombres y mujeres';
+                
+                card.innerHTML = `
+                    <div class="asistente-info">
+                        <div class="asistente-icon-wrapper" style="${a.id === 'adultos' ? 'background-color:#112239; color:#fff;' : ''}">
+                            <i data-lucide="${a.icono}" style="width:24px; height:24px;"></i>
+                        </div>
+                        <div class="asistente-text">
+                            <h4>${a.nombre}</h4>
+                            <p>${subText}</p>
+                        </div>
+                    </div>
+                `;
+                
+                const counterContainer = document.createElement('div');
+                counterContainer.style.display = 'flex';
+                counterContainer.style.flexDirection = 'column';
+                counterContainer.style.gap = '10px';
+                
+                counterContainer.appendChild(crearControlNumericoAsistente(`${a.id}V`, labels[0], a.id === 'adultos'));
+                counterContainer.appendChild(crearControlNumericoAsistente(`${a.id}M`, labels[1], a.id === 'adultos'));
+                
+                card.appendChild(counterContainer);
                 asistentesContainer.appendChild(card);
             });
+            lucide.createIcons();
         }
 
         function obtenerDatos() {
@@ -557,7 +393,7 @@
             };
 
             btn.disabled = true;
-            btn.innerText = 'Guardando...';
+            btn.innerHTML = 'Guardando...';
 
             try {
                 await firebaseReady;
@@ -568,7 +404,7 @@
                     document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
                     cargarFormulario();
                     btn.disabled = false;
-                    btn.innerText = '💾 Guardar Registro';
+                    btn.innerHTML = '<i data-lucide="save" style="width: 16px; height: 16px;"></i> Guardar Registro';
                 } else {
                     setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
                 }
@@ -576,7 +412,7 @@
                 console.error('Error Firebase:', err);
                 toast('❌ Error al guardar: ' + err.message, 'error');
                 btn.disabled = false;
-                btn.innerText = '💾 Guardar Registro';
+                btn.innerHTML = '<i data-lucide="save" style="width: 16px; height: 16px;"></i> Guardar Registro';
             }
         });
 
