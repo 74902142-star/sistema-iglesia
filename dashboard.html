@@ -156,7 +156,7 @@ service cloud.firestore {
                 </div>
 
                 <!-- Charts Grid -->
-                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); margin-bottom: 32px;">
+                <div class="charts-grid">
                     <div class="section-card" style="margin-bottom:0;">
                         <h3 style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:16px;">Asistencia por sede</h3>
                         <canvas id="chartSedes"></canvas>
@@ -352,23 +352,23 @@ service cloud.firestore {
                 kidsM += d.totalKM || 0;
             }
             document.getElementById('reportCards').innerHTML = `
-                <div class="report-card" style="border-left-color:#10b981">
+                <div class="report-card domingo" style="border-left-color:#10b981">
                     <h3>☀️ DOMINGO</h3>
-                    <div class="report-row"><span>👨 Hombres</span><span>${domH}</span></div>
-                    <div class="report-row"><span>👩 Mujeres</span><span>${domM}</span></div>
-                    <div class="report-row"><span>👥 Total</span><span><strong>${domT}</strong></span></div>
+                    <div class="report-row"><span>Total:</span><strong>${domT}</strong></div>
+                    <div class="report-row"><span>Hombres:</span>${domH}</div>
+                    <div class="report-row"><span>Mujeres:</span>${domM}</div>
                 </div>
-                <div class="report-card" style="border-left-color:#38bdf8">
-                    <h3>🌙 NEXT (Sábados)</h3>
-                    <div class="report-row"><span>👨 Hombres</span><span>${nextH}</span></div>
-                    <div class="report-row"><span>👩 Mujeres</span><span>${nextM}</span></div>
-                    <div class="report-row"><span>👥 Total</span><span><strong>${nextT}</strong></span></div>
+                <div class="report-card next" style="border-left-color:#38bdf8">
+                    <h3>🌙 NEXT</h3>
+                    <div class="report-row"><span>Total:</span><strong>${nextT}</strong></div>
+                    <div class="report-row"><span>Hombres:</span>${nextH}</div>
+                    <div class="report-row"><span>Mujeres:</span>${nextM}</div>
                 </div>
-                <div class="report-card" style="border-left-color:#f59e0b">
+                <div class="report-card kids" style="border-left-color:#f59e0b">
                     <h3>🧒 KIDS</h3>
-                    <div class="report-row"><span>👨 Niños</span><span>${kidsH}</span></div>
-                    <div class="report-row"><span>👩 Niñas</span><span>${kidsM}</span></div>
-                    <div class="report-row"><span>👥 Total</span><span><strong>${kidsT}</strong></span></div>
+                    <div class="report-row"><span>Total:</span><strong>${kidsT}</strong></div>
+                    <div class="report-row"><span>Niños:</span>${kidsH}</div>
+                    <div class="report-row"><span>Niñas:</span>${kidsM}</div>
                 </div>
             `;
             document.getElementById('whatsappBtn').onclick = () => {
@@ -417,12 +417,13 @@ service cloud.firestore {
                 type: 'bar', data: { labels: Object.keys(sedesMap).map(s => formatearSede(s)), datasets: [{ label: 'Asistentes', data: Object.values(sedesMap), backgroundColor: '#1b4570', borderRadius: 8 }] },
                 options: { responsive: true, maintainAspectRatio: true }
             });
-            let semanasMap = {};
-            for (let d of datosFiltrados) semanasMap[d.semana] = (semanasMap[d.semana] || 0) + d.totalGeneral;
-            let semanasOrdenadas = Object.keys(semanasMap).sort();
+            // Trend chart: use ALL data (unfiltered)
+            let semanasMapTotal = {};
+            for (let d of registros) semanasMapTotal[d.semana] = (semanasMapTotal[d.semana] || 0) + d.totalGeneral;
+            let semanasOrdenadasTotal = Object.keys(semanasMapTotal).sort();
             if (chartTendencia) chartTendencia.destroy();
             chartTendencia = new Chart(document.getElementById('chartTendencia'), {
-                type: 'line', data: { labels: semanasOrdenadas, datasets: [{ label: 'Asistencia', data: semanasOrdenadas.map(s => semanasMap[s]), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.05)', fill: true, tension: 0.3 }] },
+                type: 'line', data: { labels: semanasOrdenadasTotal, datasets: [{ label: 'Asistencia total', data: semanasOrdenadasTotal.map(s => semanasMapTotal[s]), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.05)', fill: true, tension: 0.3 }] },
                 options: { responsive: true, maintainAspectRatio: true }
             });
             let totalV = datosFiltrados.reduce((s, d) => s + d.totalVarones, 0);

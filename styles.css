@@ -1246,6 +1246,12 @@ button, input, select, textarea {
 }
 
 @media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    .report-cards {
+        grid-template-columns: 1fr;
+    }
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 16px;
@@ -1304,11 +1310,21 @@ button, input, select, textarea {
 }
 
 /* ==========================================================================
+   CHARTS GRID
+   ========================================================================== */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+/* ==========================================================================
    REPORT CARDS
    ========================================================================== */
 .report-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     margin-bottom: 20px;
 }
@@ -1317,27 +1333,27 @@ button, input, select, textarea {
     border: 1px solid var(--border-light);
     border-left: 4px solid var(--brand-blue);
     border-radius: var(--radius-md);
-    padding: 20px;
+    padding: 20px 24px;
     box-shadow: var(--card-shadow);
 }
 .report-card h3 {
     font-size: 15px;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--border-light);
 }
 .report-row {
+    padding: 5px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 0;
-    font-size: 14px;
-    color: var(--text-secondary);
 }
-.report-row span:last-child {
-    font-weight: 600;
+.report-row strong {
+    font-weight: 700;
     color: var(--text-primary);
 }
 .perm-alert.visible { display: block; }
