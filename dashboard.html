@@ -259,14 +259,31 @@ service cloud.firestore {
                 });
                 document.getElementById('permAlert').classList.remove('visible');
             } catch (err) {
-                console.error(err);
-                registros = [];
+                console.warn('Firestore error (primer intento):', err.message);
                 if (err.code === 'permission-denied' || (err.message || '').includes('permission')) {
                     document.getElementById('permAlert').classList.add('visible');
+                    toast('🔒 Firestore bloqueado. Sigue las instrucciones del recuadro rojo.', 'error');
+                } else {
+                    // Network/timeout error — reintentar después de 3s
+                    setTimeout(() => {
+                        db.collection('registros').orderBy('fecha', 'desc').get().then(snapshot => {
+                            registros = [];
+                            snapshot.forEach(doc => registros.push({ firebaseId: doc.id, ...doc.data() }));
+                            document.getElementById('permAlert').classList.remove('visible');
+                            procesarDatos();
+                        }).catch(e => {
+                            console.warn('Firestore error (segundo intento):', e.message);
+                            toast('⏳ Error de conexión con Firebase. Recarga si persiste.', 'warning');
+                        });
+                    }, 3000);
+                    return; // ← sale para no procesar datos vacíos
                 }
-                toast('❌ Datos bloqueados por Firebase. Sigue los pasos del recuadro rojo arriba.', 'error');
             }
 
+            procesarDatos();
+        }
+
+        function procesarDatos() {
             let sede = document.getElementById('filtroSede').value;
             let semana = document.getElementById('filtroSemana').value;
             let mes = document.getElementById('filtroMes').value;
