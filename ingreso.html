@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Registrar Servicio | Iglesia Agua Viva</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -147,11 +147,13 @@
 
         if (esInvitado) {
             document.getElementById('guestBanner').style.display = 'flex';
+            document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'block');
             document.getElementById('groupNombreInvitado').style.display = 'block';
             document.getElementById('nombreInvitado').value = usuario.nombre !== 'Invitado' ? usuario.nombre : '';
             document.getElementById('subtituloForm').textContent = 'Registra la asistencia de tu servicio';
             document.getElementById('btnVolver').onclick = () => { window.location.href = 'guest.html'; };
         } else if (esAdmin) {
+            document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'none');
             document.getElementById('subtituloForm').textContent = 'Complete los datos de asistencia y ministerios para el servicio de hoy.';
             document.getElementById('btnVolver').onclick = () => { window.location.href = 'dashboard.html'; };
         }

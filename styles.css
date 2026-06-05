@@ -137,9 +137,12 @@ button, input, select, textarea {
 }
 
 /* ── Sidebar ── */
+/* ==========================================================================
+   SIDEBAR GRADIENT (Premium)
+   ========================================================================== */
 .sidebar {
     width: 260px;
-    background-color: var(--sidebar-bg);
+    background: linear-gradient(180deg, #00334f 0%, #1c6390 100%);
     color: #ffffff;
     display: flex;
     flex-direction: column;
