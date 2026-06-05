@@ -133,7 +133,7 @@
         // Init Lucide (non-blocking)
         if (typeof lucide !== 'undefined') if (typeof lucide !== 'undefined') lucide.createIcons();
 
-        Auth.permitirRegistro();
+        // Auth.permitirRegistro();
         const esInvitado = Auth.esInvitado();
         const esAdmin = Auth.esAdmin();
         const usuario = Auth.getUsuario();
@@ -143,6 +143,11 @@
             document.getElementById('userName').innerText = usuario.nombre;
             document.getElementById('userRole').innerText = usuario.rol.toUpperCase();
             document.getElementById('userAvatar').innerText = (usuario.nombre || 'A').charAt(0).toUpperCase();
+        }
+
+        if (esAdmin) {
+            document.getElementById('guestBanner').style.display = 'none';
+            document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'none');
         }
 
         if (esInvitado) {
