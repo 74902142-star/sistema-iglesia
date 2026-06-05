@@ -1372,8 +1372,11 @@ button, input, select, textarea {
 .perm-alert pre { background: #0a1628; color: #e2e8f0; padding: 14px; border-radius: 10px; font-size: 11px; overflow-x: auto; margin-top: 12px; max-height: 180px; }
 
 /* ==========================================================================
-   GUEST BANNER
+   GUEST BANNER & GUEST-ONLY
    ========================================================================== */
+.guest-only {
+    display: none;
+}
 .guest-banner {
     display: none;
     background: var(--warning-bg);
