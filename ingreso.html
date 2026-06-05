@@ -11,151 +11,361 @@
     <script src="firebase-auth.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f0f9ff; min-height: 100vh; padding: 20px; }
-        .form-container { max-width: 900px; margin: 0 auto; }
-        .form-card { background: white; border-radius: 20px; padding: 36px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); border: 1px solid #bae6fd; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        .logo { text-align: center; margin-bottom: 28px; }
-        .logo-icon { font-size: 48px; margin-bottom: 10px; }
-        .logo h1 { font-size: 22px; font-weight: 800; color: #0c4a6e; }
-        .logo p { color: #64748b; font-size: 13px; margin-top: 4px; }
+        body { font-family: 'Inter', sans-serif; background: #f0f9ff; color: #0c4a6e; min-height: 100vh; }
 
-        .section-title {
-            font-size: 18px; font-weight: 800; margin: 24px 0 18px 0;
-            color: #0c4a6e; display: flex; align-items: center; gap: 8px;
+        /* ── Sidebar ── */
+        .app-layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 72px; background: linear-gradient(180deg, #0c4a6e 0%, #075985 50%, #0369a1 100%);
+            color: white; padding: 24px 12px; display: flex; flex-direction: column; gap: 4px;
+            position: sticky; top: 0; height: 100vh; z-index: 100;
+            box-shadow: 2px 0 24px rgba(12,74,110,0.12);
+            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
-        .section-title:first-of-type { margin-top: 0; }
+        @media (hover:hover) { .sidebar:hover { width: 260px; } }
 
-        .double-input { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 6px; }
+        .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 0; margin-bottom: 32px; white-space: nowrap; }
+        .sidebar-logo .logo-icon { font-size: 24px; flex-shrink: 0; width: 24px; text-align: center; }
+        .sidebar-logo .logo-text { display: none; }
+        .sidebar:hover .sidebar-logo .logo-text { display: block; }
+        .sidebar-logo .logo-text h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
+        .sidebar-logo .logo-text p { font-size: 11px; opacity: 0.5; margin-top: 0; }
+
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px;
+            color: rgba(255,255,255,0.6); text-decoration: none; font-weight: 500; font-size: 14px;
+            transition: background 0.2s; white-space: nowrap;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: white; }
+        .nav-link.active { background: rgba(255,255,255,0.95); color: #0c4a6e; font-weight: 700; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+        .nav-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
+        .nav-text { display: none; }
+        .sidebar:hover .nav-text { display: inline; }
+        .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        .sidebar-toggle { display: none; }
+        .sidebar-header { margin-bottom: 4px; padding: 0; }
+        .sidebar-close { display: none; }
+        .sidebar-overlay { display: none; }
+        .sidebar-overlay.active { display: block; }
+
+        .nav-section { display: flex; flex-direction: column; gap: 2px; }
+        .nav-section-title {
+            padding: 12px 12px 4px;
+            color: rgba(255,255,255,0.3); font-size: 10px; font-weight: 700;
+            letter-spacing: 1.2px; text-transform: uppercase; display: none;
+        }
+        .sidebar:hover .nav-section-title { display: block; }
+        .nav-section-content { display: flex; flex-direction: column; gap: 2px; }
+
+        /* ── Header ── */
+        .header {
+            background: white; color: #0c4a6e; padding: 18px 32px; display: flex;
+            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            border-bottom: 1px solid #bae6fd;
+            position: relative;
+        }
+        .header::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #0284c7, #38bdf8, #0284c7);
+        }
+        .logo h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: #0c4a6e; }
+        .logo p { font-size: 12px; color: #64748b; margin-top: 2px; }
+        .user-area {
+            display: flex; align-items: center; gap: 16px;
+            background: #f1f4f9; padding: 6px 18px 6px 20px; border-radius: 60px;
+            border: 1px solid #bae6fd;
+        }
+        .user-name { font-weight: 600; font-size: 14px; color: #0c4a6e; }
+        .user-role { font-size: 11px; color: #64748b; margin-top: 1px; }
+        .logout-btn {
+            background: #0c4a6e; border: none; padding: 7px 18px; border-radius: 40px;
+            color: white; cursor: pointer; font-weight: 500; font-size: 13px;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: #0369a1; }
+
+        /* ── Container ── */
+        .container { max-width: 1400px; margin: 0 auto; padding: 28px 32px; }
+
+        /* ── Info Card (Top Card) ── */
+        .info-card {
+            background: white; border-radius: 20px; padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #bae6fd; margin-bottom: 24px;
+            display: flex; justify-content: space-between; align-items: center; gap: 20px;
+        }
+        .info-card-text h3 { font-size: 18px; font-weight: 800; color: #0c4a6e; margin-bottom: 6px; }
+        .info-card-text p { font-size: 14px; color: #64748b; }
+
+        /* ── Form components ── */
+        .double-input { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .form-group {
+            background: white; border-radius: 16px; padding: 18px 24px;
+            border: 1px solid #bae6fd; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .form-group label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 10px; }
+        
+        .input-with-icon { position: relative; display: flex; align-items: center; }
+        .input-with-icon .input-icon { position: absolute; left: 16px; font-size: 18px; color: #64748b; }
         .form-control, .form-select {
-            width: 100%; padding: 13px 16px; border: 1.5px solid #bae6fd; border-radius: 10px;
+            width: 100%; padding: 13px 16px 13px 44px; border: 1.5px solid #bae6fd; border-radius: 10px;
             font-family: 'Inter', sans-serif; font-size: 15px; transition: all 0.2s;
-            background: #f8fafc; color: #0c4a6e;
+            background: #f8fafc; color: #0c4a6e; font-weight: 500;
         }
         .form-control:focus, .form-select:focus { outline: none; border-color: #0284c7; background: white; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
         .form-control::placeholder { color: #94a3b8; font-size: 14px; }
         select.form-select { cursor: pointer; }
-        select.form-select:focus { background: white; }
 
-        .ministerio-card {
-            background: #f8fafc; border-radius: 14px; padding: 18px; margin-bottom: 14px;
-            transition: all 0.2s; border: 1px solid #bae6fd;
+        /* ── Section title ── */
+        .section-title {
+            font-size: 13px; font-weight: 800; margin: 32px 0 16px 0;
+            color: #0c4a6e; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 12px;
+            text-transform: uppercase; position: relative;
         }
-        .ministerio-card:hover { border-color: #cbd5e1; }
-        .ministerio-nombre { font-weight: 700; margin-bottom: 14px; color: #0c4a6e; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .section-title::before, .section-title::after {
+            content: ''; flex: 1; height: 1.5px; background: #bae6fd;
+        }
 
-        .count-col label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 6px; text-align: center; }
+        /* ── Grid Container ── */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
 
+        /* ── Ministry Card ── */
+        .ministerio-card {
+            background: white; border-radius: 18px; padding: 20px;
+            transition: all 0.25s; border: 1px solid #bae6fd; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; gap: 14px; border-left: 4px solid #0284c7;
+        }
+        .ministerio-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(12,74,110,0.08); border-left-color: #38bdf8; }
+        .ministerio-nombre { font-weight: 800; color: #0c4a6e; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+
+        /* ── Counter Controls ── */
+        .count-col { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .count-col label { font-size: 13px; font-weight: 600; color: #475569; margin: 0; text-transform: capitalize; }
+        
         .number-control {
-            display: flex; align-items: center; gap: 10px; background: #f8fafc;
-            border-radius: 60px; border: 1.5px solid #bae6fd; padding: 3px; transition: all 0.2s;
+            display: flex; align-items: center; gap: 0; background: #f8fafc;
+            border-radius: 30px; border: 1.5px solid #bae6fd; padding: 2px; transition: all 0.2s;
+            width: 120px; justify-content: space-between;
         }
         .number-control:focus-within { border-color: #0284c7; background: white; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
         .number-control input {
-            flex: 1; border: none; text-align: center; font-size: 17px; font-weight: 700;
-            padding: 8px 0; background: transparent; font-family: 'Inter', sans-serif; color: #0c4a6e;
+            width: 32px; border: none; text-align: center; font-size: 15px; font-weight: 700;
+            background: transparent; font-family: 'Inter', sans-serif; color: #0c4a6e;
         }
         .number-control input:focus { outline: none; }
         .number-control input[type="number"] { -moz-appearance: textfield; }
         .number-control input::-webkit-inner-spin-button,
         .number-control input::-webkit-outer-spin-button { display: none; }
         .number-btn {
-            width: 40px; height: 40px; border-radius: 50%; border: none; background: #f1f4f9;
-            font-size: 22px; font-weight: 700; cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; color: #475569;
+            width: 28px; height: 28px; border-radius: 50%; border: none; background: transparent;
+            font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; color: #0284c7;
         }
         .number-btn:hover { background: #0c4a6e; color: white; }
 
+        /* ── Buttons ── */
         .btn-save {
-            width: 100%; background: #0c4a6e; color: white; border: none;
-            padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer;
-            margin-top: 28px; transition: background 0.2s;
+            background: #0c4a6e; color: white; border: none;
+            padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(12,74,110,0.15);
         }
-        .btn-save:hover { background: #0369a1; }
-        .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-save:hover { background: #0369a1; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(12,74,110,0.2); }
+        .btn-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        
         .btn-back {
-            width: 100%; background: white; border: 1.5px solid #bae6fd; padding: 12px; border-radius: 12px;
-            font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: all 0.2s; color: #475569;
+            background: white; border: 1.5px solid #bae6fd; padding: 13px 28px; border-radius: 12px;
+            font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: #475569;
+            display: inline-flex; align-items: center; gap: 6px;
         }
         .btn-back:hover { background: #f1f4f9; border-color: #cbd5e1; }
 
+        .btn-group-bottom { display: flex; justify-content: flex-end; align-items: center; gap: 14px; margin-top: 32px; }
+
         .guest-banner {
             background: #f0fdf4; border: 1.5px solid #86efac;
-            border-radius: 14px; padding: 14px 18px; margin-bottom: 20px;
+            border-radius: 16px; padding: 16px 24px; margin-bottom: 24px;
             display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
         .guest-banner p { font-size: 14px; color: #166534; font-weight: 600; margin: 0; }
-        .guest-banner a { font-size: 13px; color: #0c4a6e; font-weight: 600; text-decoration: none; border-bottom: 1px solid transparent; }
-        .guest-banner a:hover { border-bottom-color: #0c4a6e; }
+        .guest-banner a { font-size: 13px; color: #0284c7; font-weight: 700; text-decoration: none; }
+        .guest-banner a:hover { text-decoration: underline; }
 
+        /* ── Toast ── */
         .toast {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 12px 24px;
             border-radius: 60px; color: white; text-align: center; font-weight: 500; font-size: 14px; z-index: 1100;
-            animation: slideUp 0.3s;
+            animation: slideUp 0.3s; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
         }
         .toast-success { background: linear-gradient(135deg, #10b981, #059669); }
         .toast-error { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(100px) translateX(-50%); opacity: 0; } to { transform: translateY(0) translateX(-50%); opacity: 1; } }
 
-        @media (max-width: 600px) {
-            .form-card { padding: 24px; }
+        .sidebar-mobile-toggle {
+            display: none; position: fixed; top: 12px; left: 12px; z-index: 101;
+            background: #0c4a6e; border: none; color: white; width: 40px; height: 40px;
+            border-radius: 12px; font-size: 20px; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        @media (max-width: 992px) {
+            .sidebar-mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .sidebar { display: none; }
+            .sidebar.open { display: flex; }
+            .sidebar {
+                position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
+                padding: 24px 16px; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 100; flex-direction: column; overflow-y: auto;
+            }
+            .sidebar.open { left: 0; }
+            .sidebar .nav-text,
+            .sidebar .nav-section-title,
+            .sidebar .logo-text { display: block; }
+            .sidebar-close { display: block; }
+            .sidebar .sidebar-logo { padding: 0 12px; }
+            .sidebar-logo { display: flex; margin-bottom: 24px; }
+            .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 99; }
+            .sidebar-overlay.active { display: block; }
+            .app-layout { flex-direction: column; }
+            .main-content { width: 100%; }
+            .container { padding: 16px 20px; }
             .double-input { grid-template-columns: 1fr; gap: 12px; }
-            .number-btn { width: 38px; height: 38px; font-size: 20px; }
-            .section-title { font-size: 18px; }
         }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <div class="form-card">
-            <div id="guestBanner" class="guest-banner" style="display:none;">
-                <p>👤 Modo invitado — <a href="guest.html" style="font-weight:600;color:#0c4a6e;">← Volver</a> o <a href="edl.html" style="font-weight:700;color:#0c4a6e;">inscríbete a la EDL</a></p>
-                <a href="#" style="color:#dc2626;font-size:13px;" onclick="if(confirm('¿Cerrar sesión?')){localStorage.removeItem('usuarioActual');window.location.href='index.html';}return false;">Salir</a>
-            </div>
-            <div class="logo">
-                <div class="logo-icon">⛪</div>
-                <h1>Registrar Servicio</h1>
-                <p id="subtituloForm">Complete todos los datos del servicio</p>
-            </div>
-            <form id="registroForm">
-                <div class="form-group" id="groupNombreInvitado" style="display:none;">
-                    <label>👤 TU NOMBRE</label>
-                    <input type="text" id="nombreInvitado" class="form-control" placeholder="Nombre del líder que registra">
-                </div>
-                <div class="double-input">
-                    <div class="form-group">
-                        <label>📅 FECHA</label>
-                        <input type="date" id="fecha" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>📍 SEDE</label>
-                        <select id="sede" class="form-select" required>
-                            <option value="">Seleccionar</option>
-                            <option value="san_carlos_10am">🏛️ San Carlos - 10am (Domingo)</option>
-                            <option value="san_carlos_12pm">🏛️ San Carlos - 12pm (Domingo)</option>
-                            <option value="san_carlos_5pm">🌙 San Carlos - 5pm (Sábado)</option>
-                            <option value="san_carlos_7pm">🌙 San Carlos - 7pm (Sábado)</option>
-                            <option value="el_tambo_12pm">🏛️ El Tambo - 12pm</option>
-                            <option value="el_tambo_6pm">🌙 El Tambo - 6pm</option>
-                            <option value="chupaca_6pm">🌙 Chupaca - 6pm</option>
-                            <option value="jauja">🏔️ Jauja</option>
-                            <option value="belen">🏠 Belén - Tu Casa</option>
-                            <option value="transformando_ciudades">🌍 Transformando Ciudades</option>
-                        </select>
+    <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="logo-icon">⛪</span>
+                    <div class="logo-text">
+                        <h2>Agua Viva</h2>
+                        <p>Gestión Ministerial</p>
                     </div>
                 </div>
+                <button class="sidebar-close" id="sidebarClose">&times;</button>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Reportes</div>
+                <div class="nav-section-content">
+                    <a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span><span class="nav-text">Reporte de Asistencia</span></a>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Servicio</div>
+                <div class="nav-section-content">
+                    <a href="ingreso.html" class="nav-link active"><span class="nav-icon">📝</span><span class="nav-text">Registrar Servicio</span></a>
+                </div>
+            </div>
+            <div class="nav-section nav-admin" style="display:none;">
+                <div class="nav-section-title">Ministerios</div>
+                <div class="nav-section-content">
+                    <a href="predicadores.html" class="nav-link"><span class="nav-icon">🎤</span><span class="nav-text">Anfitriones y Predicadores</span></a>
+                    <a href="creativos.html" class="nav-link"><span class="nav-icon">🎨</span><span class="nav-text">Creativos</span></a>
+                </div>
+            </div>
+            <div class="nav-section nav-admin" style="display:none;">
+                <div class="nav-section-title">Formación</div>
+                <div class="nav-section-content">
+                    <a href="edl.html" class="nav-link"><span class="nav-icon">🎓</span><span class="nav-text">EDL (Escuela de Liderazgo)</span></a>
+                </div>
+            </div>
+            <div class="nav-section" style="margin-top: auto;">
+                <div class="nav-section-content">
+                    <a href="#" class="nav-link"><span class="nav-icon">⚙️</span><span class="nav-text">Configuración</span></a>
+                    <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon">🚪</span><span class="nav-text">Cerrar Sesión</span></a>
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-                <div class="section-title">🎵 MINISTERIOS</div>
-                <div id="ministeriosContainer"></div>
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="logo">
+                    <h1>⛪ Iglesia Agua Viva</h1>
+                    <p>Sistema de Gestión de Servicios</p>
+                </div>
+                <div class="user-area">
+                    <div>
+                        <div class="user-name" id="userName">Cargando...</div>
+                        <div class="user-role" id="userRole"></div>
+                    </div>
+                    <button class="logout-btn" onclick="cerrarSesion()">Salir</button>
+                </div>
+            </div>
 
-                <div class="section-title">👥 ASISTENTES</div>
-                <div id="asistentesContainer"></div>
+            <!-- Content Container -->
+            <div class="container">
+                <div id="guestBanner" class="guest-banner" style="display:none;">
+                    <p>👤 Modo invitado — <a href="guest.html">← Volver</a> o <a href="edl.html">inscríbete a la EDL</a></p>
+                    <a href="#" style="color:#ef4444;font-size:13px;font-weight:700;" onclick="if(confirm('¿Cerrar sesión?')){localStorage.removeItem('usuarioActual');window.location.href='index.html';}return false;">Salir</a>
+                </div>
 
-                <button type="submit" class="btn-save" id="btnGuardar">💾 GUARDAR REGISTRO</button>
-                <button type="button" class="btn-back" id="btnVolver">← VOLVER</button>
-            </form>
+                <!-- Page Header Card -->
+                <div class="info-card">
+                    <div class="info-card-text">
+                        <h3 id="tituloHeaderForm">Nuevo Registro de Servicio</h3>
+                        <p id="subtituloForm">Complete los datos de asistencia y ministerios para el servicio de hoy.</p>
+                    </div>
+                    <button type="button" class="btn-back" id="btnVolver">← Volver</button>
+                </div>
+
+                <form id="registroForm">
+                    <div class="form-group" id="groupNombreInvitado" style="display:none; margin-bottom: 24px;">
+                        <label>👤 Tu Nombre</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="nombreInvitado" class="form-control" placeholder="Nombre del líder que registra">
+                        </div>
+                    </div>
+
+                    <div class="double-input">
+                        <div class="form-group">
+                            <label>📅 Fecha del Servicio</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">📅</span>
+                                <input type="date" id="fecha" class="form-control" required style="padding-left: 44px;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>📍 Sede</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">📍</span>
+                                <select id="sede" class="form-select" required style="padding-left: 44px;">
+                                    <option value="">Seleccionar</option>
+                                    <option value="san_carlos_10am">🏛️ San Carlos - 10am (Domingo)</option>
+                                    <option value="san_carlos_12pm">🏛️ San Carlos - 12pm (Domingo)</option>
+                                    <option value="san_carlos_5pm">🌙 San Carlos - 5pm (Sábado)</option>
+                                    <option value="san_carlos_7pm">🌙 San Carlos - 7pm (Sábado)</option>
+                                    <option value="el_tambo_12pm">🏛️ El Tambo - 12pm</option>
+                                    <option value="el_tambo_6pm">🌙 El Tambo - 6pm</option>
+                                    <option value="chupaca_6pm">🌙 Chupaca - 6pm</option>
+                                    <option value="jauja">🏔️ Jauja</option>
+                                    <option value="belen">🏠 Belén - Tu Casa</option>
+                                    <option value="transformando_ciudades">🌍 Transformando Ciudades</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">Ministerios</div>
+                    <div id="ministeriosContainer" class="cards-grid"></div>
+
+                    <div class="section-title">Asistentes</div>
+                    <div id="asistentesContainer" class="cards-grid"></div>
+
+                    <div class="btn-group-bottom">
+                        <button type="button" class="btn-back" onclick="document.getElementById('btnVolver').click()">Cancelar</button>
+                        <button type="submit" class="btn-save" id="btnGuardar">💾 Guardar Registro</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -166,6 +376,17 @@
         const esAdmin = Auth.esAdmin();
         const usuario = Auth.getUsuario();
 
+        // Sync with layout user info
+        if (usuario) {
+            document.getElementById('userName').innerText = usuario.nombre;
+            document.getElementById('userRole').innerText = usuario.rol.toUpperCase();
+        }
+
+        // Sidebar display toggle
+        if (esAdmin) {
+            document.querySelectorAll('.nav-admin').forEach(el => el.style.display = 'block');
+        }
+
         if (esInvitado) {
             document.getElementById('guestBanner').style.display = 'flex';
             document.getElementById('groupNombreInvitado').style.display = 'block';
@@ -173,7 +394,7 @@
             document.getElementById('subtituloForm').textContent = 'Registra la asistencia de tu servicio';
             document.getElementById('btnVolver').onclick = () => { window.location.href = 'guest.html'; };
         } else if (esAdmin) {
-            document.getElementById('subtituloForm').textContent = 'Registro como administrador';
+            document.getElementById('subtituloForm').textContent = 'Complete los datos de asistencia y ministerios para el servicio de hoy.';
             document.getElementById('btnVolver').onclick = () => { window.location.href = 'dashboard.html'; };
         }
 
@@ -242,10 +463,9 @@
             ministerios.forEach(m => {
                 const card = document.createElement('div');
                 card.className = 'ministerio-card';
-                card.innerHTML = `<div class="ministerio-nombre">${m.icono} ${m.nombre}</div><div class="double-input"></div>`;
-                const doubleDiv = card.querySelector('.double-input');
-                doubleDiv.appendChild(crearControlNumerico(`${m.id}V`, '👨 Hombres'));
-                doubleDiv.appendChild(crearControlNumerico(`${m.id}M`, '👩 Mujeres'));
+                card.innerHTML = `<div class="ministerio-nombre">${m.icono} ${m.nombre}</div>`;
+                card.appendChild(crearControlNumerico(`${m.id}V`, 'Varones'));
+                card.appendChild(crearControlNumerico(`${m.id}M`, 'Mujeres'));
                 ministeriosContainer.appendChild(card);
             });
 
@@ -254,11 +474,10 @@
             asistentes.forEach(a => {
                 const card = document.createElement('div');
                 card.className = 'ministerio-card';
-                const labels = a.id === 'kids' ? ['👦 Niños', '👧 Niñas'] : ['👨 Hombres', '👩 Mujeres'];
-                card.innerHTML = `<div class="ministerio-nombre">${a.icono} ${a.nombre}</div><div class="double-input"></div>`;
-                const doubleDiv = card.querySelector('.double-input');
-                doubleDiv.appendChild(crearControlNumerico(`${a.id}V`, labels[0]));
-                doubleDiv.appendChild(crearControlNumerico(`${a.id}M`, labels[1]));
+                const labels = a.id === 'kids' ? ['Niños', 'Niñas'] : ['Varones', 'Mujeres'];
+                card.innerHTML = `<div class="ministerio-nombre">${a.icono} ${a.nombre}</div>`;
+                card.appendChild(crearControlNumerico(`${a.id}V`, labels[0]));
+                card.appendChild(crearControlNumerico(`${a.id}M`, labels[1]));
                 asistentesContainer.appendChild(card);
             });
         }
@@ -349,7 +568,7 @@
                     document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
                     cargarFormulario();
                     btn.disabled = false;
-                    btn.innerText = '💾 GUARDAR REGISTRO';
+                    btn.innerText = '💾 Guardar Registro';
                 } else {
                     setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
                 }
@@ -357,9 +576,38 @@
                 console.error('Error Firebase:', err);
                 toast('❌ Error al guardar: ' + err.message, 'error');
                 btn.disabled = false;
-                btn.innerText = '💾 GUARDAR REGISTRO';
+                btn.innerText = '💾 Guardar Registro';
             }
         });
+
+        function cerrarSesion() {
+            if (typeof Auth !== 'undefined') Auth.cerrarSesion();
+            else { localStorage.removeItem('usuarioActual'); window.location.href = 'index.html'; }
+        }
+
+        // Mobile sidebar control
+        const sidebarMobileToggle = document.getElementById('sidebarMobileToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarClose = document.getElementById('sidebarClose');
+        if (sidebarMobileToggle) {
+            sidebarMobileToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                sidebarOverlay.classList.add('active');
+            });
+        }
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
 
         document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
         cargarFormulario();
