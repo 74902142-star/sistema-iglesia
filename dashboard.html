@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Dashboard | Iglesia Agua Viva</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=2">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,6 +16,7 @@
     <script src="firebase-config.js"></script>
     <script src="firebase-auth.js"></script>
 </head>
+
 <body>
     <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
     <div class="app-layout">
@@ -30,15 +33,22 @@
                 <button class="sidebar-close" id="sidebarClose">&times;</button>
             </div>
             <div class="nav-section-content">
-                <a href="dashboard.html" class="nav-link active" id="nav-dashboard"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
-                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i data-lucide="clipboard-list"></i></span><span>Registro</span></a>
-                <a href="predicadores.html" class="nav-link" id="nav-anfitriones"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
-                <a href="creativos.html" class="nav-link" id="nav-creativos"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
-                <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
+                <a href="dashboard.html" class="nav-link active" id="nav-dashboard"><span class="nav-icon"><i
+                            data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
+                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i
+                            data-lucide="clipboard-list"></i></span><span>Registro</span></a>
+                <a href="predicadores.html" class="nav-link" id="nav-anfitriones"><span class="nav-icon"><i
+                            data-lucide="users"></i></span><span>Anfitriones</span></a>
+                <a href="creativos.html" class="nav-link" id="nav-creativos"><span class="nav-icon"><i
+                            data-lucide="palette"></i></span><span>Creativos</span></a>
+                <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i
+                            data-lucide="graduation-cap"></i></span><span>EDL</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
-                <a href="#" class="nav-link"><span class="nav-icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
+                <a href="#" class="nav-link"><span class="nav-icon"><i
+                            data-lucide="settings"></i></span><span>Configuración</span></a>
+                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i
+                            data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
             </div>
         </aside>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -47,7 +57,7 @@
         <div class="main-content">
             <div class="header">
                 <div class="header-left">
-                    <div class="header-title">📊 Reporte de Asistencia</div>
+                    <div class="header-title">Reporte de Asistencia</div>
                 </div>
                 <div class="header-right">
                     <div class="user-area">
@@ -63,9 +73,11 @@
             <div class="container">
                 <div id="permAlert" class="perm-alert">
                     <h4>🔒 Firestore bloqueado — acción requerida (1 sola vez)</h4>
-                    <p>Las reglas de Firebase están cerradas. El código está bien; debes publicar las reglas en la consola:</p>
+                    <p>Las reglas de Firebase están cerradas. El código está bien; debes publicar las reglas en la
+                        consola:</p>
                     <ol>
-                        <li>Abre <a href="https://console.firebase.google.com/project/iglesia-agua-viva/firestore/rules" target="_blank">Firebase Console → Reglas</a></li>
+                        <li>Abre <a href="https://console.firebase.google.com/project/iglesia-agua-viva/firestore/rules"
+                                target="_blank">Firebase Console → Reglas</a></li>
                         <li>Borra todo el contenido y pega las reglas de abajo</li>
                         <li>Pulsa <strong>Publicar</strong> y recarga esta página (Ctrl+F5)</li>
                     </ol>
@@ -105,9 +117,12 @@ service cloud.firestore {
                             <option value="2025">2025</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary" onclick="cargarDatos()"><i data-lucide="search" style="width: 16px; height: 16px;"></i> Filtrar</button>
-                    <button class="btn btn-secondary" onclick="window.location.href='ingreso.html'"><i data-lucide="plus" style="width: 16px; height: 16px;"></i> Nuevo registro</button>
-                    <button class="btn btn-secondary" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width: 16px; height: 16px;"></i> Exportar Excel</button>
+                    <button class="btn btn-primary" onclick="cargarDatos()"><i data-lucide="search"
+                            style="width: 16px; height: 16px;"></i> Filtrar</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='ingreso.html'"><i
+                            data-lucide="plus" style="width: 16px; height: 16px;"></i> Nuevo registro</button>
+                    <button class="btn btn-secondary" onclick="exportarExcel()"><i data-lucide="file-spreadsheet"
+                            style="width: 16px; height: 16px;"></i> Exportar Excel</button>
                 </div>
 
                 <!-- Stats Grid -->
@@ -145,35 +160,44 @@ service cloud.firestore {
                 <!-- Report Section -->
                 <div class="section-card">
                     <div class="section-header">
-                        <div class="section-title"><i data-lucide="file-text" style="width: 20px; height: 20px; color: var(--brand-blue);"></i> REPORTE DE SERVICIOS <span id="filtroInfo" style="font-size:13px;color:#6c7a8a;margin-left:8px;"></span></div>
+                        <div class="section-title"><i data-lucide="file-text"
+                                style="width: 20px; height: 20px; color: var(--brand-blue);"></i> REPORTE DE SERVICIOS
+                            <span id="filtroInfo" style="font-size:13px;color:#6c7a8a;margin-left:8px;"></span>
+                        </div>
                     </div>
                     <div class="report-cards" id="reportCards">
                         <!-- Loaded dynamically -->
                     </div>
                     <button class="btn btn-whatsapp" id="whatsappBtn" style="width:100%; margin-top: 10px;">
-                        <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i> ENVIAR REPORTE POR WHATSAPP
+                        <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i> ENVIAR REPORTE POR
+                        WHATSAPP
                     </button>
                 </div>
 
                 <!-- Charts Grid -->
                 <div class="charts-grid">
                     <div class="section-card" style="margin-bottom:0;">
-                        <h3 style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:16px;">Asistencia por sede</h3>
+                        <h3 style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:16px;">
+                            Asistencia por sede</h3>
                         <canvas id="chartSedes"></canvas>
                     </div>
                     <div class="section-card" style="margin-bottom:0;">
-                        <h3 style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:16px;">Tendencia semanal</h3>
+                        <h3 style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:16px;">
+                            Tendencia semanal</h3>
                         <canvas id="chartTendencia"></canvas>
                     </div>
                     <div class="section-card" style="margin-bottom:0;">
-                        <h3 style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:16px;">Varones vs Mujeres</h3>
+                        <h3 style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:16px;">
+                            Varones vs Mujeres</h3>
                         <canvas id="chartGenero"></canvas>
                     </div>
                 </div>
 
                 <!-- Historial -->
                 <div class="section-card">
-                    <h3 style="margin-bottom:20px; font-size:18px; font-weight:700;"><i data-lucide="history" style="width: 20px; height: 20px; color: var(--brand-blue); vertical-align: middle; margin-right: 8px;"></i> Historial de registros</h3>
+                    <h3 style="margin-bottom:20px; font-size:18px; font-weight:700;"><i data-lucide="history"
+                            style="width: 20px; height: 20px; color: var(--brand-blue); vertical-align: middle; margin-right: 8px;"></i>
+                        Historial de registros</h3>
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
@@ -190,7 +214,10 @@ service cloud.firestore {
                                 </tr>
                             </thead>
                             <tbody id="tablaBody">
-                                <tr><td colspan="9" style="text-align:center; padding: 48px; color: var(--text-muted);">Cargando registros...</td></tr>
+                                <tr>
+                                    <td colspan="9" style="text-align:center; padding: 48px; color: var(--text-muted);">
+                                        Cargando registros...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -327,7 +354,7 @@ service cloud.firestore {
                     <div class="stat-card-details">
                         <h4>Varones</h4>
                         <div class="stat-value">${varones}</div>
-                        <div class="stat-trend neutral">${total > 0 ? Math.round(varones/total*100) : 0}% del total</div>
+                        <div class="stat-trend neutral">${total > 0 ? Math.round(varones / total * 100) : 0}% del total</div>
                     </div>
                     <div class="stat-card-icon"><i data-lucide="user"></i></div>
                 </div>
@@ -335,7 +362,7 @@ service cloud.firestore {
                     <div class="stat-card-details">
                         <h4>Mujeres</h4>
                         <div class="stat-value">${mujeres}</div>
-                        <div class="stat-trend neutral">${total > 0 ? Math.round(mujeres/total*100) : 0}% del total</div>
+                        <div class="stat-trend neutral">${total > 0 ? Math.round(mujeres / total * 100) : 0}% del total</div>
                     </div>
                     <div class="stat-card-icon"><i data-lucide="user"></i></div>
                 </div>
@@ -343,7 +370,7 @@ service cloud.firestore {
                     <div class="stat-card-details">
                         <h4>Kids</h4>
                         <div class="stat-value">${kids}</div>
-                        <div class="stat-trend neutral">${total > 0 ? Math.round(kids/total*100) : 0}% del total</div>
+                        <div class="stat-trend neutral">${total > 0 ? Math.round(kids / total * 100) : 0}% del total</div>
                     </div>
                     <div class="stat-card-icon"><i data-lucide="smile"></i></div>
                 </div>
@@ -367,27 +394,27 @@ service cloud.firestore {
             document.getElementById('reportCards').innerHTML = `
                 <div class="report-card domingo" style="border-left-color:#10b981">
                     <h3>☀️ DOMINGO</h3>
-                    <div class="report-row"><span>Total:</span><strong>${domT}</strong></div>
                     <div class="report-row"><span>Hombres:</span>${domH}</div>
                     <div class="report-row"><span>Mujeres:</span>${domM}</div>
+                    <div class="report-row"><span>Total:</span><strong>${domT}</strong></div>
                 </div>
                 <div class="report-card next" style="border-left-color:#38bdf8">
                     <h3>🌙 NEXT</h3>
-                    <div class="report-row"><span>Total:</span><strong>${nextT}</strong></div>
                     <div class="report-row"><span>Hombres:</span>${nextH}</div>
                     <div class="report-row"><span>Mujeres:</span>${nextM}</div>
+                    <div class="report-row"><span>Total:</span><strong>${nextT}</strong></div>
                 </div>
                 <div class="report-card kids" style="border-left-color:#f59e0b">
                     <h3>🧒 KIDS</h3>
-                    <div class="report-row"><span>Total:</span><strong>${kidsT}</strong></div>
                     <div class="report-row"><span>Niños:</span>${kidsH}</div>
                     <div class="report-row"><span>Niñas:</span>${kidsM}</div>
+                    <div class="report-row"><span>Total:</span><strong>${kidsT}</strong></div>
                 </div>
             `;
             document.getElementById('whatsappBtn').onclick = () => {
                 let semana = document.getElementById('filtroSemana').value || 'General';
                 let fecha = new Date().toLocaleDateString();
-                let msg = `IGLESIA AGUA VIVA\nREPORTE ${semana}\n${fecha}\n\nNEXT (Sábados): ${nextT}\nHombres: ${nextH} | Mujeres: ${nextM}\n\nDOMINGO: ${domT}\nHombres: ${domH} | Mujeres: ${domM}\n\nKIDS: ${kidsT}\nNiños: ${kidsH} | Niñas: ${kidsM}`;
+                let msg = `*AGUA VIVA HUANCAYO*\n*REPORTE ${semana}\n${fecha}*\n\n*NEXT:* ${nextT}\nHombres: ${nextH} | Mujeres: ${nextM}\n\n*DOMINGO:* ${domT}\nHombres: ${domH} | Mujeres: ${domM}\n\n*KIDS:* ${kidsT}\nNiños: ${kidsH} | Niñas: ${kidsM}`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             };
         }
@@ -461,10 +488,10 @@ service cloud.firestore {
             let html = `
                 <div class="form-group"><label>📅 FECHA</label><input type="date" id="editFecha" class="form-control" value="${reg.fecha}"></div>
                 <div class="form-group"><label>📍 SEDE</label><select id="editSede" class="form-select">
-                    <option value="san_carlos_10am" ${reg.sede === 'san_carlos_10am' ? 'selected' : ''}>San Carlos 10am</option>
-                    <option value="san_carlos_12pm" ${reg.sede === 'san_carlos_12pm' ? 'selected' : ''}>San Carlos 12pm</option>
-                    <option value="san_carlos_5pm" ${reg.sede === 'san_carlos_5pm' ? 'selected' : ''}>San Carlos 5pm</option>
-                    <option value="san_carlos_7pm" ${reg.sede === 'san_carlos_7pm' ? 'selected' : ''}>San Carlos 7pm</option>
+                    <option value="hyo_10am" ${reg.sede === 'hyo_10am' ? 'selected' : ''}>Huancayo 10am</option>
+                    <option value="hyo_12pm" ${reg.sede === 'hyo_12pm' ? 'selected' : ''}>Huancayo - 12pm</option>
+                    <option value="NEXT_5pm" ${reg.sede === 'NEXT_5pm' ? 'selected' : ''}>NEXT - 5pm</option>
+                    <option value="NEXT_PLUS_7pm" ${reg.sede === 'NEXT_PLUS_7pm' ? 'selected' : ''}>NEXT PLUS - 7pm</option>
                     <option value="el_tambo_12pm" ${reg.sede === 'el_tambo_12pm' ? 'selected' : ''}>El Tambo 12pm</option>
                     <option value="el_tambo_6pm" ${reg.sede === 'el_tambo_6pm' ? 'selected' : ''}>El Tambo 6pm</option>
                     <option value="chupaca_6pm" ${reg.sede === 'chupaca_6pm' ? 'selected' : ''}>Chupaca 6pm</option>
@@ -474,7 +501,7 @@ service cloud.firestore {
                 </select></div>
                 <div class="double-input">
                     <div class="form-group"><label>👥 TOTAL</label><input type="number" id="editTotal" class="form-control" value="${reg.totalGeneral}" min="0"></div>
-                    <div class="form-group"><label>🧒 KIDS</label><input type="number" id="editKids" class="form-control" value="${(reg.totalKV||0)+(reg.totalKM||0)}" min="0"></div>
+                    <div class="form-group"><label>🧒 KIDS</label><input type="number" id="editKids" class="form-control" value="${(reg.totalKV || 0) + (reg.totalKM || 0)}" min="0"></div>
                 </div>
                 <div class="double-input">
                     <div class="form-group"><label>👨 VARONES</label><input type="number" id="editVarones" class="form-control" value="${reg.totalVarones}" min="0"></div>
@@ -553,7 +580,7 @@ service cloud.firestore {
                 toast('📋 Reglas copiadas. Pégalas en Firebase Console → Reglas → Publicar');
             });
         }
-        
+
         function cerrarSesion() {
             if (typeof Auth !== 'undefined') Auth.cerrarSesion();
             else { localStorage.removeItem('usuarioActual'); window.location.href = 'index.html'; }
@@ -565,19 +592,19 @@ service cloud.firestore {
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarClose = document.getElementById('sidebarClose');
         if (sidebarMobileToggle) {
-            sidebarMobileToggle.addEventListener('click', function() {
+            sidebarMobileToggle.addEventListener('click', function () {
                 sidebar.classList.toggle('open');
                 sidebarOverlay.classList.add('active');
             });
         }
         if (sidebarClose) {
-            sidebarClose.addEventListener('click', function() {
+            sidebarClose.addEventListener('click', function () {
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('active');
             });
         }
         if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', function() {
+            sidebarOverlay.addEventListener('click', function () {
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('active');
             });
@@ -585,7 +612,7 @@ service cloud.firestore {
 
         function inicializarFiltros() {
             let selectSede = document.getElementById('filtroSede');
-            let sedes = ['san_carlos_10am', 'san_carlos_12pm', 'san_carlos_5pm', 'san_carlos_7pm', 'el_tambo_12pm', 'el_tambo_6pm', 'chupaca_6pm', 'jauja', 'belen', 'transformando_ciudades'];
+            let sedes = ['hyo_10am', 'hyo_12pm', 'NEXT_5pm', 'NEXT_PLUS_7pm', 'el_tambo_12pm', 'el_tambo_6pm', 'chupaca_6pm', 'jauja', 'belen', 'transformando_ciudades'];
             for (let s of sedes) { let opt = document.createElement('option'); opt.value = s; opt.textContent = formatearSede(s); selectSede.appendChild(opt); }
             let selectMes = document.getElementById('filtroMes');
             for (let i = 1; i <= 12; i++) { let opt = document.createElement('option'); opt.value = `2026-${String(i).padStart(2, '0')}`; opt.textContent = `Mes ${i}`; selectMes.appendChild(opt); }
@@ -604,4 +631,5 @@ service cloud.firestore {
         cargarDatos();
     </script>
 </body>
+
 </html>

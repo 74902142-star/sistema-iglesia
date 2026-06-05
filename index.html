@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Iglesia Agua Viva | Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
@@ -31,8 +33,15 @@
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .login-card {
@@ -177,7 +186,8 @@
             letter-spacing: 1px;
         }
 
-        .divider::before, .divider::after {
+        .divider::before,
+        .divider::after {
             content: '';
             flex: 1;
             height: 1px;
@@ -262,8 +272,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .toast {
@@ -282,15 +297,28 @@
             animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .toast-success { background: #10b981; }
-        .toast-error { background: #ef4444; }
+        .toast-success {
+            background: #10b981;
+        }
+
+        .toast-error {
+            background: #ef4444;
+        }
 
         @keyframes slideUp {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-card">
@@ -298,13 +326,15 @@
                 <div class="logo-icon">
                     <i data-lucide="church" style="width: 28px; height: 28px;"></i>
                 </div>
-                <h1>Iglesia Agua Viva</h1>
-                <p>Sistema de Gestión de Servicios</p>
+                <h1>Agua Viva Huancayo</h1>
+                <p>Sistema de Gestión</p>
             </div>
-            
+
             <div class="guest-card">
-                <h3><i data-lucide="user-check" style="width: 18px; height: 18px; color: #10b981;"></i> Acceso invitado</h3>
-                <p>Ingresa tu nombre para acceder a los módulos de <strong>Reporte de Asistencia</strong> y <strong>EDL (Escuela de Liderazgo)</strong>.</p>
+                <h3><i data-lucide="user-check" style="width: 18px; height: 18px; color: #10b981;"></i> Acceso invitado
+                </h3>
+                <p>Ingresa tu nombre para acceder a los módulos de <strong>Reporte de Asistencia</strong> y <strong>EDL
+                        (Escuela de Liderazgo)</strong>.</p>
                 <div class="form-group" style="margin-bottom:16px;">
                     <label>Tu nombre</label>
                     <div class="input-wrapper">
@@ -312,7 +342,8 @@
                         <input type="text" id="guestName" class="input" placeholder="Ej: María - Líder San Carlos">
                     </div>
                 </div>
-                <button type="button" class="btn-guest" id="guestBtn">Continuar <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></button>
+                <button type="button" class="btn-guest" id="guestBtn">Continuar <i data-lucide="arrow-right"
+                        style="width: 16px; height: 16px;"></i></button>
             </div>
 
             <div class="divider">o acceso administrador</div>
@@ -332,7 +363,8 @@
                         <input type="password" id="loginPassword" class="input" placeholder="••••••••">
                     </div>
                 </div>
-                <button id="loginBtn" class="btn"><i data-lucide="log-in" style="width: 16px; height: 16px;"></i> Iniciar sesión (Admin)</button>
+                <button id="loginBtn" class="btn"><i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
+                    Iniciar sesión (Admin)</button>
             </div>
 
             <a href="#" class="btn-link-admin" id="toggleAdmin">¿Eres administrador? Mostrar login</a>
@@ -425,13 +457,14 @@
             }, 300);
         }
 
-        document.getElementById('loginEmail').addEventListener('keypress', function(e) {
+        document.getElementById('loginEmail').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') iniciarSesion();
         });
-        document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+        document.getElementById('loginPassword').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') iniciarSesion();
         });
         document.getElementById('loginBtn').addEventListener('click', iniciarSesion);
     </script>
 </body>
+
 </html>

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Creativos | Iglesia Agua Viva</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=2">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -12,6 +14,7 @@
     <script src="firebase-config.js"></script>
     <script src="firebase-auth.js"></script>
 </head>
+
 <body>
     <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
     <div class="app-layout">
@@ -28,15 +31,22 @@
                 <button class="sidebar-close" id="sidebarClose">&times;</button>
             </div>
             <div class="nav-section-content">
-                <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
-                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i data-lucide="clipboard-list"></i></span><span>Registro</span></a>
-                <a href="predicadores.html" class="nav-link" id="nav-anfitriones"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
-                <a href="creativos.html" class="nav-link active" id="nav-creativos"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
-                <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
+                <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i
+                            data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
+                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i
+                            data-lucide="clipboard-list"></i></span><span>Registro</span></a>
+                <a href="predicadores.html" class="nav-link" id="nav-anfitriones"><span class="nav-icon"><i
+                            data-lucide="users"></i></span><span>Anfitriones</span></a>
+                <a href="creativos.html" class="nav-link active" id="nav-creativos"><span class="nav-icon"><i
+                            data-lucide="palette"></i></span><span>Creativos</span></a>
+                <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i
+                            data-lucide="graduation-cap"></i></span><span>EDL</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
-                <a href="#" class="nav-link"><span class="nav-icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
+                <a href="#" class="nav-link"><span class="nav-icon"><i
+                            data-lucide="settings"></i></span><span>Configuración</span></a>
+                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i
+                            data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
             </div>
         </aside>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -46,7 +56,7 @@
             <!-- Header -->
             <div class="header">
                 <div class="header-left">
-                    <div class="header-title">🎨 Equipo de Creativos</div>
+                    <div class="header-title">Equipo de Creativos</div>
                 </div>
                 <div class="header-right">
                     <div class="user-area">
@@ -67,7 +77,8 @@
                         <div class="stat-card-details">
                             <h4>Producción</h4>
                             <div class="stat-value" id="countProduccion">0</div>
-                            <div class="stat-trend up"><i data-lucide="trending-up" style="width:14px; height:14px; vertical-align:middle;"></i> +2 esta semana</div>
+                            <div class="stat-trend up"><i data-lucide="trending-up"
+                                    style="width:14px; height:14px; vertical-align:middle;"></i> +2 esta semana</div>
                         </div>
                         <div class="stat-card-icon"><i data-lucide="sliders"></i></div>
                     </div>
@@ -75,7 +86,8 @@
                         <div class="stat-card-details">
                             <h4>Fotografía</h4>
                             <div class="stat-value" id="countFotografia">0</div>
-                            <div class="stat-trend neutral"><i data-lucide="check" style="width:14px; height:14px; vertical-align:middle;"></i> Equipo completo</div>
+                            <div class="stat-trend neutral"><i data-lucide="check"
+                                    style="width:14px; height:14px; vertical-align:middle;"></i> Equipo completo</div>
                         </div>
                         <div class="stat-card-icon"><i data-lucide="camera"></i></div>
                     </div>
@@ -83,25 +95,32 @@
                         <div class="stat-card-details">
                             <h4>Multimedia</h4>
                             <div class="stat-value" id="countMultimedia">0</div>
-                            <div class="stat-trend up"><i data-lucide="play" style="width:14px; height:14px; vertical-align:middle;"></i> 3 en servicio</div>
+                            <div class="stat-trend up"><i data-lucide="play"
+                                    style="width:14px; height:14px; vertical-align:middle;"></i> 3 en servicio</div>
                         </div>
                         <div class="stat-card-icon"><i data-lucide="video"></i></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-card-details">
-                            <h4>Anfitriones</h4>
-                            <div class="stat-value" id="countAnfitriones">0</div>
-                            <div class="stat-trend down" style="color:var(--warning-text);"><i data-lucide="alert-triangle" style="width:14px; height:14px; vertical-align:middle;"></i> 2 puestos libres</div>
+                            <h4>Redes Sociales</h4>
+                            <div class="stat-value" id="countRedes">0</div>
+                            <div class="stat-trend down" style="color:var(--warning-text);"><i
+                                    data-lucide="alert-triangle"
+                                    style="width:14px; height:14px; vertical-align:middle;"></i> 2 puestos libres</div>
                         </div>
-                        <div class="stat-card-icon" style="background-color:var(--warning-bg); color:var(--warning);"><i data-lucide="bell"></i></div>
+                        <div class="stat-card-icon" style="background-color:var(--warning-bg); color:var(--warning);"><i
+                                data-lucide="bell"></i></div>
                     </div>
                 </div>
 
                 <!-- Creatives List -->
                 <div class="section-card">
                     <div class="section-header">
-                        <div class="section-title"><i data-lucide="users" style="width: 20px; height: 20px; color: var(--brand-blue);"></i> Lista de Creativos</div>
-                        <button class="btn btn-primary" onclick="abrirModal()"><i data-lucide="plus" style="width:16px; height:16px;"></i> Nuevo Registro</button>
+                        <div class="section-title"><i data-lucide="users"
+                                style="width: 20px; height: 20px; color: var(--brand-blue);"></i> Lista de Creativos
+                        </div>
+                        <button class="btn btn-primary" onclick="abrirModal()"><i data-lucide="plus"
+                                style="width:16px; height:16px;"></i> Nuevo Registro</button>
                     </div>
 
                     <div class="table-container">
@@ -118,7 +137,11 @@
                                 </tr>
                             </thead>
                             <tbody id="tablaCreativos">
-                                <tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">Cargando creativos...</td></tr>
+                                <tr>
+                                    <td colspan="7"
+                                        style="text-align: center; padding: 40px; color: var(--text-muted);">Cargando
+                                        creativos...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -148,7 +171,7 @@
                                 <option value="Producción">🎛️ Producción</option>
                                 <option value="Fotografía">📸 Fotografía</option>
                                 <option value="Multimedia">💻 Multimedia</option>
-                                <option value="Anfitrión">🎙️ Anfitrión</option>
+                                <option value="Anfitrión">Redes Sociales</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -172,10 +195,14 @@
                     </div>
                     <div class="form-group">
                         <label>Teléfono (Opcional)</label>
-                        <input type="tel" id="creTelefono" class="form-control" placeholder="Ej: 999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
-                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe comenzar con 9</div>
+                        <input type="tel" id="creTelefono" class="form-control" placeholder="Ej: 999888777"
+                            maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe comenzar con
+                            9</div>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 20px;"><i data-lucide="save" style="width: 16px; height: 16px;"></i> Guardar Registro</button>
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; justify-content: center; margin-top: 20px;"><i data-lucide="save"
+                            style="width: 16px; height: 16px;"></i> Guardar Registro</button>
                 </form>
             </div>
         </div>
@@ -345,19 +372,19 @@
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarClose = document.getElementById('sidebarClose');
         if (sidebarMobileToggle) {
-            sidebarMobileToggle.addEventListener('click', function() {
+            sidebarMobileToggle.addEventListener('click', function () {
                 sidebar.classList.toggle('open');
                 sidebarOverlay.classList.add('active');
             });
         }
         if (sidebarClose) {
-            sidebarClose.addEventListener('click', function() {
+            sidebarClose.addEventListener('click', function () {
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('active');
             });
         }
         if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', function() {
+            sidebarOverlay.addEventListener('click', function () {
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('active');
             });
@@ -367,4 +394,5 @@
         cargarCreativos();
     </script>
 </body>
+
 </html>

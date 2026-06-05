@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>EDL - Escuela de Liderazgo | Iglesia Agua Viva</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=2">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -14,6 +16,7 @@
     <script src="auth.js"></script>
     <script src="firebase-auth.js"></script>
 </head>
+
 <body>
     <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
     <div class="app-layout">
@@ -31,15 +34,22 @@
             </div>
             <!-- Unified Sidebar Links -->
             <div class="nav-section-content">
-                <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
-                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i data-lucide="clipboard-list"></i></span><span>Registro</span></a>
-                <a href="predicadores.html" class="nav-link" id="nav-anfitriones"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
-                <a href="creativos.html" class="nav-link" id="nav-creativos"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
-                <a href="edl.html" class="nav-link active" id="nav-edl"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
+                <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i
+                            data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
+                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i
+                            data-lucide="clipboard-list"></i></span><span>Registro</span></a>
+                <a href="predicadores.html" class="nav-link" id="nav-anfitriones"><span class="nav-icon"><i
+                            data-lucide="users"></i></span><span>Anfitriones</span></a>
+                <a href="creativos.html" class="nav-link" id="nav-creativos"><span class="nav-icon"><i
+                            data-lucide="palette"></i></span><span>Creativos</span></a>
+                <a href="edl.html" class="nav-link active" id="nav-edl"><span class="nav-icon"><i
+                            data-lucide="graduation-cap"></i></span><span>EDL</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
-                <a href="#" class="nav-link"><span class="nav-icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
+                <a href="#" class="nav-link"><span class="nav-icon"><i
+                            data-lucide="settings"></i></span><span>Configuración</span></a>
+                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i
+                            data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
             </div>
         </aside>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -71,7 +81,8 @@
                             <div class="stat-card-details">
                                 <h4>Total Inscripciones</h4>
                                 <div class="stat-value" id="statInscripciones">0</div>
-                                <div class="stat-trend up"><i data-lucide="trending-up" style="width:14px; height:14px; vertical-align:middle;"></i> +12%</div>
+                                <div class="stat-trend up"><i data-lucide="trending-up"
+                                        style="width:14px; height:14px; vertical-align:middle;"></i> +12%</div>
                             </div>
                             <div class="stat-card-icon"><i data-lucide="user-plus"></i></div>
                         </div>
@@ -79,29 +90,42 @@
                             <div class="stat-card-details">
                                 <h4>Total Pagado</h4>
                                 <div class="stat-value" id="statPagado">S/ 0</div>
-                                <div class="stat-trend up" style="color:var(--success-text);"><i data-lucide="check" style="width:14px; height:14px; vertical-align:middle;"></i> Cancelado</div>
+                                <div class="stat-trend up" style="color:var(--success-text);"><i data-lucide="check"
+                                        style="width:14px; height:14px; vertical-align:middle;"></i> Cancelado</div>
                             </div>
-                            <div class="stat-card-icon" style="background-color:var(--success-bg); color:var(--success);"><i data-lucide="circle-dollar-sign"></i></div>
+                            <div class="stat-card-icon"
+                                style="background-color:var(--success-bg); color:var(--success);"><i
+                                    data-lucide="circle-dollar-sign"></i></div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-card-details">
                                 <h4>Total Pendiente</h4>
                                 <div class="stat-value" id="statPendiente">S/ 0</div>
-                                <div class="stat-trend down" style="color:var(--warning-text);"><i data-lucide="clock" style="width:14px; height:14px; vertical-align:middle;"></i> Por cobrar</div>
+                                <div class="stat-trend down" style="color:var(--warning-text);"><i data-lucide="clock"
+                                        style="width:14px; height:14px; vertical-align:middle;"></i> Por cobrar</div>
                             </div>
-                            <div class="stat-card-icon" style="background-color:var(--warning-bg); color:var(--warning);"><i data-lucide="clock"></i></div>
+                            <div class="stat-card-icon"
+                                style="background-color:var(--warning-bg); color:var(--warning);"><i
+                                    data-lucide="clock"></i></div>
                         </div>
                         <!-- Dark Blue Progress Card -->
                         <div class="stat-card" style="background-color: var(--sidebar-bg); color: #ffffff;">
                             <div class="stat-card-details" style="width: 100%;">
                                 <h4 style="color: rgba(255,255,255,0.7);">Recaudación Esperada</h4>
-                                <div class="stat-value" id="statEsperado" style="color: #ffffff; margin-bottom: 8px;">S/ 0</div>
-                                <div class="progress-container" style="background: rgba(255,255,255,0.15); border-radius: 10px; height: 6px; width: 100%; overflow: hidden; margin-top: 12px; margin-bottom: 6px;">
-                                    <div id="statMetaProgress" style="background: #3b82f6; width: 0%; height: 100%; transition: width 0.3s;"></div>
+                                <div class="stat-value" id="statEsperado" style="color: #ffffff; margin-bottom: 8px;">S/
+                                    0</div>
+                                <div class="progress-container"
+                                    style="background: rgba(255,255,255,0.15); border-radius: 10px; height: 6px; width: 100%; overflow: hidden; margin-top: 12px; margin-bottom: 6px;">
+                                    <div id="statMetaProgress"
+                                        style="background: #3b82f6; width: 0%; height: 100%; transition: width 0.3s;">
+                                    </div>
                                 </div>
-                                <div style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500;" id="statMetaText">0% de la meta alcanzada</div>
+                                <div style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500;"
+                                    id="statMetaText">0% de la meta alcanzada</div>
                             </div>
-                            <div class="stat-card-icon" style="background-color: rgba(255,255,255,0.08); color: #ffffff;"><i data-lucide="bar-chart-3"></i></div>
+                            <div class="stat-card-icon"
+                                style="background-color: rgba(255,255,255,0.08); color: #ffffff;"><i
+                                    data-lucide="bar-chart-3"></i></div>
                         </div>
                     </div>
                 </div>
@@ -112,7 +136,8 @@
                         <div class="filters-bar">
                             <div class="filter-group">
                                 <label>🔍 Buscar</label>
-                                <input type="text" id="filtroBusqueda" class="filter-input" placeholder="Nombre o DNI...">
+                                <input type="text" id="filtroBusqueda" class="filter-input"
+                                    placeholder="Nombre o DNI...">
                             </div>
                             <div class="filter-group">
                                 <label>📚 Curso</label>
@@ -120,15 +145,21 @@
                                     <option value="">Todos los cursos</option>
                                 </select>
                             </div>
-                            <button class="btn btn-primary" onclick="aplicarFiltros()"><i data-lucide="search" style="width:16px; height:16px;"></i> Filtrar</button>
-                            <button class="btn btn-secondary" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width:16px; height:16px;"></i> Exportar a Excel</button>
-                            <button class="btn btn-primary" onclick="abrirModal()"><i data-lucide="plus" style="width:16px; height:16px;"></i> Nueva inscripción</button>
+                            <button class="btn btn-primary" onclick="aplicarFiltros()"><i data-lucide="search"
+                                    style="width:16px; height:16px;"></i> Filtrar</button>
+                            <button class="btn btn-secondary" onclick="exportarExcel()"><i
+                                    data-lucide="file-spreadsheet" style="width:16px; height:16px;"></i> Exportar a
+                                Excel</button>
+                            <button class="btn btn-primary" onclick="abrirModal()"><i data-lucide="plus"
+                                    style="width:16px; height:16px;"></i> Nueva inscripción</button>
                         </div>
 
                         <!-- Table -->
                         <div class="section-card">
                             <div class="section-header">
-                                <div class="section-title"><i data-lucide="graduation-cap" style="width: 20px; height: 20px; color: var(--brand-blue);"></i> Inscripciones</div>
+                                <div class="section-title"><i data-lucide="graduation-cap"
+                                        style="width: 20px; height: 20px; color: var(--brand-blue);"></i> Inscripciones
+                                </div>
                             </div>
                             <div class="table-container">
                                 <table class="data-table">
@@ -148,7 +179,11 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tablaInscripciones">
-                                        <tr><td colspan="11" style="text-align:center;padding:48px;color:var(--text-muted);">Cargando...</td></tr>
+                                        <tr>
+                                            <td colspan="11"
+                                                style="text-align:center;padding:48px;color:var(--text-muted);">
+                                                Cargando...</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -160,11 +195,13 @@
                         <div class="section-header">
                             <div class="section-title">✏️ Inscríbete a la EDL</div>
                         </div>
-                        <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Completa tus datos para inscribirte a un curso o seminario.</p>
+                        <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Completa tus datos
+                            para inscribirte a un curso o seminario.</p>
                         <form id="formInscripcionGuest">
                             <div class="form-group">
                                 <label>Nombres y apellidos completos *</label>
-                                <input type="text" id="guestNombres" class="form-control" required placeholder="Ej: Juan Pérez López">
+                                <input type="text" id="guestNombres" class="form-control" required
+                                    placeholder="Ej: Juan Pérez López">
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
@@ -176,29 +213,36 @@
                                 </div>
                                 <div class="form-group">
                                     <label id="guestDocLabel">N° DNI *</label>
-                                    <input type="text" id="guestDocNum" class="form-control" required maxlength="8" placeholder="12345678" inputmode="numeric" pattern="[0-9]*">
+                                    <input type="text" id="guestDocNum" class="form-control" required maxlength="8"
+                                        placeholder="12345678" inputmode="numeric" pattern="[0-9]*">
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Celular *</label>
-                                    <input type="tel" id="guestCelular" class="form-control" required placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
-                                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe comenzar con 9</div>
+                                    <input type="tel" id="guestCelular" class="form-control" required
+                                        placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe
+                                        comenzar con 9</div>
                                 </div>
                                 <div class="form-group">
                                     <label>Correo personal *</label>
-                                    <input type="email" id="guestCorreo" class="form-control" required placeholder="correo@ejemplo.com">
+                                    <input type="email" id="guestCorreo" class="form-control" required
+                                        placeholder="correo@ejemplo.com">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Líder (quien te inscribe) *</label>
-                                <input type="text" id="guestLider" class="form-control" required placeholder="Nombre del líder">
+                                <label>Líder de GC *</label>
+                                <input type="text" id="guestLider" class="form-control" required
+                                    placeholder="Nombre del líder">
                             </div>
                             <div class="form-group">
                                 <label>Curso *</label>
                                 <select id="guestCurso" class="form-control" required></select>
                             </div>
-                            <div class="curso-info" id="guestCursoInfo" style="display:none; padding:16px; background:#f8fafc; border:1px solid var(--border-light); border-radius:12px; margin-bottom:20px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);"></div>
+                            <div class="curso-info" id="guestCursoInfo"
+                                style="display:none; padding:16px; background:#f8fafc; border:1px solid var(--border-light); border-radius:12px; margin-bottom:20px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">
+                            </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Método de pago *</label>
@@ -212,41 +256,63 @@
                                 </div>
                                 <div class="form-group" id="guestCapturaGroup">
                                     <label>Captura de pago</label>
-                                    <div class="captura-zone" id="guestCapturaZone" onclick="document.getElementById('guestPagoCaptura').click()">
+                                    <div class="captura-zone" id="guestCapturaZone"
+                                        onclick="document.getElementById('guestPagoCaptura').click()">
                                         <div class="captura-zone-icon">🖼️</div>
                                         <div class="captura-zone-title">Sube tu comprobante de pago</div>
-                                        <div class="captura-zone-sub">Yape, Plin o Transferencia — máximo 5MB</div>
+                                        <div class="captura-zone-sub">Yape, Plin o Transferencia</div>
                                         <div class="captura-zone-actions">
-                                            <button type="button" class="captura-btn" onclick="event.stopPropagation();document.getElementById('guestPagoCaptura').click()">📁 Elegir imagen</button>
-                                            <button type="button" class="captura-btn captura-btn-cam" onclick="event.stopPropagation();document.getElementById('guestPagoCapturaCam').click()">📷 Tomar foto</button>
+                                            <button type="button" class="captura-btn"
+                                                onclick="event.stopPropagation();document.getElementById('guestPagoCaptura').click()">📁
+                                                Elegir imagen</button>
+                                            <button type="button" class="captura-btn captura-btn-cam"
+                                                onclick="event.stopPropagation();document.getElementById('guestPagoCapturaCam').click()">📷
+                                                Tomar foto</button>
                                         </div>
                                         <div class="captura-filename" id="guestCapturaFilename"></div>
                                     </div>
                                     <input type="file" id="guestPagoCaptura" accept="image/*">
                                     <input type="file" id="guestPagoCapturaCam" accept="image/*" capture="environment">
                                     <div class="captura-preview-wrap" id="guestCapturaPreview">
-                                        <button type="button" class="captura-preview-remove" onclick="removerCaptura('guest')">✕</button>
-                                        <img id="guestCapturaImg" class="captura-preview-img" onclick="abrirCaptura(this.src)" alt="Vista previa">
+                                        <button type="button" class="captura-preview-remove"
+                                            onclick="removerCaptura('guest')">✕</button>
+                                        <img id="guestCapturaImg" class="captura-preview-img"
+                                            onclick="abrirCaptura(this.src)" alt="Vista previa">
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary" style="width:100%; justify-content: center;"><i data-lucide="check" style="width:16px; height:16px;"></i> Inscribirme</button>
+                            <button type="submit" class="btn btn-primary"
+                                style="width:100%; justify-content: center;"><i data-lucide="check"
+                                    style="width:16px; height:16px;"></i> Inscribirme</button>
                         </form>
-                        <div id="guestSuccess" style="display:none;background:#dcfce7;border-radius:24px;padding:32px;text-align:center;margin-top:16px;">
+                        <div id="guestSuccess"
+                            style="display:none;background:#dcfce7;border-radius:24px;padding:32px;text-align:center;margin-top:16px;">
                             <div style="font-size:48px;margin-bottom:12px;">✅</div>
                             <h3 style="color:#166534;margin-bottom:8px;">¡Inscripción enviada!</h3>
-                            <p style="color:#065f46;">Tu inscripción ha sido registrada. El administrador revisará y confirmará tu pago.</p>
+                            <p style="color:#065f46;">Tu inscripción ha sido registrada. El administrador revisará y
+                                confirmará tu pago.</p>
                         </div>
                     </div>
 
                     <!-- Info card -->
-                    <div class="section-card" style="background: linear-gradient(135deg, #f8fafc, #f1f4f9); border: 1px solid var(--border-light); margin-top:24px;">
-                        <h3 style="font-size:16px; font-weight:700; color:var(--brand-blue); margin-bottom:12px;">📢 Información EDL</h3>
-                        <p style="font-size:13.5px; line-height:1.6; color:var(--text-secondary);">Buen día amados hermanos 😃, no es tiempo de detenernos, es necesario seguir avanzando y seguir preparándote, por ello te animamos a inscribirte ✏️ en los cursos y seminarios que tenemos este ciclo en la EDL. 🤓.</p>
-                        <p style="margin-top:12px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">🔥 El requisito para el seminario de Int. Dones del Espíritu Santo es haber aprobado el Discipulado 3.</p>
-                        <p style="margin-top:8px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">🔥 El seminario de Apologética no tiene requisito.</p>
-                        <p style="margin-top:12px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">📒🖊️ Inscripciones en oficina, o al Yape o Plin al número <strong>964940579</strong> y enviar la captura.</p>
-                        <div style="margin-top:16px; padding:16px; background:#ffffff; border-radius:12px; border:1.5px solid var(--border-light); font-size:13.5px; line-height:1.6;">
+                    <div class="section-card"
+                        style="background: linear-gradient(135deg, #f8fafc, #f1f4f9); border: 1px solid var(--border-light); margin-top:24px;">
+                        <h3 style="font-size:16px; font-weight:700; color:var(--brand-blue); margin-bottom:12px;">📢
+                            Información EDL</h3>
+                        <p style="font-size:13.5px; line-height:1.6; color:var(--text-secondary);">Buen día amados
+                            hermanos 😃, no es tiempo de detenernos, es necesario seguir avanzando y seguir
+                            preparándote, por ello te animamos a inscribirte ✏️ en los cursos y seminarios que tenemos
+                            este ciclo en la EDL. 🤓.</p>
+                        <p style="margin-top:12px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">🔥
+                            El requisito para el seminario de Int. Dones del Espíritu Santo es haber aprobado el
+                            Discipulado 3.</p>
+                        <p style="margin-top:8px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">🔥 El
+                            seminario de Apologética no tiene requisito.</p>
+                        <p style="margin-top:12px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">
+                            📒🖊️ Inscripciones en oficina, o al Yape o Plin al número <strong>964940579</strong> y
+                            enviar la captura.</p>
+                        <div
+                            style="margin-top:16px; padding:16px; background:#ffffff; border-radius:12px; border:1.5px solid var(--border-light); font-size:13.5px; line-height:1.6;">
                             <strong style="color:var(--brand-blue);">💰 Costos:</strong><br>
                             Discipulado 1: S/ 30.00<br>
                             Discipulado 2 y 3: S/ 50.00<br>
@@ -283,14 +349,17 @@
                         </div>
                         <div class="form-group">
                             <label id="insDocLabel">N° DNI *</label>
-                            <input type="text" id="insDocNum" class="form-control" required maxlength="8" placeholder="12345678" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" id="insDocNum" class="form-control" required maxlength="8"
+                                placeholder="12345678" inputmode="numeric" pattern="[0-9]*">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Celular *</label>
-                            <input type="tel" id="insCelular" class="form-control" required placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
-                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe comenzar con 9</div>
+                            <input type="tel" id="insCelular" class="form-control" required placeholder="999888777"
+                                maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe comenzar
+                                con 9</div>
                         </div>
                         <div class="form-group">
                             <label>Correo personal *</label>
@@ -298,14 +367,16 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Líder (quien inscribe) *</label>
+                        <label>Líder de GC *</label>
                         <input type="text" id="insLider" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label>Curso *</label>
                         <select id="insCurso" class="form-control" required></select>
                     </div>
-                    <div class="curso-info" id="cursoInfo" style="display:none; padding:14px; background:#f8fafc; border:1px solid var(--border-light); border-radius:12px; margin-bottom:20px; font-size:13px; line-height:1.5; color:var(--text-secondary);"></div>
+                    <div class="curso-info" id="cursoInfo"
+                        style="display:none; padding:14px; background:#f8fafc; border:1px solid var(--border-light); border-radius:12px; margin-bottom:20px; font-size:13px; line-height:1.5; color:var(--text-secondary);">
+                    </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Monto</label>
@@ -332,25 +403,33 @@
                         </div>
                         <div class="form-group" id="insCapturaGroup">
                             <label>Captura de pago</label>
-                            <div class="captura-zone" id="insCapturaZone" onclick="document.getElementById('insPagoCaptura').click()">
+                            <div class="captura-zone" id="insCapturaZone"
+                                onclick="document.getElementById('insPagoCaptura').click()">
                                 <div class="captura-zone-icon">🖼️</div>
                                 <div class="captura-zone-title">Sube tu comprobante de pago</div>
-                                <div class="captura-zone-sub">Yape, Plin o Transferencia — máximo 5MB</div>
+                                <div class="captura-zone-sub">Yape, Plin o Transferencia</div>
                                 <div class="captura-zone-actions">
-                                    <button type="button" class="captura-btn" onclick="event.stopPropagation();document.getElementById('insPagoCaptura').click()">📁 Elegir imagen</button>
-                                    <button type="button" class="captura-btn captura-btn-cam" onclick="event.stopPropagation();document.getElementById('insPagoCapturaCam').click()">📷 Tomar foto</button>
+                                    <button type="button" class="captura-btn"
+                                        onclick="event.stopPropagation();document.getElementById('insPagoCaptura').click()">📁
+                                        Elegir imagen</button>
+                                    <button type="button" class="captura-btn captura-btn-cam"
+                                        onclick="event.stopPropagation();document.getElementById('insPagoCapturaCam').click()">📷
+                                        Tomar foto</button>
                                 </div>
                                 <div class="captura-filename" id="insCapturaFilename"></div>
                             </div>
                             <input type="file" id="insPagoCaptura" accept="image/*">
                             <input type="file" id="insPagoCapturaCam" accept="image/*" capture="environment">
                             <div class="captura-preview-wrap" id="insCapturaPreview">
-                                <button type="button" class="captura-preview-remove" onclick="removerCaptura('ins')">✕</button>
-                                <img id="insCapturaImg" class="captura-preview-img" onclick="abrirCaptura(this.src)" alt="Vista previa">
+                                <button type="button" class="captura-preview-remove"
+                                    onclick="removerCaptura('ins')">✕</button>
+                                <img id="insCapturaImg" class="captura-preview-img" onclick="abrirCaptura(this.src)"
+                                    alt="Vista previa">
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:20px;"><i data-lucide="save" style="width:16px; height:16px;"></i> Guardar inscripción</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:20px;"><i
+                            data-lucide="save" style="width:16px; height:16px;"></i> Guardar inscripción</button>
                 </form>
             </div>
         </div>
@@ -376,16 +455,16 @@
         }
 
         const CURSOS = [
-            { id: 'disc1_next', nombre: 'Discipulado 1 NEXT', inicio: '20 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 30 },
-            { id: 'disc2_next', nombre: 'Discipulado 2 NEXT', inicio: '20 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 50 },
-            { id: 'disc1', nombre: 'Discipulado 1', inicio: '20 de junio', dia: 'Sábado', hora: '5:30 PM', monto: 30 },
-            { id: 'disc2', nombre: 'Discipulado 2', inicio: '18 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50 },
-            { id: 'disc3', nombre: 'Discipulado 3', inicio: '18 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50 },
-            { id: 'lidere1', nombre: 'Lidere 1', inicio: '17 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
-            { id: 'lidere2', nombre: 'Lidere 2', inicio: '17 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
-            { id: 'lidere3', nombre: 'Lidere 3', inicio: '17 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
-            { id: 'sem_apologetica', nombre: 'Seminario: Apologética', inicio: '20 de junio', dia: 'Sábado', hora: '5:30 PM', monto: 50 },
-            { id: 'sem_dones', nombre: 'Seminario: Int. Dones del Espíritu Santo', inicio: '18 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50, requiereDisc3: true }
+            { id: 'disc1_next', nombre: 'Discipulado 1 NEXT', inicio: '27 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 30 },
+            { id: 'disc2_next', nombre: 'Discipulado 2 NEXT', inicio: '27 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 50 },
+            { id: 'disc1', nombre: 'Discipulado 1', inicio: '27 de junio', dia: 'Sábado', hora: '5:30 PM', monto: 30 },
+            { id: 'disc2', nombre: 'Discipulado 2', inicio: '23 de junio', dia: 'Martes', hora: '7:30 PM', monto: 50 },
+            { id: 'disc3', nombre: 'Discipulado 3', inicio: '25 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50 },
+            { id: 'lidere1', nombre: 'Lidere 1', inicio: '24 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
+            { id: 'lidere2', nombre: 'Lidere 2', inicio: '24 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
+            { id: 'lidere3', nombre: 'Lidere 3', inicio: '24 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
+            { id: 'sem_apologetica', nombre: 'Seminario: Apologética', inicio: '27 de junio', dia: 'Sábado', hora: '5:30 PM', monto: 50 },
+            { id: 'sem_dones', nombre: 'Seminario: Int. Dones del Espíritu Santo', inicio: '25 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50, requiereDisc3: true }
         ];
 
         const dbIns = db.collection('inscripciones');
@@ -464,8 +543,8 @@
             pairs.forEach(p => {
                 const sel = document.getElementById(p.select);
                 if (!sel) return;
-                sel.addEventListener('change', function() {
-                    const isDigital = ['yape','plin','transferencia'].includes(this.value);
+                sel.addEventListener('change', function () {
+                    const isDigital = ['yape', 'plin', 'transferencia'].includes(this.value);
                     document.getElementById(p.group).style.display = isDigital ? 'block' : 'none';
                     if (!isDigital) {
                         removerCaptura(p.select.startsWith('guest') ? 'guest' : 'ins');
@@ -478,7 +557,7 @@
 
         function formatMonto(n) { return 'S/ ' + n.toFixed(2); }
 
-        document.getElementById('insCurso').addEventListener('change', function() {
+        document.getElementById('insCurso').addEventListener('change', function () {
             const curso = getCurso(this.value);
             const info = document.getElementById('cursoInfo');
             if (!curso) { info.style.display = 'none'; return; }
@@ -529,7 +608,7 @@
 
         const guestCurso = document.getElementById('guestCurso');
         if (guestCurso) {
-            guestCurso.addEventListener('change', function() {
+            guestCurso.addEventListener('change', function () {
                 const curso = getCurso(this.value);
                 const info = document.getElementById('guestCursoInfo');
                 if (!curso) { info.style.display = 'none'; return; }
@@ -555,7 +634,7 @@
                 const metodoPago = document.getElementById('guestMetodoPago').value;
                 if (!metodoPago) { toast('❌ Selecciona un método de pago', 'warning'); return; }
 
-                const isDigital = ['yape','plin','transferencia'].includes(metodoPago);
+                const isDigital = ['yape', 'plin', 'transferencia'].includes(metodoPago);
                 const capturaFile = getCapturaFile('guest');
                 if (isDigital && !capturaFile) { toast('❌ Sube la captura de tu pago', 'warning'); return; }
 
@@ -671,7 +750,7 @@
                 const metodo = i.metodoPago ? i.metodoPago.charAt(0).toUpperCase() + i.metodoPago.slice(1) : '-';
                 const initials = getInitials(i.nombres);
                 const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" onclick="abrirCaptura('${i.pagoCaptura}')" title="Ver captura de pago">` : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
-                
+
                 return `<tr>
                     <td>
                         <div class="student-cell">
@@ -786,7 +865,7 @@
             document.getElementById('insCurso').dispatchEvent(new Event('change'));
             document.getElementById('insEstado').value = i.estadoPago;
             document.getElementById('insMetodoPago').value = i.metodoPago || '';
-            const isDigital = ['yape','plin','transferencia'].includes(i.metodoPago || '');
+            const isDigital = ['yape', 'plin', 'transferencia'].includes(i.metodoPago || '');
             document.getElementById('insCapturaGroup').style.display = isDigital ? 'block' : 'none';
             const preview = document.getElementById('insCapturaPreview');
             if (i.pagoCaptura) {
@@ -844,19 +923,19 @@
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarClose = document.getElementById('sidebarClose');
         if (sidebarMobileToggle) {
-            sidebarMobileToggle.addEventListener('click', function() {
+            sidebarMobileToggle.addEventListener('click', function () {
                 sidebar.classList.toggle('open');
                 sidebarOverlay.classList.add('active');
             });
         }
         if (sidebarClose) {
-            sidebarClose.addEventListener('click', function() {
+            sidebarClose.addEventListener('click', function () {
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('active');
             });
         }
         if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', function() {
+            sidebarOverlay.addEventListener('click', function () {
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('active');
             });
@@ -880,13 +959,13 @@
             document.getElementById('lightboxCaptura').classList.remove('active');
         }
 
-        document.getElementById('lightboxCaptura').addEventListener('click', function(e) {
+        document.getElementById('lightboxCaptura').addEventListener('click', function (e) {
             if (e.target === this || e.target.classList.contains('lightbox-close')) cerrarCaptura();
         });
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') cerrarCaptura();
         });
-        
+
         if (typeof lucide !== 'undefined') lucide.createIcons();
     </script>
 
@@ -895,4 +974,5 @@
         <img src="" alt="Captura de pago">
     </div>
 </body>
+
 </html>
