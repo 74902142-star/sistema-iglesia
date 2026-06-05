@@ -212,8 +212,8 @@ service cloud.firestore {
 
     <script src="auth.js"></script>
     <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
+        // Initialize Lucide icons (non-blocking if CDN fails)
+        if (typeof lucide !== 'undefined') if (typeof lucide !== 'undefined') lucide.createIcons();
 
         if (!Auth.esAdmin()) {
             window.location.replace('index.html');
@@ -335,7 +335,7 @@ service cloud.firestore {
                     <div class="stat-card-icon"><i data-lucide="smile"></i></div>
                 </div>
             `;
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function actualizarReportes() {

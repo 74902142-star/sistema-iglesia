@@ -1302,3 +1302,72 @@ button, input, select, textarea {
         padding: 16px 12px;
     }
 }
+
+/* ==========================================================================
+   UTILITY: Firestore Permission Alert
+   ========================================================================== */
+.perm-alert {
+    display: none;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 4px solid var(--danger);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+}
+.perm-alert.visible { display: block; }
+.perm-alert h4 { font-size: 16px; margin-bottom: 10px; color: var(--danger-text); }
+.perm-alert ol { margin: 10px 0 10px 20px; line-height: 1.8; font-size: 14px; }
+.perm-alert a { color: #1d4ed8; font-weight: 600; }
+.perm-alert pre { background: #0a1628; color: #e2e8f0; padding: 14px; border-radius: 10px; font-size: 11px; overflow-x: auto; margin-top: 12px; max-height: 180px; }
+
+/* ==========================================================================
+   GUEST BANNER
+   ========================================================================== */
+.guest-banner {
+    display: none;
+    background: var(--warning-bg);
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+}
+
+/* ==========================================================================
+   LIGHTBOX MODAL (Captura EDL)
+   ========================================================================== */
+.lightbox-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.lightbox-modal img {
+    max-width: 95%;
+    max-height: 95%;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    object-fit: contain;
+}
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 36px;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+.lightbox-close:hover { opacity: 1; }
+

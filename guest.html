@@ -182,7 +182,7 @@
     <script src="auth.js"></script>
     <script>
         // Init Lucide
-        lucide.createIcons();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         const user = Auth.getUsuario();
         if (!user || user.rol !== 'invitado') {

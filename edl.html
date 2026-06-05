@@ -606,7 +606,7 @@
                     toast('❌ Error al inscribir: ' + err.message, 'warning');
                     btn.disabled = false;
                     btn.innerHTML = '<i data-lucide="check" style="width:16px; height:16px;"></i> Inscribirme';
-                    lucide.createIcons();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
                 }
             });
         }
@@ -700,7 +700,7 @@
                     </td>
                 </tr>`;
             }).join('');
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         document.getElementById('formInscripcion').addEventListener('submit', async (e) => {
@@ -887,7 +887,7 @@
             if (e.key === 'Escape') cerrarCaptura();
         });
         
-        lucide.createIcons();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     </script>
 
     <div id="lightboxCaptura" class="lightbox-modal">

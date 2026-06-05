@@ -342,7 +342,7 @@
     <script src="auth.js"></script>
     <script>
         // Init Lucide
-        lucide.createIcons();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         const USERS = [
             { email: "jhonfernandezcondor@gmail.com", password: "JSferco18", nombre: "Jhon Smith", rol: "admin" },
@@ -420,7 +420,7 @@
                     mostrarNotificacion('❌ Correo o contraseña incorrectos', 'error');
                     btn.disabled = false;
                     btn.innerHTML = '<i data-lucide="log-in" style="width: 16px; height: 16px;"></i> Iniciar sesión (Admin)';
-                    lucide.createIcons();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
                 }
             }, 300);
         }

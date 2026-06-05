@@ -262,7 +262,7 @@
                     </tr>
                 `;
             }).join('');
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         document.getElementById('formCreativo').addEventListener('submit', async (e) => {
@@ -364,7 +364,7 @@
             });
         }
 
-        lucide.createIcons();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
         cargarCreativos();
     </script>
 </body>
