@@ -5,37 +5,60 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    /* Colors */
-    --primary-bg: #f8fafc;
-    --sidebar-bg: #112239;
-    --sidebar-active: #233e5c;
-    --sidebar-hover: rgba(255, 255, 255, 0.08);
+    /* Primary palette */
+    --primary: #00334f;
+    --primary-hover: #004a72;
+    --secondary: #1c6390;
+    --on-primary: #ffffff;
+    --on-secondary: #ffffff;
+    --primary-container: #0c4a6e;
+    --secondary-container: #90cdff;
+    --secondary-container-hover: #7bbfff;
+    
+    /* Surface */
+    --surface: #f8f9ff;
+    --surface-container: #e5eeff;
+    --surface-container-high: #dce9ff;
+    --surface-container-highest: #d3e4fe;
+    --surface-dim: #cbdbf5;
+    --surface-bright: #f8f9ff;
+    --surface-variant: #d3e4fe;
+    
+    /* Text */
+    --text-primary: #0b1c30;
+    --text-secondary: #1e293b;
+    --text-muted: #41474e;
+    --text-inverse: #ffffff;
+    
+    /* Borders */
+    --border-light: #e2e8f0;
+    --border-medium: #c1c7cf;
+    
+    /* Sidebar */
+    --sidebar-gradient-start: #00334f;
+    --sidebar-gradient-end: #1c6390;
     --sidebar-text: rgba(255, 255, 255, 0.7);
     --sidebar-text-active: #ffffff;
+    --sidebar-hover: rgba(255, 255, 255, 0.08);
     
-    --brand-blue: #1b4570;
-    --brand-blue-hover: #26598c;
-    --brand-blue-light: #eff6ff;
+    /* Legacy aliases for backward compat */
+    --primary-bg: #f8f9ff;
+    --sidebar-bg: #00334f;
+    --sidebar-active: #1c6390;
+    --brand-blue: #00334f;
+    --brand-blue-hover: #004a72;
+    --brand-blue-light: #e5eeff;
     
-    --text-primary: #1e293b;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
-    
-    --border-light: #e2e8f0;
-    --border-medium: #cbd5e1;
-    
+    /* Semantic */
     --success: #10b981;
     --success-bg: #dcfce7;
     --success-text: #15803d;
-    
     --warning: #f59e0b;
     --warning-bg: #fef3c7;
     --warning-text: #b45309;
-    
     --danger: #ef4444;
     --danger-bg: #fef2f2;
     --danger-text: #b91c1c;
-
     --purple: #8b5cf6;
     --purple-bg: #f5f3ff;
     --purple-text: #6d28d9;
@@ -62,6 +85,47 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
+}
+
+/* ── Glass Card ── */
+.glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(144, 205, 255, 0.3);
+    border-radius: var(--radius-lg);
+}
+.glass-card-solid {
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+}
+
+/* ── Gradient Divider ── */
+.gradient-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 32px 0 24px;
+}
+.gradient-divider::before,
+.gradient-divider::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+}
+.gradient-divider::before {
+    background: linear-gradient(to right, transparent, var(--secondary-container));
+}
+.gradient-divider::after {
+    background: linear-gradient(to left, transparent, var(--secondary-container));
+}
+.gradient-divider span {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    white-space: nowrap;
 }
 
 button, input, select, textarea {
@@ -92,7 +156,7 @@ button, input, select, textarea {
 /* ── Sidebar ── */
 .sidebar {
     width: 260px;
-    background-color: var(--sidebar-bg);
+    background: linear-gradient(180deg, var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-end) 100%);
     color: #ffffff;
     display: flex;
     flex-direction: column;
@@ -236,7 +300,16 @@ button, input, select, textarea {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border-light);
+    position: relative;
+}
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
 }
 
 .header-left {
@@ -376,7 +449,8 @@ button, input, select, textarea {
 }
 
 .stat-card {
-    background-color: #ffffff;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
     border-radius: var(--radius-lg);
     padding: 24px;
     box-shadow: var(--card-shadow);
@@ -384,6 +458,7 @@ button, input, select, textarea {
     justify-content: space-between;
     align-items: flex-start;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(144, 205, 255, 0.3);
 }
 
 .stat-card:hover {
@@ -438,11 +513,13 @@ button, input, select, textarea {
 .stat-card:nth-child(4) .stat-card-icon { background-color: rgba(245, 158, 11, 0.08); color: #f59e0b; }
 
 .section-card {
-    background-color: #ffffff;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
     border-radius: var(--radius-lg);
     padding: 28px;
     box-shadow: var(--card-shadow);
     margin-bottom: 32px;
+    border: 1px solid rgba(144, 205, 255, 0.3);
 }
 
 .section-header {
@@ -465,7 +542,8 @@ button, input, select, textarea {
 
 /* ── Forms & Controls ── */
 .filters-bar {
-    background-color: #ffffff;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
     border-radius: var(--radius-lg);
     padding: 20px;
     margin-bottom: 32px;
@@ -474,6 +552,7 @@ button, input, select, textarea {
     flex-wrap: wrap;
     align-items: flex-end;
     box-shadow: var(--card-shadow);
+    border: 1px solid rgba(144, 205, 255, 0.3);
 }
 
 .filter-group {
@@ -505,9 +584,9 @@ button, input, select, textarea {
 
 .filter-select:focus, .filter-input:focus, .form-control:focus, .form-select:focus {
     outline: none;
-    border-color: var(--brand-blue);
+    border-color: var(--secondary);
     background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(27, 69, 112, 0.1);
+    box-shadow: 0 0 0 3px rgba(144, 205, 255, 0.3);
 }
 
 .input-with-icon {
@@ -566,9 +645,13 @@ button, input, select, textarea {
 }
 
 .btn-primary {
-    background-color: var(--brand-blue);
+    background: linear-gradient(to right, var(--primary), var(--secondary));
     color: #ffffff;
-    box-shadow: 0 4px 10px rgba(27, 69, 112, 0.15);
+    box-shadow: 0 4px 14px rgba(0, 51, 79, 0.2);
+}
+.btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(0, 51, 79, 0.3);
+    transform: translateY(-1px);
 }
 
 .btn-primary:hover {
@@ -610,8 +693,8 @@ button, input, select, textarea {
     font-size: 12px;
     font-weight: 800;
     margin: 40px 0 24px;
-    color: var(--brand-blue);
-    letter-spacing: 1.5px;
+    color: var(--primary);
+    letter-spacing: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -622,8 +705,13 @@ button, input, select, textarea {
 .section-title-divider::before, .section-title-divider::after {
     content: '';
     flex: 1;
-    height: 1px;
-    background-color: var(--border-light);
+    height: 2px;
+}
+.section-title-divider::before {
+    background: linear-gradient(to right, transparent, var(--secondary-container));
+}
+.section-title-divider::after {
+    background: linear-gradient(to left, transparent, var(--secondary-container));
 }
 
 /* ── Ministry Counters Grid ── */
@@ -635,10 +723,11 @@ button, input, select, textarea {
 }
 
 .ministerio-card {
-    background-color: #ffffff;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
     border-radius: var(--radius-lg);
     padding: 22px;
-    border: 1px solid var(--border-light);
+    border: 1px solid rgba(144, 205, 255, 0.3);
     box-shadow: var(--card-shadow);
     display: flex;
     flex-direction: column;
@@ -655,14 +744,14 @@ button, input, select, textarea {
     left: 0;
     width: 4px;
     height: 100%;
-    background-color: var(--brand-blue);
+    background-color: var(--secondary);
 }
 
 .ministerio-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--card-shadow-hover);
-    border-color: var(--border-medium);
 }
+
 
 .ministerio-nombre {
     font-size: 16px;
@@ -702,19 +791,18 @@ button, input, select, textarea {
 .number-control {
     display: flex;
     align-items: center;
-    background-color: #f1f5f9;
-    border-radius: var(--radius-xl);
-    padding: 2px;
+    background-color: #ffffff;
+    border-radius: 9999px;
+    padding: 3px;
     width: 110px;
     justify-content: space-between;
-    border: 1.5px solid transparent;
+    border: 1.5px solid var(--border-light);
     transition: all 0.2s;
 }
 
 .number-control:focus-within {
-    border-color: var(--brand-blue);
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(27, 69, 112, 0.08);
+    border-color: var(--secondary-container);
+    box-shadow: 0 0 0 3px rgba(144, 205, 255, 0.2);
 }
 
 .number-control input {
@@ -724,7 +812,7 @@ button, input, select, textarea {
     font-size: 14px;
     font-weight: 700;
     background: transparent;
-    color: var(--text-primary);
+    color: var(--primary);
 }
 
 .number-control input:focus {
@@ -742,20 +830,23 @@ button, input, select, textarea {
 }
 
 .number-btn {
-    width: 26px;
-    height: 26px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     border: none;
-    background-color: #ffffff;
-    font-size: 15px;
+    background: transparent;
+    color: var(--primary);
+    font-size: 18px;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-secondary);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: all 0.2s;
+    flex-shrink: 0;
+}
+.number-btn:hover {
+    background-color: var(--surface-variant);
 }
 
 .number-btn:hover {
@@ -765,10 +856,11 @@ button, input, select, textarea {
 
 /* Large assistant counters */
 .asistente-card {
-    background-color: #ffffff;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
     border-radius: var(--radius-lg);
     padding: 24px;
-    border: 1px solid var(--border-light);
+    border: 1px solid rgba(144, 205, 255, 0.3);
     box-shadow: var(--card-shadow);
     display: flex;
     align-items: center;
@@ -816,9 +908,18 @@ button, input, select, textarea {
     display: flex;
     align-items: center;
     gap: 14px;
-    background-color: #f1f5f9;
-    padding: 4px;
-    border-radius: var(--radius-xl);
+    background-color: #ffffff;
+    padding: 6px 18px;
+    border-radius: 9999px;
+    border: 2px solid rgba(144, 205, 255, 0.3);
+}
+
+.asistente-counter .counter-value {
+    min-width: 40px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
 }
 
 .asistente-counter-btn {
@@ -836,9 +937,19 @@ button, input, select, textarea {
 }
 
 .asistente-counter-btn.minus {
-    background-color: #ffffff;
-    color: var(--text-secondary);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    background-color: var(--surface-variant);
+    color: var(--primary);
+}
+.asistente-counter-btn.minus:hover {
+    background-color: var(--secondary-container);
+}
+
+.asistente-counter-btn.plus {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+.asistente-counter-btn.plus:hover {
+    background-color: var(--primary-hover);
 }
 
 .asistente-counter-btn.minus:hover {
