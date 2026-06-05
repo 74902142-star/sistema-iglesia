@@ -332,6 +332,12 @@
                     <a href="dashboard.html" class="nav-link active"><span class="nav-icon">📊</span><span class="nav-text">Reporte de Asistencia</span></a>
                 </div>
             </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Servicio</div>
+                <div class="nav-section-content">
+                    <a href="ingreso.html" class="nav-link"><span class="nav-icon">📝</span><span class="nav-text">Registrar Servicio</span></a>
+                </div>
+            </div>
             <div class="nav-section nav-admin" style="display:none;">
                 <div class="nav-section-title">Ministerios</div>
                 <div class="nav-section-content">
@@ -343,6 +349,12 @@
                 <div class="nav-section-title">Formación</div>
                 <div class="nav-section-content">
                     <a href="edl.html" class="nav-link"><span class="nav-icon">🎓</span><span class="nav-text">EDL (Escuela de Liderazgo)</span></a>
+                </div>
+            </div>
+            <div class="nav-section" style="margin-top: auto;">
+                <div class="nav-section-content">
+                    <a href="#" class="nav-link"><span class="nav-icon">⚙️</span><span class="nav-text">Configuración</span></a>
+                    <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon">🚪</span><span class="nav-text">Cerrar Sesión</span></a>
                 </div>
             </div>
         </aside>
@@ -384,6 +396,16 @@ service cloud.firestore {
             <button class="btn-copy" onclick="copiarReglas()">📋 Copiar reglas</button>
         </div>
 
+        <div class="filters-bar">
+            <div class="filter-group"><label>📍 SEDE</label><select id="filtroSede" class="filter-select"><option value="todas">Todas las sedes</option></select></div>
+            <div class="filter-group"><label>📅 SEMANA</label><input type="week" id="filtroSemana" class="filter-input"></div>
+            <div class="filter-group"><label>📆 MES</label><select id="filtroMes" class="filter-select"><option value="">Todos</option></select></div>
+            <div class="filter-group"><label>🗓️ AÑO</label><select id="filtroAnio" class="filter-select"><option value="2026" selected>2026</option><option value="2025">2025</option></select></div>
+            <button class="btn-primary" onclick="cargarDatos()">🔍 Filtrar</button>
+            <button class="btn-secondary" onclick="window.location.href='ingreso.html'">➕ Nuevo registro</button>
+            <button class="btn-secondary" onclick="exportarExcel()">📎 Exportar Excel</button>
+        </div>
+
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value">0</div><div class="stat-label">Total asistentes</div></div>
             <div class="stat-card"><div class="stat-icon">👨</div><div class="stat-value">0</div><div class="stat-label">Varones</div></div>
@@ -416,16 +438,6 @@ service cloud.firestore {
                 </div>
             </div>
             <button class="btn-whatsapp" id="whatsappBtn">📱 ENVIAR REPORTE POR WHATSAPP</button>
-        </div>
-
-        <div class="filters-bar">
-            <div class="filter-group"><label>📍 SEDE</label><select id="filtroSede" class="filter-select"><option value="todas">Todas las sedes</option></select></div>
-            <div class="filter-group"><label>📅 SEMANA</label><input type="week" id="filtroSemana" class="filter-input"></div>
-            <div class="filter-group"><label>📆 MES</label><select id="filtroMes" class="filter-select"><option value="">Todos</option></select></div>
-            <div class="filter-group"><label>🗓️ AÑO</label><select id="filtroAnio" class="filter-select"><option value="2026" selected>2026</option><option value="2025">2025</option></select></div>
-            <button class="btn-primary" onclick="cargarDatos()">🔍 Filtrar</button>
-            <button class="btn-secondary" onclick="window.location.href='ingreso.html'">➕ Nuevo registro</button>
-            <button class="btn-secondary" onclick="exportarExcel()">📎 Exportar Excel</button>
         </div>
 
         <div class="charts-grid">
