@@ -30,9 +30,9 @@
             <div class="nav-section-content">
                 <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
                 <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i data-lucide="clipboard-list"></i></span><span>Registro</span></a>
-                <a href="predicadores.html" class="nav-link active" id="nav-anfitriones" style="display:none;"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
-                <a href="creativos.html" class="nav-link nav-admin" id="nav-creativos" style="display:none;"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
-                <a href="edl.html" class="nav-link nav-admin" id="nav-edl" style="display:none;"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
+                <a href="predicadores.html" class="nav-link active" id="nav-anfitriones"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
+                <a href="creativos.html" class="nav-link" id="nav-creativos"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
+                <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
                 <a href="#" class="nav-link"><span class="nav-icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
@@ -203,7 +203,7 @@
                             </select>
                         </div>
                     </div>
-                    <div id="groupSede" class="form-group" style="display:none;">
+                    <div id="groupSede" class="form-group">
                         <label>Sede</label>
                         <input type="text" id="regSede" class="form-control" placeholder="Ej: Huancayo">
                     </div>
@@ -228,13 +228,13 @@
             </div>
             <div class="wa-modal-body modal-body">
                 <div class="wa-msg-preview" id="waMsgPreview"></div>
-                <div class="wa-photo-preview" id="waPhotoPreview" style="display:none;">
+                <div class="wa-photo-preview" id="waPhotoPreview">
                     <img id="waPhotoImg">
                 </div>
                 <div class="wa-actions">
                     <button class="btn btn-primary" onclick="enviarWAAhora()"><i data-lucide="send" style="width: 16px; height: 16px;"></i> Enviar ahora</button>
                     <button class="btn btn-secondary" onclick="copiarMensaje()"><i data-lucide="copy" style="width: 16px; height: 16px;"></i> Copiar mensaje</button>
-                    <button class="btn btn-secondary" id="waDownloadBtn" style="display:none;" onclick="descargarFotoWA()"><i data-lucide="download-cloud" style="width: 16px; height: 16px;"></i> Descargar foto</button>
+                    <button class="btn btn-secondary" id="waDownloadBtn" onclick="descargarFotoWA()"><i data-lucide="download-cloud" style="width: 16px; height: 16px;"></i> Descargar foto</button>
                 </div>
             </div>
         </div>
@@ -247,7 +247,6 @@
         document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
 
         // Admin layout toggle
-        document.querySelectorAll('.nav-admin').forEach(el => el.style.display = 'block');
 
         const dbPart = db.collection('participantes');
         const dbPersonas = db.collection('personas');

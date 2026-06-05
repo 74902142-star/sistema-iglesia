@@ -30,9 +30,9 @@
             <div class="nav-section-content">
                 <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
                 <a href="ingreso.html" class="nav-link active" id="nav-registro"><span class="nav-icon"><i data-lucide="clipboard-list"></i></span><span>Registro</span></a>
-                <a href="predicadores.html" class="nav-link nav-admin" id="nav-anfitriones" style="display:none;"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
-                <a href="creativos.html" class="nav-link nav-admin" id="nav-creativos" style="display:none;"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
-                <a href="edl.html" class="nav-link nav-admin" id="nav-edl" style="display:none;"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
+                <a href="predicadores.html" class="nav-link" id="nav-anfitriones"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
+                <a href="creativos.html" class="nav-link" id="nav-creativos"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
+                <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
                 <a href="#" class="nav-link"><span class="nav-icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
@@ -61,7 +61,7 @@
 
             <!-- Content Container -->
             <div class="container">
-                <div id="guestBanner" class="guest-banner" style="display:none;">
+                <div id="guestBanner" class="guest-banner">
                     <p>👤 Modo invitado — <a href="guest.html">← Volver</a> o <a href="edl.html">inscríbete a la EDL</a></p>
                     <a href="#" style="color:#ef4444;font-size:13px;font-weight:700;" onclick="if(confirm('¿Cerrar sesión?')){localStorage.removeItem('usuarioActual');window.location.href='index.html';}return false;">Salir</a>
                 </div>
@@ -143,11 +143,6 @@
             document.getElementById('userName').innerText = usuario.nombre;
             document.getElementById('userRole').innerText = usuario.rol.toUpperCase();
             document.getElementById('userAvatar').innerText = (usuario.nombre || 'A').charAt(0).toUpperCase();
-        }
-
-        // Sidebar display toggle
-        if (esAdmin) {
-            document.querySelectorAll('.nav-admin').forEach(el => el.style.display = 'block');
         }
 
         if (esInvitado) {
