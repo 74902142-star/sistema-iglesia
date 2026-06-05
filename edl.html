@@ -367,7 +367,10 @@
         document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
 
         // Show/hide admin and guest sections
-        if (esInvitado) {
+        if (esAdmin) {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'none');
+        } else if (esInvitado) {
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'block');
         }
