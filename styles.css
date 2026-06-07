@@ -1577,22 +1577,25 @@ select.glass-input {
 /* ==========================================================================
    LIGHTBOX MODAL (Captura EDL)
    ========================================================================== */
+/* ==========================================================================
+   LIGHTBOX MODAL (Corrección robusta)
+   ========================================================================== */
 .lightbox-modal {
-    display: none; /* ← ESTO DEBE OCULTARLO */
+    display: none !important; /* Forzamos oculto */
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 9999;
+    background: rgba(0,0,0,0.9);
+    z-index: 99999 !important; /* Forzamos capa superior */
     align-items: center;
     justify-content: center;
     padding: 20px;
 }
 .lightbox-modal.active {
-    display: flex;
+    display: flex !important;
 }
 .lightbox-modal img {
     max-width: 95%;
-    max-height: 95%;
+    max-height: 90vh;
     border-radius: 8px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     object-fit: contain;
@@ -1601,15 +1604,13 @@ select.glass-input {
     position: absolute;
     top: 20px;
     right: 30px;
-    font-size: 36px;
+    font-size: 40px;
     color: #fff;
+    cursor: pointer;
     background: none;
     border: none;
-    cursor: pointer;
-    opacity: 0.8;
-    transition: opacity 0.2s;
+    z-index: 100000;
 }
-.lightbox-close:hover { opacity: 1; }
 
 /* ==========================================================================
    CAPTURA DE PAGO (EDL)
@@ -1741,7 +1742,21 @@ select.glass-input {
 }
 
 
-/* Grid Utils */
-.grid { display: grid; gap: 20px; }
-.grid-cols-1 { grid-template-columns: 1fr; }
-@media (min-width: 768px) { .md\:grid-cols-2 { grid-template-columns: 1fr 1fr; } }
+/* ==========================================================================
+   MOVIL: SIMETRÍA FORZADA (Arreglo final)
+   ========================================================================== */
+@media (max-width: 768px) {
+    body { padding: 0 !important; margin: 0 !important; }
+    .container, .main-content {
+        padding: 12px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .section-card, .stat-card {
+        padding: 16px !important;
+        margin-bottom: 12px !important;
+    }
+    .data-table {
+        font-size: 12px;
+    }
+}
