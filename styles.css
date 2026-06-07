@@ -1219,10 +1219,9 @@ select.glass-input {
 
 /* ── Split Layout for Preachers ── */
 .preachers-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 28px;
-    align-items: start;
     margin-top: 24px;
 }
 
@@ -1369,10 +1368,6 @@ select.glass-input {
     
     .container {
         padding: 20px;
-    }
-    
-    .preachers-grid {
-        grid-template-columns: 1fr;
     }
 }
 
