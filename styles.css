@@ -745,11 +745,17 @@ select.glass-input {
 }
 
 /* ── Ministry Counters Grid ── */
-.cards-grid {
+/* Arreglo de Simetría: tarjetas siempre iguales */
+.cards-grid, .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
-    margin-bottom: 32px;
+    width: 100%;
+}
+
+.ministerio-card, .asistente-card, .stat-card {
+    min-width: 0; /* Necesario para que el grid funcione bien */
+    flex: 1;
 }
 
 .ministerio-card {
