@@ -1376,21 +1376,28 @@ select.glass-input {
     }
 }
 
-@media (max-width: 768px) {
-    .container, .admin-container {
-        padding: 16px !important;
-    }
-    
-    /* Forzar 1 sola columna y simetría en móvil */
+/* ── Tablet: grid columnas → 1fr antes de que auto-fit cree anchos desiguales ── */
+@media (max-width: 850px) {
     .stats-grid, .report-cards, .charts-grid, .cards-grid {
         grid-template-columns: 1fr !important;
         gap: 16px !important;
     }
+}
 
-    /* Asegurar que las cards no se desborden */
+/* ── Móvil: padding uniforme, simetría total ── */
+@media (max-width: 768px) {
+    .container, .admin-container {
+        padding: 16px !important;
+    }
+
+    .container, .main-content {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
     .section-card, .stat-card, .ministerio-card, .asistente-card {
         width: 100% !important;
-        padding: 20px !important;
+        padding: 16px !important;
         margin-bottom: 16px !important;
         box-sizing: border-box !important;
     }
@@ -1404,10 +1411,6 @@ select.glass-input {
         width: 100%;
     }
     
-    .stat-card {
-        padding: 16px;
-    }
-    
     .stat-card-details .stat-value {
         font-size: 26px;
     }
@@ -1417,15 +1420,13 @@ select.glass-input {
         height: 40px;
         font-size: 16px;
     }
-}
 
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
+    .data-table {
+        font-size: 12px;
     }
-    
+
     .header-search-bar {
-        display: none; /* Hide search bar on very small devices */
+        display: none;
     }
     
     .user-area {
@@ -1434,11 +1435,7 @@ select.glass-input {
     }
     
     .user-info {
-        display: none; /* Hide name on small mobile headers */
-    }
-    
-    .container {
-        padding: 16px 12px;
+        display: none;
     }
 }
 
@@ -1564,17 +1561,6 @@ select.glass-input {
     font-weight: 500;
     color: var(--text-primary);
     outline: none;
-}
-    display: none;
-    background: var(--warning-bg);
-    border: 1px solid #fde68a;
-    border-radius: var(--radius-md);
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    font-size: 14px;
 }
 
 /* ==========================================================================
@@ -1742,24 +1728,4 @@ select.glass-input {
 }
 .captura-thumb:hover {
     transform: scale(1.15);
-}
-
-
-/* ==========================================================================
-   MOVIL: SIMETRÍA FORZADA (Arreglo final)
-   ========================================================================== */
-@media (max-width: 768px) {
-    body { padding: 0 !important; margin: 0 !important; }
-    .container, .main-content {
-        padding: 12px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-    .section-card, .stat-card {
-        padding: 16px !important;
-        margin-bottom: 12px !important;
-    }
-    .data-table {
-        font-size: 12px;
-    }
 }
