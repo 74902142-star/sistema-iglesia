@@ -749,7 +749,7 @@
                 const estadoCls = i.estadoPago === 'Canceló' ? 'estado-pagado' : 'estado-debe';
                 const metodo = i.metodoPago ? i.metodoPago.charAt(0).toUpperCase() + i.metodoPago.slice(1) : '-';
                 const initials = getInitials(i.nombres);
-                const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" onclick="abrirCaptura('${i.pagoCaptura.replace(/'/g, "\\'")}')" title="Ver captura de pago">` : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
+                const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" title="Ver captura de pago">` : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
 
                 return `<tr>
                     <td>
@@ -947,6 +947,12 @@
         initDocTipo();
         initMetodoPagoToggles();
         if (esAdmin) cargarInscripciones();
+
+        // Event delegation for captura thumbnails (avoids inline onclick with huge base64)
+        document.getElementById('tablaInscripciones').addEventListener('click', function (e) {
+            const thumb = e.target.closest('.captura-thumb');
+            if (thumb) abrirCaptura(thumb.src);
+        });
 
         function abrirCaptura(src) {
             const modal = document.getElementById('lightboxCaptura');

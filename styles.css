@@ -425,6 +425,13 @@ button, input, select, textarea {
     margin-bottom: 32px;
 }
 
+.report-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
 .stat-card {
     background-color: #ffffff;
     border-radius: var(--radius-lg);
@@ -745,17 +752,11 @@ select.glass-input {
 }
 
 /* ── Ministry Counters Grid ── */
-/* Arreglo de Simetría: tarjetas siempre iguales */
-.cards-grid, .stats-grid {
+.cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
     width: 100%;
-}
-
-.ministerio-card, .asistente-card, .stat-card {
-    min-width: 0; /* Necesario para que el grid funcione bien */
-    flex: 1;
 }
 
 .ministerio-card {
@@ -1219,7 +1220,7 @@ select.glass-input {
 /* ── Split Layout for Preachers ── */
 .preachers-grid {
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 28px;
     align-items: start;
     margin-top: 24px;
@@ -1393,11 +1394,7 @@ select.glass-input {
         margin-bottom: 16px !important;
         box-sizing: border-box !important;
     }
-}
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-    
+
     .filters-bar {
         flex-direction: column;
         align-items: stretch;
