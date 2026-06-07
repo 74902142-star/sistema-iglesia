@@ -1009,6 +1009,8 @@ select.glass-input {
     border: 1px solid var(--border-light);
     overflow-x: auto;
     margin-bottom: 24px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .data-table {
