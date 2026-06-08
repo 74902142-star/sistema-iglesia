@@ -675,7 +675,7 @@
         }
 
         (async () => {
-            await cargarPersonas();
+            try { await cargarPersonas(); } catch (e) { console.warn('personas no disponible:', e.message); }
             cargarParticipantes();
         })();
 
