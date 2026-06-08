@@ -1411,6 +1411,14 @@ select.glass-input {
         box-sizing: border-box !important;
     }
     
+    input[type="week"], input[type="date"] {
+        font-size: 11px !important;
+    }
+    
+    .filter-group {
+        overflow: hidden;
+    }
+    
     .filters-bar button {
         width: 100%;
     }
