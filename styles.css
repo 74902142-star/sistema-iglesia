@@ -548,6 +548,10 @@ button, input, select, textarea {
     margin-bottom: 8px;
 }
 
+.input-constrain {
+    width: 100%;
+}
+
 .filter-select, .filter-input, .form-control, .form-select {
     width: 100%;
     padding: 11px 16px;
@@ -1414,10 +1418,30 @@ select.glass-input {
     input[type="week"], input[type="date"] {
         font-size: 11px !important;
     }
-    
+
     .filter-group {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+    }
+
+    .input-constrain {
         overflow: hidden;
         border-radius: var(--radius-md);
+        border: 1.5px solid var(--border-light);
+        background: #f8fafc;
+    }
+    
+    .input-constrain input {
+        border: none !important;
+        background: transparent !important;
+        padding: 9px 12px !important;
+        margin: 0;
+        display: block;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
     
     .filters-bar button {
