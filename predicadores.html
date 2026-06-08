@@ -7,7 +7,7 @@
     <title>Predicadores y Anfitriones | Iglesia Agua Viva</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="styles.css?v=10">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -556,57 +556,74 @@
 
         document.getElementById('formRegistro').addEventListener('submit', async (e) => {
             e.preventDefault();
+            await firebaseReady;
             const telefono = document.getElementById('regTelefono').value.trim();
             if (!/^9\d{8}$/.test(telefono)) {
                 toast('❌ Celular debe tener 9 dígitos y comenzar con 9', 'warning');
                 return;
             }
 
-            const fotoFile = document.getElementById('regFoto').files[0];
-            let foto = undefined;
-            if (fotoFile) {
-                if (fotoFile.size > 500000) { toast('❌ La imagen es muy grande (máx 500KB)', 'warning'); return; }
-                foto = await fileToBase64(fotoFile);
-            }
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = 'Guardando...';
 
-            const data = {
-                nombre: document.getElementById('regNombre').value.trim(),
-                fecha: document.getElementById('regFecha').value,
-                hora: document.getElementById('regHora').value,
-                telefono: telefono,
-                tipoServicio: document.getElementById('regServicio').value,
-                rol: document.getElementById('regRol').value,
-                sede: document.getElementById('regSede').value.trim() || '',
-                enviado: false
-            };
-            if (foto) data.foto = foto;
-
-            if (editandoId) {
-                if (foto === undefined) {
-                    const prev = participantesCache.find(p => p.id === editandoId);
-                    if (prev && prev.foto) data.foto = prev.foto;
+            try {
+                const fotoFile = document.getElementById('regFoto').files[0];
+                let foto = undefined;
+                if (fotoFile) {
+                    if (fotoFile.size > 500000) { toast('❌ La imagen es muy grande (máx 500KB)', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Registro'; return; }
+                    foto = await fileToBase64(fotoFile);
                 }
-                await dbPart.doc(editandoId).update(data);
-                toast('✅ Registro actualizado');
-            } else {
-                await dbPart.add(data);
-                toast('✅ Registro agregado');
-            }
-            if (telefono) {
-                const nombreNorm = data.nombre.toLowerCase();
-                const existing = personasCache.find(p => p.nombre.toLowerCase() === nombreNorm);
-                if (existing) {
-                    if (existing.telefono !== telefono) {
-                        await dbPersonas.doc(existing.id).update({ telefono });
-                        existing.telefono = telefono;
+
+                const data = {
+                    nombre: document.getElementById('regNombre').value.trim(),
+                    fecha: document.getElementById('regFecha').value,
+                    hora: document.getElementById('regHora').value,
+                    telefono: telefono,
+                    tipoServicio: document.getElementById('regServicio').value,
+                    rol: document.getElementById('regRol').value,
+                    sede: document.getElementById('regSede').value.trim() || '',
+                    enviado: false
+                };
+                if (foto) data.foto = foto;
+
+                if (editandoId) {
+                    if (foto === undefined) {
+                        const prev = participantesCache.find(p => p.id === editandoId);
+                        if (prev && prev.foto) data.foto = prev.foto;
                     }
+                    await dbPart.doc(editandoId).update(data);
                 } else {
-                    const ref = await dbPersonas.add({ nombre: data.nombre, telefono });
-                    personasCache.push({ id: ref.id, nombre: data.nombre, telefono });
+                    await dbPart.add(data);
                 }
+
+                // Sincronizar con personas (fallo silencioso si no hay permiso)
+                try {
+                    if (telefono) {
+                        const nombreNorm = data.nombre.toLowerCase();
+                        const existing = personasCache.find(p => p.nombre.toLowerCase() === nombreNorm);
+                        if (existing) {
+                            if (existing.telefono !== telefono) {
+                                await dbPersonas.doc(existing.id).update({ telefono });
+                                existing.telefono = telefono;
+                            }
+                        } else {
+                            const ref = await dbPersonas.add({ nombre: data.nombre, telefono });
+                            personasCache.push({ id: ref.id, nombre: data.nombre, telefono });
+                        }
+                    }
+                } catch (e) {
+                    console.warn('No se pudo sincronizar con personas:', e.message);
+                }
+
+                toast('✅ Registro guardado');
+                cerrarModal();
+                cargarParticipantes();
+            } catch (err) {
+                toast('❌ Error al guardar: ' + err.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Guardar Registro';
             }
-            cerrarModal();
-            cargarParticipantes();
         });
 
         function abrirModal() {
