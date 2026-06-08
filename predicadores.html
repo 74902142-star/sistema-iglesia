@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Predicadores y Anfitriones | Iglesia Agua Viva</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=4">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -12,6 +14,7 @@
     <script src="firebase-config.js"></script>
     <script src="firebase-auth.js"></script>
 </head>
+
 <body>
     <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
     <div class="app-layout">
@@ -28,15 +31,22 @@
                 <button class="sidebar-close" id="sidebarClose">&times;</button>
             </div>
             <div class="nav-section-content">
-                <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
-                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i data-lucide="clipboard-list"></i></span><span>Registro</span></a>
-                <a href="predicadores.html" class="nav-link active" id="nav-anfitriones"><span class="nav-icon"><i data-lucide="users"></i></span><span>Anfitriones</span></a>
-                <a href="creativos.html" class="nav-link" id="nav-creativos"><span class="nav-icon"><i data-lucide="palette"></i></span><span>Creativos</span></a>
-                <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>EDL</span></a>
+                <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i
+                            data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
+                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i
+                            data-lucide="clipboard-list"></i></span><span>Registro</span></a>
+                <a href="predicadores.html" class="nav-link active" id="nav-anfitriones"><span class="nav-icon"><i
+                            data-lucide="users"></i></span><span>Anfitriones</span></a>
+                <a href="creativos.html" class="nav-link" id="nav-creativos"><span class="nav-icon"><i
+                            data-lucide="palette"></i></span><span>Creativos</span></a>
+                <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i
+                            data-lucide="graduation-cap"></i></span><span>EDL</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
-                <a href="#" class="nav-link"><span class="nav-icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
+                <a href="#" class="nav-link"><span class="nav-icon"><i
+                            data-lucide="settings"></i></span><span>Configuración</span></a>
+                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i
+                            data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
             </div>
         </aside>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -46,7 +56,7 @@
             <!-- Header -->
             <div class="header">
                 <div class="header-left">
-                    <div class="header-title">🎤 Anfitriones y Predicadores</div>
+                    <div class="header-title">Anfitriones y Predicadores</div>
                 </div>
                 <div class="header-right">
                     <div class="user-area">
@@ -67,7 +77,8 @@
                         <div class="stat-card-details">
                             <h4>Total Predicadores</h4>
                             <div class="stat-value" id="countPredicadores">0</div>
-                            <div class="stat-trend up"><i data-lucide="trending-up" style="width:14px; height:14px; vertical-align:middle;"></i> +2 este mes</div>
+                            <div class="stat-trend up"><i data-lucide="trending-up"
+                                    style="width:14px; height:14px; vertical-align:middle;"></i> +2 este mes</div>
                         </div>
                         <div class="stat-card-icon"><i data-lucide="user-check"></i></div>
                     </div>
@@ -75,7 +86,8 @@
                         <div class="stat-card-details">
                             <h4>Total Anfitriones</h4>
                             <div class="stat-value" id="countAnfitriones">0</div>
-                            <div class="stat-trend up"><i data-lucide="sparkles" style="width:14px; height:14px; vertical-align:middle;"></i> Activos hoy</div>
+                            <div class="stat-trend up"><i data-lucide="sparkles"
+                                    style="width:14px; height:14px; vertical-align:middle;"></i> Activos hoy</div>
                         </div>
                         <div class="stat-card-icon"><i data-lucide="users"></i></div>
                     </div>
@@ -83,9 +95,12 @@
                         <div class="stat-card-details">
                             <h4>Recordatorios Pendientes</h4>
                             <div class="stat-value" id="countPendientes">0</div>
-                            <div class="stat-trend down" style="color:var(--danger);"><i data-lucide="alert-circle" style="width:14px; height:14px; vertical-align:middle;"></i> Requiere atención</div>
+                            <div class="stat-trend down" style="color:var(--danger);"><i data-lucide="alert-circle"
+                                    style="width:14px; height:14px; vertical-align:middle;"></i> Requiere atención</div>
                         </div>
-                        <div class="stat-card-icon" style="background-color:rgba(239,68,68,0.08); color:var(--danger);"><i data-lucide="bell"></i></div>
+                        <div class="stat-card-icon" style="background-color:rgba(239,68,68,0.08); color:var(--danger);">
+                            <i data-lucide="bell"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -94,18 +109,26 @@
                     <!-- Top: Carga Masiva -->
                     <div class="section-card" style="display: flex; flex-direction: column; justify-content: center;">
                         <div class="upload-area" id="uploadArea">
-                            <div class="upload-area-icon"><i data-lucide="cloud-upload" style="width: 28px; height: 28px;"></i></div>
+                            <div class="upload-area-icon"><i data-lucide="cloud-upload"
+                                    style="width: 28px; height: 28px;"></i></div>
                             <h4>Zona de Carga Masiva</h4>
-                            <p style="font-size:12px; margin-top: 4px;">Arrastra tu archivo Excel aquí o haz clic para seleccionar desde tu equipo.</p>
-                            <button class="btn btn-secondary" onclick="descargarPlantilla()" style="margin-top: 16px; width: 100%;"><i data-lucide="download" style="width: 14px; height: 14px;"></i> Descargar Plantilla</button>
-                            <button class="btn btn-primary" onclick="abrirModal()" style="margin-top: 10px; width: 100%;"><i data-lucide="plus" style="width: 14px; height: 14px;"></i> Agregar Registro</button>
+                            <p style="font-size:12px; margin-top: 4px;">Arrastra tu archivo Excel aquí o haz clic para
+                                seleccionar desde tu equipo.</p>
+                            <button class="btn btn-secondary" onclick="descargarPlantilla()"
+                                style="margin-top: 16px; width: 100%;"><i data-lucide="download"
+                                    style="width: 14px; height: 14px;"></i> Descargar Plantilla</button>
+                            <button class="btn btn-primary" onclick="abrirModal()"
+                                style="margin-top: 10px; width: 100%;"><i data-lucide="plus"
+                                    style="width: 14px; height: 14px;"></i> Agregar Registro</button>
                         </div>
                     </div>
 
                     <!-- Right: Predicadores Table -->
                     <div class="section-card" style="margin-bottom: 0;">
                         <div class="section-header">
-                            <div class="section-title"><i data-lucide="award" style="width: 20px; height: 20px; color: var(--brand-blue);"></i> Predicadores Destacados</div>
+                            <div class="section-title"><i data-lucide="award"
+                                    style="width: 20px; height: 20px; color: var(--brand-blue);"></i> Predicadores
+                                Destacados</div>
                         </div>
                         <div class="table-container">
                             <table class="data-table">
@@ -118,7 +141,11 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tablaPredicadores">
-                                    <tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-muted);">Cargando predicadores...</td></tr>
+                                    <tr>
+                                        <td colspan="4"
+                                            style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                            Cargando predicadores...</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -128,7 +155,9 @@
                 <!-- Bottom: Anfitriones General Table -->
                 <div class="section-card">
                     <div class="section-header">
-                        <div class="section-title"><i data-lucide="users" style="width: 20px; height: 20px; color: var(--brand-blue);"></i> Listado General de Anfitriones</div>
+                        <div class="section-title"><i data-lucide="users"
+                                style="width: 20px; height: 20px; color: var(--brand-blue);"></i> Listado General de
+                            Anfitriones</div>
                     </div>
                     <div class="table-container">
                         <table class="data-table">
@@ -142,7 +171,11 @@
                                 </tr>
                             </thead>
                             <tbody id="tablaAnfitriones">
-                                <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">Cargando anfitriones...</td></tr>
+                                <tr>
+                                    <td colspan="5"
+                                        style="text-align: center; padding: 40px; color: var(--text-muted);">Cargando
+                                        anfitriones...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -177,8 +210,10 @@
                     </div>
                     <div class="form-group">
                         <label>Teléfono (WhatsApp) *</label>
-                        <input type="tel" id="regTelefono" class="form-control" required placeholder="Ej: 999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
-                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe comenzar con 9 (ej: 999888777)</div>
+                        <input type="tel" id="regTelefono" class="form-control" required placeholder="Ej: 999888777"
+                            maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe comenzar con
+                            9 (ej: 999888777)</div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -207,13 +242,18 @@
                         <label>Sede</label>
                         <input type="text" id="regSede" class="form-control" placeholder="Ej: Huancayo">
                     </div>
-                    <div class="photo-upload-group" style="margin-top: 12px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid var(--border-light);">
+                    <div class="photo-upload-group"
+                        style="margin-top: 12px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid var(--border-light);">
                         <label>🎨 Paleta de colores (opcional)</label>
                         <input type="file" id="regFoto" class="form-control" accept="image/png,image/jpeg,image/webp">
-                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Sube la imagen de la paleta de colores para enviar junto al mensaje</div>
-                        <img id="regFotoPreview" class="photo-preview" style="max-width: 160px; max-height: 120px; border-radius: 10px; margin-top: 8px; border: 1px solid var(--border-light); object-fit: cover; display:none;">
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Sube la imagen de la paleta
+                            de colores para enviar junto al mensaje</div>
+                        <img id="regFotoPreview" class="photo-preview"
+                            style="max-width: 160px; max-height: 120px; border-radius: 10px; margin-top: 8px; border: 1px solid var(--border-light); object-fit: cover; display:none;">
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 20px;"><i data-lucide="save" style="width: 16px; height: 16px;"></i> Guardar Registro</button>
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; justify-content: center; margin-top: 20px;"><i data-lucide="save"
+                            style="width: 16px; height: 16px;"></i> Guardar Registro</button>
                 </form>
             </div>
         </div>
@@ -232,9 +272,12 @@
                     <img id="waPhotoImg">
                 </div>
                 <div class="wa-actions">
-                    <button class="btn btn-primary" onclick="enviarWAAhora()"><i data-lucide="send" style="width: 16px; height: 16px;"></i> Enviar ahora</button>
-                    <button class="btn btn-secondary" onclick="copiarMensaje()"><i data-lucide="copy" style="width: 16px; height: 16px;"></i> Copiar mensaje</button>
-                    <button class="btn btn-secondary" id="waDownloadBtn" onclick="descargarFotoWA()"><i data-lucide="download-cloud" style="width: 16px; height: 16px;"></i> Descargar foto</button>
+                    <button class="btn btn-primary" onclick="enviarWAAhora()"><i data-lucide="send"
+                            style="width: 16px; height: 16px;"></i> Enviar ahora</button>
+                    <button class="btn btn-secondary" onclick="copiarMensaje()"><i data-lucide="copy"
+                            style="width: 16px; height: 16px;"></i> Copiar mensaje</button>
+                    <button class="btn btn-secondary" id="waDownloadBtn" onclick="descargarFotoWA()"><i
+                            data-lucide="download-cloud" style="width: 16px; height: 16px;"></i> Descargar foto</button>
                 </div>
             </div>
         </div>
@@ -402,12 +445,12 @@
             }
         }
 
-        document.getElementById('regServicio').addEventListener('change', function() {
+        document.getElementById('regServicio').addEventListener('change', function () {
             autoSetFields(this.value);
         });
 
         // Photo preview
-        document.getElementById('regFoto').addEventListener('change', function(e) {
+        document.getElementById('regFoto').addEventListener('change', function (e) {
             const file = e.target.files[0];
             const preview = document.getElementById('regFotoPreview');
             if (file) {
@@ -484,10 +527,10 @@
                     </tr>`;
                 } else {
                     // Anfitriones columns: Nombre Completo, Teléfono, Rol Asignado, Estado, Acciones
-                    const statusDot = enviado 
+                    const statusDot = enviado
                         ? `<span style="display:inline-flex; align-items:center; gap:6px; font-weight:600; color:#15803d;"><span style="width:8px; height:8px; background-color:#10b981; border-radius:50%;"></span> Presente</span>`
                         : `<span style="display:inline-flex; align-items:center; gap:6px; font-weight:600; color:#b45309;"><span style="width:8px; height:8px; background-color:#f59e0b; border-radius:50%;"></span> En camino</span>`;
-                    
+
                     return `<tr>
                         <td>
                             <div class="student-cell">
@@ -589,7 +632,7 @@
             document.getElementById('regHora').value = p.hora;
             document.getElementById('regRol').value = p.rol;
             document.getElementById('regSede').value = p.sede || '';
-            document.getElementById('groupSede').style.display = ['DOMINGO_10_HYO','DOMINGO_12_HYO','DOMINGO_12_TAMBO','DOMINGO_18_TAMBO','DOMINGO'].includes(p.tipoServicio) ? 'block' : 'none';
+            document.getElementById('groupSede').style.display = ['DOMINGO_10_HYO', 'DOMINGO_12_HYO', 'DOMINGO_12_TAMBO', 'DOMINGO_18_TAMBO', 'DOMINGO'].includes(p.tipoServicio) ? 'block' : 'none';
 
             const preview = document.getElementById('regFotoPreview');
             if (p.foto) { preview.src = p.foto; preview.style.display = 'block'; }
@@ -731,23 +774,24 @@
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarClose = document.getElementById('sidebarClose');
         if (sidebarMobileToggle) {
-            sidebarMobileToggle.addEventListener('click', function() {
+            sidebarMobileToggle.addEventListener('click', function () {
                 sidebar.classList.toggle('open');
                 sidebarOverlay.classList.add('active');
             });
         }
         if (sidebarClose) {
-            sidebarClose.addEventListener('click', function() {
+            sidebarClose.addEventListener('click', function () {
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('active');
             });
         }
         if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', function() {
+            sidebarOverlay.addEventListener('click', function () {
                 sidebar.classList.remove('open');
                 sidebarOverlay.classList.remove('active');
             });
         }
     </script>
 </body>
+
 </html>

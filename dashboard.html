@@ -622,7 +622,7 @@ service cloud.firestore {
 
         function cargarUsuario() {
             document.getElementById('userName').innerText = usuarioActual.nombre || 'Administrador';
-            document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : '📋 Líder de Sede';
+            document.getElementById('userRole').innerText = esAdmin ? 'Administrador' : '📋 Líder de Sede';
             document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
         }
 

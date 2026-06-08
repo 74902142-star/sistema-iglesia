@@ -1407,6 +1407,7 @@ select.glass-input {
     .filter-group, .filter-select, .filter-input, .form-control, .form-select, input[type="week"], input[type="date"] {
         width: 100% !important;
         max-width: 100% !important;
+        min-width: 0 !important;
         box-sizing: border-box !important;
     }
     
