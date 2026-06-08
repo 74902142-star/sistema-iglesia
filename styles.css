@@ -1404,7 +1404,7 @@ select.glass-input {
         align-items: stretch;
     }
     
-    .filter-group, .filter-select, .filter-input, .form-control, .form-select, input[type="week"], input[type="date"] {
+    .filter-group, .filter-select, .filter-input, .form-control, .form-select, input[type="week"], input[type="date"], #filtroSemana {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
