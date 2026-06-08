@@ -1415,6 +1415,11 @@ select.glass-input {
         font-size: 11px !important;
     }
     
+    .filter-group {
+        overflow: hidden;
+        border-radius: var(--radius-md);
+    }
+    
     .filters-bar button {
         width: 100%;
     }
