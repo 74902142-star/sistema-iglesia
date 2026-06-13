@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>KIDS - Registro de Maestros | Iglesia Agua Viva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=12">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="firebase-auth.js"></script>
+</head>
+
+<body>
+    <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="logo.png" alt="Logo" class="sidebar-logo-img" />
+                    <div class="logo-text">
+                        <h2>Agua Viva</h2>
+                        <p>Administración</p>
+                    </div>
+                </div>
+                <button class="sidebar-close" id="sidebarClose">&times;</button>
+            </div>
+            <div class="nav-section-content">
+                <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i
+                            data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
+                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i
+                            data-lucide="clipboard-list"></i></span><span>Registro</span></a>
+                <a href="predicadores.html" class="nav-link" id="nav-anfitriones"><span class="nav-icon"><i
+                            data-lucide="users"></i></span><span>Anfitriones</span></a>
+                <a href="creativos.html" class="nav-link" id="nav-creativos"><span class="nav-icon"><i
+                            data-lucide="palette"></i></span><span>Creativos</span></a>
+                <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i
+                            data-lucide="graduation-cap"></i></span><span>EDL</span></a>
+                <a href="kids.html" class="nav-link active" id="nav-kids"><span class="nav-icon"><i
+                            data-lucide="heart"></i></span><span>KIDS</span></a>
+            </div>
+            <div class="nav-section-content" style="margin-top: auto;">
+                <a href="#" class="nav-link"><span class="nav-icon"><i
+                            data-lucide="settings"></i></span><span>Configuración</span></a>
+                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i
+                            data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <div class="header-title">🧒 KIDS – Registro de Maestros</div>
+                </div>
+                <div class="header-right">
+                    <div class="user-area">
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Cargando...</div>
+                            <div class="user-role" id="userRole"></div>
+                        </div>
+                        <div class="user-avatar" id="userAvatar">A</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Container -->
+            <div class="container">
+
+                <!-- ========== ADMIN VIEW ========== -->
+                <div class="admin-only">
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-details">
+                                <h4>Total Maestros</h4>
+                                <div class="stat-value" id="statTotal">0</div>
+                                <div class="stat-trend up"><i data-lucide="trending-up"
+                                        style="width:14px;height:14px;vertical-align:middle;"></i> Registrados</div>
+                            </div>
+                            <div class="stat-card-icon"><i data-lucide="users"></i></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-details">
+                                <h4>Hoy</h4>
+                                <div class="stat-value" id="statHoy">0</div>
+                                <div class="stat-trend up" style="color:var(--success-text);"><i data-lucide="check"
+                                        style="width:14px;height:14px;vertical-align:middle;"></i> Asistieron</div>
+                            </div>
+                            <div class="stat-card-icon"
+                                style="background-color:var(--success-bg);color:var(--success);"><i
+                                    data-lucide="calendar-check"></i></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-details">
+                                <h4>Varones / Mujeres</h4>
+                                <div class="stat-value" id="statGenero" style="font-size:22px;">0 / 0</div>
+                                <div class="stat-trend neutral">Maestros activos</div>
+                            </div>
+                            <div class="stat-card-icon"
+                                style="background-color:var(--brand-blue-light);color:var(--brand-blue);"><i
+                                    data-lucide="users"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Search Teacher by DNI -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title"><i data-lucide="search"
+                                    style="width:20px;height:20px;color:var(--brand-blue);"></i> Buscar Maestro por DNI
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+                            <div class="filter-group" style="flex:2;min-width:200px;">
+                                <label>📇 DNI del Maestro</label>
+                                <input type="text" id="dniBuscar" class="filter-input" placeholder="Ingresa DNI..."
+                                    maxlength="8" inputmode="numeric" pattern="[0-9]*">
+                            </div>
+                            <button class="btn btn-primary" onclick="buscarMaestro()"><i data-lucide="search"
+                                    style="width:16px;height:16px;"></i> Buscar</button>
+                            <button class="btn btn-secondary" onclick="limpiarBusqueda()"><i data-lucide="x"
+                                    style="width:16px;height:16px;"></i> Limpiar</button>
+                            <button class="btn btn-primary" onclick="abrirModalNuevo()"><i data-lucide="plus"
+                                    style="width:16px;height:16px;"></i> Nuevo Maestro</button>
+                        </div>
+                    </div>
+
+                    <!-- Teacher Profile Card -->
+                    <div id="teacherProfile" style="display:none;">
+                        <div class="section-card"
+                            style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;">
+                            <div class="kids-silhouette" id="teacherSilhouette">
+                                <i data-lucide="user" style="width:48px;height:48px;"></i>
+                            </div>
+                            <div style="flex:1;min-width:200px;">
+                                <h3 id="teacherNombre" style="font-size:20px;font-weight:700;margin-bottom:4px;">—</h3>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:14px;color:var(--text-secondary);">
+                                    <div><strong>DNI:</strong> <span id="teacherDni">—</span></div>
+                                    <div><strong>Celular:</strong> <span id="teacherCelular">—</span></div>
+                                    <div><strong>Sexo:</strong> <span id="teacherSexo">—</span></div>
+                                    <div><strong>Líder:</strong> <span id="teacherLider">—</span></div>
+                                </div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:8px;">
+                                <button class="btn btn-primary" onclick="registrarAsistencia()"><i data-lucide="calendar-check"
+                                        style="width:16px;height:16px;"></i> Registrar Asistencia</button>
+                                <button class="btn btn-secondary" onclick="editarMaestro()"><i data-lucide="edit"
+                                        style="width:16px;height:16px;"></i> Editar</button>
+                                <button class="btn btn-secondary" style="color:var(--danger);border-color:var(--danger);"
+                                    onclick="eliminarMaestro()"><i data-lucide="trash"
+                                        style="width:16px;height:16px;"></i> Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance History -->
+                    <div class="section-card" id="historySection" style="display:none;">
+                        <div class="section-header">
+                            <div class="section-title"><i data-lucide="clock"
+                                    style="width:20px;height:20px;color:var(--brand-blue);"></i> Historial de
+                                <span id="historyName">—</span></div>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Hora</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyBody">
+                                    <tr>
+                                        <td colspan="2" style="text-align:center;padding:32px;color:var(--text-muted);">
+                                            Sin registros</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- All Teachers Table -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title"><i data-lucide="list"
+                                    style="width:20px;height:20px;color:var(--brand-blue);"></i> Listado de Maestros</div>
+                            <button class="btn btn-secondary" onclick="exportarExcel()"><i data-lucide="file-spreadsheet"
+                                    style="width:16px;height:16px;"></i> Exportar Excel</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombres</th>
+                                        <th>DNI</th>
+                                        <th>Celular</th>
+                                        <th>Sexo</th>
+                                        <th>Líder</th>
+                                        <th>Asistencia</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaMaestros">
+                                    <tr>
+                                        <td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">
+                                            Cargando...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ========== GUEST VIEW ========== -->
+                <div class="guest-only">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title">🧒 Registro de Asistencia KIDS</div>
+                        </div>
+                        <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">
+                            Ingresa tu DNI para registrar tu asistencia como maestro del ministerio KIDS.
+                        </p>
+
+                        <!-- Guest DNI Input -->
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:24px;">
+                            <div class="filter-group" style="flex:1;min-width:200px;">
+                                <label>📇 Ingresa tu DNI</label>
+                                <input type="text" id="guestDniInput" class="filter-input"
+                                    placeholder="Ej: 12345678" maxlength="8" inputmode="numeric" pattern="[0-9]*">
+                            </div>
+                            <button class="btn btn-primary" onclick="buscarMaestroGuest()"><i data-lucide="search"
+                                    style="width:16px;height:16px;"></i> Buscar</button>
+                        </div>
+
+                        <!-- Guest Profile (hidden until found) -->
+                        <div id="guestProfile" style="display:none;">
+                            <div class="section-card"
+                                style="background:linear-gradient(135deg,#f8fafc,#f1f4f9);text-align:center;padding:32px;">
+                                <div class="kids-silhouette" id="guestSilhouette" style="margin:0 auto 16px;width:80px;height:80px;">
+                                    <i data-lucide="user" style="width:40px;height:40px;"></i>
+                                </div>
+                                <h3 id="guestNombre" style="font-size:22px;font-weight:700;margin-bottom:4px;">—</h3>
+                                <div style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">
+                                    <span id="guestDniTexto">—</span> · <span id="guestCelularTexto">—</span>
+                                    <br><span id="guestLiderTexto">Líder: —</span>
+                                </div>
+                                <button class="btn btn-primary" onclick="registrarAsistenciaGuest()"
+                                    style="justify-content:center;width:100%;max-width:300px;">
+                                    <i data-lucide="calendar-check" style="width:18px;height:18px;"></i>
+                                    Registrar mi Asistencia
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Guest Success -->
+                        <div id="guestSuccess"
+                            style="display:none;background:#dcfce7;border-radius:24px;padding:32px;text-align:center;margin-top:16px;">
+                            <div style="font-size:48px;margin-bottom:12px;">✅</div>
+                            <h3 style="color:#166534;margin-bottom:8px;">¡Asistencia registrada!</h3>
+                            <p style="color:#065f46;">Tu ingreso ha sido registrado correctamente. ¡Gracias por servir!</p>
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div class="section-card"
+                        style="background:linear-gradient(135deg,#f8fafc,#f1f4f9);border:1px solid var(--border-light);">
+                        <h3 style="font-size:16px;font-weight:700;color:var(--brand-blue);margin-bottom:12px;">📢
+                            Ministerio KIDS</h3>
+                        <p style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);">
+                            El ministerio KIDS está dedicado a la enseñanza y cuidado de nuestros niños.
+                            Cada maestro debe registrar su asistencia al llegar al servicio.
+                        </p>
+                        <p style="margin-top:12px;font-size:13.5px;line-height:1.6;color:var(--text-secondary);">
+                            🔥 <strong>Requisito:</strong> Ser parte del discipulado y tener corazón de servicio.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Maestro -->
+    <div id="modalMaestro" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nuevo Maestro</h3>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formMaestro">
+                    <input type="hidden" id="editId">
+                    <div class="form-group">
+                        <label>Nombres y apellidos *</label>
+                        <input type="text" id="mNombres" class="form-control" required
+                            placeholder="Ej: María Pérez López">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>DNI *</label>
+                            <input type="text" id="mDni" class="form-control" required maxlength="8"
+                                placeholder="12345678" inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <div class="form-group">
+                            <label>Celular *</label>
+                            <input type="tel" id="mCelular" class="form-control" required
+                                placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Sexo *</label>
+                            <select id="mSexo" class="form-control" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Líder</label>
+                            <input type="text" id="mLider" class="form-control" placeholder="Nombre del líder">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"
+                        style="width:100%;justify-content:center;margin-top:20px;">
+                        <i data-lucide="save" style="width:16px;height:16px;"></i> Guardar Maestro
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual'));
+        if (!usuarioActual) { window.location.href = 'index.html'; }
+        const esAdmin = usuarioActual.rol === 'admin';
+        const esInvitado = usuarioActual.rol === 'invitado';
+        if (!esAdmin && !esInvitado) { window.location.href = 'index.html'; }
+
+        document.getElementById('userName').innerText = esAdmin ? usuarioActual.nombre : usuarioActual.nombre;
+        document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : '👥 Invitado';
+        document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
+
+        if (esAdmin) {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'none');
+        } else {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'block');
+        }
+
+        const dbKids = db.collection('kids_maestros');
+        const dbAsistencia = db.collection('kids_asistencia');
+        let maestros = [];
+        let maestroActual = null; // selected teacher for actions
+
+        // ── Load ──
+        async function cargarMaestros() {
+            await firebaseReady;
+            const snap = await dbKids.get();
+            maestros = [];
+            snap.forEach(d => maestros.push({ id: d.id, ...d.data() }));
+            actualizarStats();
+            renderTabla();
+        }
+
+        function actualizarStats() {
+            document.getElementById('statTotal').innerText = maestros.length;
+            const hoy = new Date().toISOString().split('T')[0];
+            Promise.all(maestros.map(m =>
+                dbAsistencia.where('maestroId', '==', m.id).where('fecha', '==', hoy).get()
+            )).then(results => {
+                const asisHoy = results.filter(r => r.size > 0).length;
+                document.getElementById('statHoy').innerText = asisHoy;
+            });
+            const varones = maestros.filter(m => m.sexo === 'Masculino').length;
+            const mujeres = maestros.filter(m => m.sexo === 'Femenino').length;
+            document.getElementById('statGenero').innerText = `${varones} / ${mujeres}`;
+        }
+
+        function renderTabla() {
+            const tbody = document.getElementById('tablaMaestros');
+            if (maestros.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">No hay maestros registrados</td></tr>';
+                return;
+            }
+            tbody.innerHTML = maestros.map(m => {
+                const sexoIcon = m.sexo === 'Masculino' ? '♂️' : m.sexo === 'Femenino' ? '♀️' : '—';
+                return `<tr>
+                    <td>
+                        <div class="student-cell">
+                            <div class="student-avatar" style="background:${m.sexo === 'Femenino' ? '#fce7f3;color:#db2777' : '#dbeafe;color:#1d4ed8'}">
+                                ${(m.nombres || 'A').charAt(0)}
+                            </div>
+                            <div class="student-info">
+                                <h5>${m.nombres}</h5>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${m.dni}</td>
+                    <td>${m.celular || '—'}</td>
+                    <td>${sexoIcon}</td>
+                    <td>${m.lider || '—'}</td>
+                    <td><button class="btn btn-secondary" style="padding:4px 10px;font-size:11px;" onclick="verAsistencia('${m.id}','${m.nombres}')">Ver</button></td>
+                    <td>
+                        <button class="action-btn btn-edit btn" style="padding:6px;border-radius:6px;" onclick="editarMaestroId('${m.id}')"><i data-lucide="edit" style="width:14px;height:14px;"></i></button>
+                        <button class="action-btn btn-del btn" style="padding:6px;border-radius:6px;" onclick="eliminarMaestroId('${m.id}','${m.nombres}')"><i data-lucide="trash" style="width:14px;height:14px;"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // ── Search / Auto-fill ──
+        function buscarMaestro() {
+            const dni = document.getElementById('dniBuscar').value.trim();
+            if (!dni) { toast('Ingresa un DNI', 'warning'); return; }
+            const m = maestros.find(x => x.dni === dni);
+            if (!m) { toast('❌ Maestro no encontrado', 'warning'); return; }
+            mostrarMaestro(m);
+        }
+
+        function mostrarMaestro(m) {
+            maestroActual = m;
+            document.getElementById('teacherNombre').innerText = m.nombres;
+            document.getElementById('teacherDni').innerText = m.dni;
+            document.getElementById('teacherCelular').innerText = m.celular || '—';
+            document.getElementById('teacherSexo').innerText = m.sexo || '—';
+            document.getElementById('teacherLider').innerText = m.lider || '—';
+
+            const sil = document.getElementById('teacherSilhouette');
+            sil.className = 'kids-silhouette';
+            if (m.sexo === 'Masculino') sil.classList.add('male');
+            else if (m.sexo === 'Femenino') sil.classList.add('female');
+            sil.innerHTML = m.sexo === 'Femenino'
+                ? '<i data-lucide="user" style="width:48px;height:48px;"></i>'
+                : '<i data-lucide="user" style="width:48px;height:48px;"></i>';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            document.getElementById('teacherProfile').style.display = 'block';
+            cargarHistorial(m.id, m.nombres);
+        }
+
+        async function cargarHistorial(id, nombre) {
+            document.getElementById('historyName').innerText = nombre;
+            const snap = await dbAsistencia.where('maestroId', '==', id).orderBy('timestamp', 'desc').get();
+            const tbody = document.getElementById('historyBody');
+            if (snap.empty) {
+                tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:32px;color:var(--text-muted);">Sin registros</td></tr>';
+            } else {
+                tbody.innerHTML = snap.docs.map(d => {
+                    const data = d.data();
+                    const f = data.fecha || '—';
+                    const h = data.hora || '—';
+                    return `<tr><td>${f}</td><td>${h}</td></tr>`;
+                }).join('');
+            }
+            document.getElementById('historySection').style.display = 'block';
+        }
+
+        function limpiarBusqueda() {
+            document.getElementById('dniBuscar').value = '';
+            document.getElementById('teacherProfile').style.display = 'none';
+            document.getElementById('historySection').style.display = 'none';
+            maestroActual = null;
+        }
+
+        async function registrarAsistencia() {
+            if (!maestroActual) return;
+            const now = new Date();
+            await dbAsistencia.add({
+                maestroId: maestroActual.id,
+                fecha: now.toISOString().split('T')[0],
+                hora: now.toTimeString().split(' ')[0],
+                timestamp: now.toISOString()
+            });
+            toast('✅ Asistencia registrada para ' + maestroActual.nombres);
+            cargarHistorial(maestroActual.id, maestroActual.nombres);
+            actualizarStats();
+        }
+
+        // ── Guest ──
+        async function buscarMaestroGuest() {
+            const dni = document.getElementById('guestDniInput').value.trim();
+            if (!dni) { toast('Ingresa tu DNI', 'warning'); return; }
+
+            await firebaseReady;
+            const snap = await dbKids.where('dni', '==', dni).get();
+            if (snap.empty) {
+                toast('❌ Maestro no encontrado. Consulta con el administrador.', 'warning');
+                return;
+            }
+            const doc = snap.docs[0];
+            const m = { id: doc.id, ...doc.data() };
+            maestroActual = m;
+
+            document.getElementById('guestNombre').innerText = m.nombres;
+            document.getElementById('guestDniTexto').innerText = 'DNI: ' + m.dni;
+            document.getElementById('guestCelularTexto').innerText = '📱 ' + (m.celular || '—');
+            document.getElementById('guestLiderTexto').innerText = 'Líder: ' + (m.lider || '—');
+
+            const sil = document.getElementById('guestSilhouette');
+            sil.className = 'kids-silhouette';
+            if (m.sexo === 'Masculino') sil.classList.add('male');
+            else if (m.sexo === 'Femenino') sil.classList.add('female');
+            sil.innerHTML = '<i data-lucide="user" style="width:40px;height:40px;"></i>';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            document.getElementById('guestProfile').style.display = 'block';
+            document.getElementById('guestSuccess').style.display = 'none';
+        }
+
+        async function registrarAsistenciaGuest() {
+            if (!maestroActual) return;
+            const now = new Date();
+            await dbAsistencia.add({
+                maestroId: maestroActual.id,
+                fecha: now.toISOString().split('T')[0],
+                hora: now.toTimeString().split(' ')[0],
+                timestamp: now.toISOString(),
+                origen: 'invitado'
+            });
+            document.getElementById('guestProfile').style.display = 'none';
+            document.getElementById('guestSuccess').style.display = 'block';
+            document.getElementById('guestDniInput').value = '';
+            toast('✅ Asistencia registrada. ¡Gracias ' + maestroActual.nombres + '!');
+        }
+
+        // ── CRUD Maestro ──
+        function abrirModalNuevo() {
+            editandoId = null;
+            document.getElementById('formMaestro').reset();
+            document.getElementById('modalTitle').innerText = 'Nuevo Maestro';
+            document.getElementById('modalMaestro').style.display = 'flex';
+        }
+
+        let editandoId = null;
+
+        document.getElementById('formMaestro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await firebaseReady;
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = 'Guardando...';
+
+            try {
+                const dni = document.getElementById('mDni').value.trim();
+                if (!/^\d{8}$/.test(dni)) { toast('❌ DNI debe tener 8 dígitos', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Maestro'; return; }
+                const celular = document.getElementById('mCelular').value.trim();
+                if (celular && !/^9\d{8}$/.test(celular)) { toast('❌ Celular inválido', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Maestro'; return; }
+
+                const data = {
+                    nombres: document.getElementById('mNombres').value.trim(),
+                    dni: dni,
+                    celular: celular,
+                    sexo: document.getElementById('mSexo').value,
+                    lider: document.getElementById('mLider').value.trim() || ''
+                };
+
+                if (editandoId) {
+                    await dbKids.doc(editandoId).update(data);
+                    toast('✅ Maestro actualizado');
+                } else {
+                    await dbKids.add(data);
+                    toast('✅ Maestro registrado');
+                }
+                cerrarModal();
+                cargarMaestros();
+            } catch (err) {
+                toast('❌ Error: ' + err.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Guardar Maestro';
+            }
+        });
+
+        function editarMaestro() {
+            if (!maestroActual) return;
+            editarMaestroId(maestroActual.id);
+        }
+
+        async function editarMaestroId(id) {
+            const doc = await dbKids.doc(id).get();
+            const m = doc.data();
+            editandoId = id;
+            document.getElementById('mNombres').value = m.nombres;
+            document.getElementById('mDni').value = m.dni;
+            document.getElementById('mCelular').value = m.celular || '';
+            document.getElementById('mSexo').value = m.sexo || '';
+            document.getElementById('mLider').value = m.lider || '';
+            document.getElementById('modalTitle').innerText = 'Editar Maestro';
+            document.getElementById('modalMaestro').style.display = 'flex';
+        }
+
+        function eliminarMaestro() {
+            if (!maestroActual) return;
+            eliminarMaestroId(maestroActual.id, maestroActual.nombres);
+        }
+
+        async function eliminarMaestroId(id, nombre) {
+            if (!confirm('¿Eliminar a ' + nombre + '?')) return;
+            await dbKids.doc(id).delete();
+            toast('🗑️ Maestro eliminado');
+            if (maestroActual && maestroActual.id === id) limpiarBusqueda();
+            cargarMaestros();
+        }
+
+        function verAsistencia(id, nombre) {
+            const m = maestros.find(x => x.id === id);
+            if (m) mostrarMaestro(m);
+        }
+
+        // ── Export ──
+        function exportarExcel() {
+            if (typeof XLSX === 'undefined') { toast('❌ Librería XLSX no cargada', 'error'); return; }
+            const datos = maestros.map(m => ({
+                Nombres: m.nombres,
+                DNI: m.dni,
+                Celular: m.celular || '',
+                Sexo: m.sexo || '',
+                Lider: m.lider || ''
+            }));
+            const ws = XLSX.utils.json_to_sheet(datos);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Maestros KIDS');
+            XLSX.writeFile(wb, `kids_maestros_${new Date().toISOString().split('T')[0]}.xlsx`);
+            toast('📎 Excel exportado');
+        }
+
+        // ── Toast ──
+        function toast(msg, tipo = 'success') {
+            const t = document.createElement('div');
+            t.className = 'toast toast-' + tipo;
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, tipo === 'warning' ? 5000 : 3000);
+        }
+
+        function cerrarModal() { document.getElementById('modalMaestro').style.display = 'none'; }
+
+        function cerrarSesion() {
+            if (typeof Auth !== 'undefined') Auth.cerrarSesion();
+            else { localStorage.removeItem('usuarioActual'); window.location.href = 'index.html'; }
+        }
+
+        // ── Mobile sidebar ──
+        const sidebarMobileToggle = document.getElementById('sidebarMobileToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarClose = document.getElementById('sidebarClose');
+        if (sidebarMobileToggle) {
+            sidebarMobileToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('open');
+                sidebarOverlay.classList.add('active');
+            });
+        }
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', function () {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function () {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
+
+        // ── Enter key search ──
+        document.getElementById('dniBuscar').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') buscarMaestro();
+        });
+        document.getElementById('guestDniInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') buscarMaestroGuest();
+        });
+
+        if (esAdmin) cargarMaestros();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    </script>
+
+</body>
+
+</html>
