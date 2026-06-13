@@ -261,6 +261,52 @@
                             </div>
                         </div>
 
+                        <!-- Guest Register Form (shown when DNI not found) -->
+                        <div id="guestRegisterForm" style="display:none;">
+                            <div class="section-card"
+                                style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fed7aa;padding:24px;">
+                                <h3 style="font-size:16px;font-weight:700;color:#c2410c;margin-bottom:16px;">📝 Maestro no encontrado</h3>
+                                <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">
+                                    Tu DNI no está registrado en el sistema. Completa tus datos para registrarte y marcar asistencia.
+                                </p>
+                                <div class="form-group">
+                                    <label>📇 DNI</label>
+                                    <input type="text" id="regDni" class="form-control" readonly style="background:#f1f5f9;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Nombres y apellidos *</label>
+                                    <input type="text" id="regNombres" class="form-control" required placeholder="Ej: María Pérez López">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Celular *</label>
+                                        <input type="tel" id="regCelular" class="form-control" required placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Sexo *</label>
+                                        <select id="regSexo" class="form-control" required>
+                                            <option value="">Seleccionar...</option>
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Femenino">Femenino</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Líder</label>
+                                    <input type="text" id="regLider" class="form-control" placeholder="Nombre de tu líder">
+                                </div>
+                                <button class="btn btn-primary" onclick="registrarMaestroYAsistencia()"
+                                    style="justify-content:center;width:100%;margin-top:16px;">
+                                    <i data-lucide="calendar-check" style="width:18px;height:18px;"></i>
+                                    Registrarme y marcar asistencia
+                                </button>
+                                <button class="btn" onclick="cancelarRegistro()"
+                                    style="justify-content:center;width:100%;margin-top:8px;background:#e2e8f0;color:#475569;">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Guest Success -->
                         <div id="guestSuccess"
                             style="display:none;background:#dcfce7;border-radius:24px;padding:32px;text-align:center;margin-top:16px;">
@@ -492,11 +538,15 @@
         async function buscarMaestroGuest() {
             const dni = document.getElementById('guestDniInput').value.trim();
             if (!dni) { toast('Ingresa tu DNI', 'warning'); return; }
+            if (!/^\d{8}$/.test(dni)) { toast('❌ DNI debe tener 8 dígitos', 'warning'); return; }
 
             await firebaseReady;
             const snap = await dbKids.where('dni', '==', dni).get();
             if (snap.empty) {
-                toast('❌ Maestro no encontrado. Consulta con el administrador.', 'warning');
+                document.getElementById('regDni').value = dni;
+                document.getElementById('guestRegisterForm').style.display = 'block';
+                document.getElementById('guestProfile').style.display = 'none';
+                document.getElementById('guestSuccess').style.display = 'none';
                 return;
             }
             const doc = snap.docs[0];
@@ -515,6 +565,7 @@
             sil.innerHTML = '<i data-lucide="user" style="width:40px;height:40px;"></i>';
             if (typeof lucide !== 'undefined') lucide.createIcons();
 
+            document.getElementById('guestRegisterForm').style.display = 'none';
             document.getElementById('guestProfile').style.display = 'block';
             document.getElementById('guestSuccess').style.display = 'none';
         }
@@ -533,6 +584,48 @@
             document.getElementById('guestSuccess').style.display = 'block';
             document.getElementById('guestDniInput').value = '';
             toast('✅ Asistencia registrada. ¡Gracias ' + maestroActual.nombres + '!');
+        }
+
+        async function registrarMaestroYAsistencia() {
+            const dni = document.getElementById('regDni').value.trim();
+            const nombres = document.getElementById('regNombres').value.trim();
+            const celular = document.getElementById('regCelular').value.trim();
+            const sexo = document.getElementById('regSexo').value;
+            const lider = document.getElementById('regLider').value.trim();
+
+            if (!nombres) { toast('❌ Ingresa tus nombres', 'warning'); return; }
+            if (!celular) { toast('❌ Ingresa tu celular', 'warning'); return; }
+            if (!sexo) { toast('❌ Selecciona tu sexo', 'warning'); return; }
+
+            const btn = document.querySelector('#guestRegisterForm .btn-primary');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Guardando...';
+
+            try {
+                await firebaseReady;
+                const docRef = await dbKids.add({
+                    dni, nombres, celular, sexo,
+                    lider: lider || 'Pendiente',
+                    createdAt: new Date().toISOString(),
+                    origen: 'auto-registro'
+                });
+                maestroActual = { id: docRef.id, dni, nombres, celular, sexo, lider: lider || 'Pendiente' };
+                await registrarAsistenciaGuest();
+                document.getElementById('guestRegisterForm').style.display = 'none';
+            } catch (e) {
+                toast('❌ Error al registrarte: ' + e.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Registrarme y marcar asistencia';
+            }
+        }
+
+        function cancelarRegistro() {
+            document.getElementById('guestRegisterForm').style.display = 'none';
+            document.getElementById('guestDniInput').value = '';
+            document.getElementById('regNombres').value = '';
+            document.getElementById('regCelular').value = '';
+            document.getElementById('regSexo').value = '';
+            document.getElementById('regLider').value = '';
         }
 
         // ── CRUD Maestro ──

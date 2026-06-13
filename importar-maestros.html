@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importar Maestros KIDS | Iglesia Agua Viva</title>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js">
+    </script>
+    <script src="firebase-config.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f8f9ff;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 24px;
+            color: #00334f;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 4px 24px rgba(0, 51, 79, 0.08);
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .btn-primary {
+            background: #00334f;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #1c6390;
+        }
+        .btn-primary:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .btn-danger:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #00334f;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .log {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+        .log .success {
+            color: #4ade80;
+        }
+        .log .error {
+            color: #f87171;
+        }
+        .log .info {
+            color: #60a5fa;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+            display: none;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00334f, #1c6390);
+            border-radius: 4px;
+            transition: width .3s;
+            width: 0%;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .hidden {
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th,
+        td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            color: #00334f;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .badge-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📥 Importar Maestros KIDS</h1>
+        <p class="subtitle">Herramienta para importar masivamente los maestros del ministerio KIDS a Firestore.</p>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="number" id="countTotal">0</div>
+                <div class="label">Total a importar</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="countSuccess">0</div>
+                <div class="label">Importados</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="countError">0</div>
+                <div class="label">Errores</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="actions">
+                <button class="btn btn-primary" id="btnImportar" onclick="importarTodo()">🚀 Importar todos los maestros</button>
+                <button class="btn btn-danger" id="btnLimpiar" onclick="limpiarTodo()">🗑️ Limpiar todos los maestros</button>
+            </div>
+            <div class="progress-bar" id="progressBar">
+                <div class="fill" id="progressFill"></div>
+            </div>
+            <div class="log" id="log">Esperando acción...</div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom:16px;color:#00334f;">📋 Vista previa de datos</h3>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>DNI</th>
+                            <th>Nombres</th>
+                            <th>Celular</th>
+                            <th>Sexo</th>
+                            <th>Líder</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaPreview"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MAESTROS = [
+            { dni: '70886764', nombres: 'Nataly Quispe Bendezu', celular: '986404890', sexo: 'Femenino',
+            lider: 'Pastora Diana' },
+            { dni: '75183069', nombres: 'Danitza Fiorella Perez Suasnabar', celular: '952731465', sexo: 'Femenino',
+                lider: 'Pastora Diana' },
+            { dni: '41874382', nombres: 'Reyna Rosa Chamorro Munguia', celular: '937503040', sexo: 'Femenino',
+                lider: 'Elizabeth Ceras' },
+            { dni: '47523360', nombres: 'Carla Verónica Galvan Francia', celular: '926078692', sexo: 'Femenino',
+                lider: 'Carmen Zamora' },
+            { dni: '44865466', nombres: 'Rocio Barreto Cajincho', celular: '959499092', sexo: 'Femenino',
+                lider: 'Carmencita Zamora de Mauricio' },
+            { dni: '77082812', nombres: 'Soriano Prado Arnaldo', celular: '986155478', sexo: 'Masculino',
+                lider: 'Fredy Romero' },
+            { dni: '78841879', nombres: 'Christely Diana Quispe Ceras', celular: '931652738', sexo: 'Femenino',
+            lider: 'Ninguno' },
+            { dni: '78486137', nombres: 'Camila Zoe Chavez Yaurivilca', celular: '992118016', sexo: 'Femenino',
+                lider: 'Patricia Perez' },
+            { dni: '43217797', nombres: 'Vanessa Torres Soto', celular: '983979031', sexo: 'Femenino',
+                lider: 'Carmen Zamora' },
+            { dni: '74833600', nombres: 'Medrano Solis Gabriela', celular: '979453704', sexo: 'Femenino',
+                lider: 'Celia de la Cruz' },
+            { dni: '48189319', nombres: 'Angela Roxana Gómez Briceño', celular: '949827232', sexo: 'Femenino',
+                lider: 'Mirella Yupanqui' },
+            { dni: '45542817', nombres: 'Vanesa Yaurivilca', celular: '964831940', sexo: 'Femenino',
+            lider: 'Carmen Z.' },
+            { dni: '005847578', nombres: 'María Acosta Mendoza', celular: '930390116', sexo: 'Femenino',
+            lider: 'Carmen Z.' },
+            { dni: '61445015', nombres: 'Daniela Ramos Chamorro', celular: '984633318', sexo: 'Femenino',
+                lider: 'Stheffany Quispe' },
+            { dni: '72698361', nombres: 'Evelyn Mariel Larrazabal Pando', celular: '947029548', sexo: 'Femenino',
+                lider: 'Stefany Jibaja' },
+            { dni: '43141509', nombres: 'Raquel Mancco Pariona', celular: '992930192', sexo: 'Femenino',
+                lider: 'Elizabeth Ceras' },
+            { dni: '72153398', nombres: 'Marlith Yanira Cabello Angel', celular: '920820664', sexo: 'Femenino',
+                lider: 'Lindacristal Jimenez' },
+            { dni: '44938988', nombres: 'Helen Angely Huatuco León', celular: '968662614', sexo: 'Femenino',
+                lider: 'Ps. Diana Quiroz' },
+            { dni: '41713755', nombres: 'Elizabeth Bertha Mauricio Osorio', celular: '916222116', sexo: 'Femenino',
+                lider: 'Carmen Zamora' },
+            { dni: '40946381', nombres: 'María Ines Zambrano Verástegui', celular: '989206367', sexo: 'Femenino',
+                lider: 'Carolina Zambrano' },
+            { dni: '75006884', nombres: 'Raquel Huarcaya Lunasco', celular: '912680025', sexo: 'Femenino',
+                lider: 'Elizabeth Ceras' },
+            { dni: '73175561', nombres: 'Karla Winnie Ñaupari Torres', celular: '967208099', sexo: 'Femenino',
+                lider: 'Fiorela Perez' },
+            { dni: '42660629', nombres: 'Rhoda Arirama Tapayuri', celular: '903397565', sexo: 'Femenino',
+                lider: 'Carolina Zambrano Verástegui' },
+            { dni: '47082405', nombres: 'Daniel Enrique Yupanqui Torres', celular: '979430738', sexo: 'Masculino',
+                lider: 'Ps. Yvan Burneo' },
+            { dni: '72549172', nombres: 'Roger Porras', celular: '999999999', sexo: 'Masculino', lider: 'Pendiente' },
+        ];
+
+        const dbKids = db.collection('kids_maestros');
+        let resultados = [];
+
+        function renderPreview() {
+            const tbody = document.getElementById('tablaPreview');
+            tbody.innerHTML = MAESTROS.map((m, i) => `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${m.dni}</td>
+                            <td>${m.nombres}</td>
+                            <td>${m.celular}</td>
+                            <td>${m.sexo === 'Masculino' ? '♂️' : '♀️'}</td>
+                            <td>${m.lider}</td>
+                            <td><span class="badge badge-pending">Pendiente</span></td>
+                        </tr>
+                    `).join('');
+            document.getElementById('countTotal').innerText = MAESTROS.length;
+        }
+
+        function log(msg, type = 'info') {
+            const el = document.getElementById('log');
+            el.innerHTML += `<div class="${type}">${msg}</div>`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function actualizarEstado(i, tipo) {
+            const filas = document.querySelectorAll('#tablaPreview tr');
+            if (filas[i]) {
+                const badge = filas[i].querySelector('.badge');
+                if (tipo === 'success') {
+                    badge.className = 'badge badge-success';
+                    badge.innerText = '✅ Importado';
+                } else if (tipo === 'error') {
+                    badge.className = 'badge badge-error';
+                    badge.innerText = '❌ Error';
+                }
+            }
+        }
+
+        async function importarTodo() {
+            const btn = document.getElementById('btnImportar');
+            const btnLimpiar = document.getElementById('btnLimpiar');
+            const bar = document.getElementById('progressBar');
+            const fill = document.getElementById('progressFill');
+
+            btn.disabled = true;
+            btnLimpiar.disabled = true;
+            bar.style.display = 'block';
+            document.getElementById('log').innerHTML = '';
+            resultados = [];
+            let success = 0,
+                errors = 0;
+
+            log('🚀 Iniciando importación...', 'info');
+
+            for (let i = 0; i < MAESTROS.length; i++) {
+                const m = MAESTROS[i];
+                try {
+                    log(`📄 (${i + 1}/${MAESTROS.length}) ${m.nombres}...`, 'info');
+                    await dbKids.add({
+                        dni: m.dni,
+                        nombres: m.nombres,
+                        celular: m.celular,
+                        sexo: m.sexo,
+                        lider: m.lider
+                    });
+                    success++;
+                    resultados.push({ ...m, estado: 'success' });
+                    actualizarEstado(i, 'success');
+                    log(`✅ ${m.nombres} importado correctamente`, 'success');
+                } catch (e) {
+                    errors++;
+                    resultados.push({ ...m, estado: 'error', error: e.message });
+                    actualizarEstado(i, 'error');
+                    log(`❌ ${m.nombres}: ${e.message}`, 'error');
+                }
+                fill.style.width = `${((i + 1) / MAESTROS.length) * 100}%`;
+                document.getElementById('countSuccess').innerText = success;
+                document.getElementById('countError').innerText = errors;
+            }
+
+            log(`\n🎉 ¡Importación completada! ${success} exitosos, ${errors} errores.`, 'info');
+            btn.disabled = false;
+            btnLimpiar.disabled = false;
+        }
+
+        async function limpiarTodo() {
+            if (!confirm('¿ESTÁS SEGURO? Esto eliminará TODOS los maestros de la colección kids_maestros.')) return;
+            if (!confirm('⚠️ ÚLTIMA ADVERTENCIA: Esta acción no se puede deshacer. ¿Continuar?')) return;
+
+            const btn = document.getElementById('btnImportar');
+            const btnLimpiar = document.getElementById('btnLimpiar');
+            btn.disabled = true;
+            btnLimpiar.disabled = true;
+            document.getElementById('log').innerHTML = '';
+
+            log('🗑️ Limpiando colección kids_maestros...', 'info');
+
+            try {
+                const snap = await dbKids.get();
+                let count = 0;
+                const batchSize = 500;
+                let batch = db.batch();
+                let ops = 0;
+
+                snap.forEach(doc => {
+                    batch.delete(doc.ref);
+                    ops++;
+                    if (ops >= batchSize) {
+                        // Can't commit here in forEach, need different approach
+                    }
+                });
+
+                // Simpler: delete one by one
+                for (const doc of snap.docs) {
+                    await doc.ref.delete();
+                    count++;
+                    log(`🗑️ Eliminado: ${doc.data().nombres || doc.id}`, 'info');
+                }
+
+                log(`\n✅ ${count} maestros eliminados correctamente.`, 'success');
+                document.getElementById('countSuccess').innerText = '0';
+                document.getElementById('countTotal').innerText = '0';
+
+                // Reset preview badges
+                document.querySelectorAll('#tablaPreview .badge').forEach(b => {
+                    b.className = 'badge badge-pending';
+                    b.innerText = 'Pendiente';
+                });
+
+            } catch (e) {
+                log(`❌ Error al limpiar: ${e.message}`, 'error');
+            }
+
+            btn.disabled = false;
+            btnLimpiar.disabled = false;
+        }
+
+        renderPreview();
+    </script>
+</body>
+</html>
