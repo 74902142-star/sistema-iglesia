@@ -59,7 +59,7 @@
             <!-- Header -->
             <div class="header">
                 <div class="header-left">
-                    <div class="header-title">🧒 KIDS – Registro de Maestros</div>
+                    <div class="header-title">Agua Viva KIDS – Registro de Maestros</div>
                 </div>
                 <div class="header-right">
                     <div class="user-area">
@@ -136,14 +136,14 @@
 
                     <!-- Teacher Profile Card -->
                     <div id="teacherProfile" style="display:none;">
-                        <div class="section-card"
-                            style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;">
+                        <div class="section-card" style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;">
                             <div class="kids-silhouette" id="teacherSilhouette">
                                 <i data-lucide="user" style="width:48px;height:48px;"></i>
                             </div>
                             <div style="flex:1;min-width:200px;">
                                 <h3 id="teacherNombre" style="font-size:20px;font-weight:700;margin-bottom:4px;">—</h3>
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:14px;color:var(--text-secondary);">
+                                <div
+                                    style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:14px;color:var(--text-secondary);">
                                     <div><strong>DNI:</strong> <span id="teacherDni">—</span></div>
                                     <div><strong>Celular:</strong> <span id="teacherCelular">—</span></div>
                                     <div><strong>Sexo:</strong> <span id="teacherSexo">—</span></div>
@@ -151,11 +151,13 @@
                                 </div>
                             </div>
                             <div style="display:flex;flex-direction:column;gap:8px;">
-                                <button class="btn btn-primary" onclick="registrarAsistencia()"><i data-lucide="calendar-check"
-                                        style="width:16px;height:16px;"></i> Registrar Asistencia</button>
+                                <button class="btn btn-primary" onclick="registrarAsistencia()"><i
+                                        data-lucide="calendar-check" style="width:16px;height:16px;"></i> Registrar
+                                    Asistencia</button>
                                 <button class="btn btn-secondary" onclick="editarMaestro()"><i data-lucide="edit"
                                         style="width:16px;height:16px;"></i> Editar</button>
-                                <button class="btn btn-secondary" style="color:var(--danger);border-color:var(--danger);"
+                                <button class="btn btn-secondary"
+                                    style="color:var(--danger);border-color:var(--danger);"
                                     onclick="eliminarMaestro()"><i data-lucide="trash"
                                         style="width:16px;height:16px;"></i> Eliminar</button>
                             </div>
@@ -167,7 +169,8 @@
                         <div class="section-header">
                             <div class="section-title"><i data-lucide="clock"
                                     style="width:20px;height:20px;color:var(--brand-blue);"></i> Historial de
-                                <span id="historyName">—</span></div>
+                                <span id="historyName">—</span>
+                            </div>
                         </div>
                         <div class="table-container">
                             <table class="data-table">
@@ -191,9 +194,11 @@
                     <div class="section-card">
                         <div class="section-header">
                             <div class="section-title"><i data-lucide="list"
-                                    style="width:20px;height:20px;color:var(--brand-blue);"></i> Listado de Maestros</div>
-                            <button class="btn btn-secondary" onclick="exportarExcel()"><i data-lucide="file-spreadsheet"
-                                    style="width:16px;height:16px;"></i> Exportar Excel</button>
+                                    style="width:20px;height:20px;color:var(--brand-blue);"></i> Listado de Maestros
+                            </div>
+                            <button class="btn btn-secondary" onclick="exportarExcel()"><i
+                                    data-lucide="file-spreadsheet" style="width:16px;height:16px;"></i> Exportar
+                                Excel</button>
                         </div>
                         <div class="table-container">
                             <table class="data-table">
@@ -222,6 +227,30 @@
 
                 <!-- ========== GUEST VIEW ========== -->
                 <div class="guest-only">
+
+                    <!-- Password Gate -->
+                    <div id="kidsPasswordGate" class="section-card" style="text-align:center;padding:40px 32px;">
+                        <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+                        <h2 style="font-size:20px;font-weight:700;color:#00334f;margin-bottom:8px;">Acceso Restringido</h2>
+                        <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">
+                            Ingresa la contraseña para acceder al registro de asistencia KIDS.
+                        </p>
+                        <div style="max-width:300px;margin:0 auto;">
+                            <input type="password" id="kidsPasswordInput" class="form-control"
+                                placeholder="Contraseña" style="text-align:center;font-size:16px;margin-bottom:16px;"
+                                onkeydown="if(event.key==='Enter')verificarPasswordKids()">
+                            <button class="btn btn-primary" onclick="verificarPasswordKids()"
+                                style="width:100%;justify-content:center;">
+                                <i data-lucide="unlock" style="width:16px;height:16px;"></i> Ingresar
+                            </button>
+                        </div>
+                        <p id="passwordError" style="color:#dc2626;font-size:13px;margin-top:12px;display:none;">
+                            ❌ Contraseña incorrecta. Intenta de nuevo.
+                        </p>
+                    </div>
+
+                    <!-- Guest Content (hidden until password verified) -->
+                    <div id="kidsGuestContent" style="display:none;">
                     <div class="section-card">
                         <div class="section-header">
                             <div class="section-title">🧒 Registro de Asistencia KIDS</div>
@@ -234,8 +263,8 @@
                         <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:24px;">
                             <div class="filter-group" style="flex:1;min-width:200px;">
                                 <label>📇 Ingresa tu DNI</label>
-                                <input type="text" id="guestDniInput" class="filter-input"
-                                    placeholder="Ej: 12345678" maxlength="8" inputmode="numeric" pattern="[0-9]*">
+                                <input type="text" id="guestDniInput" class="filter-input" placeholder="Ej: 12345678"
+                                    maxlength="8" inputmode="numeric" pattern="[0-9]*">
                             </div>
                             <button class="btn btn-primary" onclick="buscarMaestroGuest()"><i data-lucide="search"
                                     style="width:16px;height:16px;"></i> Buscar</button>
@@ -245,7 +274,8 @@
                         <div id="guestProfile" style="display:none;">
                             <div class="section-card"
                                 style="background:linear-gradient(135deg,#f8fafc,#f1f4f9);text-align:center;padding:32px;">
-                                <div class="kids-silhouette" id="guestSilhouette" style="margin:0 auto 16px;width:80px;height:80px;">
+                                <div class="kids-silhouette" id="guestSilhouette"
+                                    style="margin:0 auto 16px;width:80px;height:80px;">
                                     <i data-lucide="user" style="width:40px;height:40px;"></i>
                                 </div>
                                 <h3 id="guestNombre" style="font-size:22px;font-weight:700;margin-bottom:4px;">—</h3>
@@ -265,22 +295,27 @@
                         <div id="guestRegisterForm" style="display:none;">
                             <div class="section-card"
                                 style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fed7aa;padding:24px;">
-                                <h3 style="font-size:16px;font-weight:700;color:#c2410c;margin-bottom:16px;">📝 Maestro no encontrado</h3>
+                                <h3 style="font-size:16px;font-weight:700;color:#c2410c;margin-bottom:16px;">📝 Maestro
+                                    no encontrado</h3>
                                 <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">
-                                    Tu DNI no está registrado en el sistema. Completa tus datos para registrarte y marcar asistencia.
+                                    Tu DNI no está registrado en el sistema. Completa tus datos para registrarte y
+                                    marcar asistencia.
                                 </p>
                                 <div class="form-group">
                                     <label>📇 DNI</label>
-                                    <input type="text" id="regDni" class="form-control" readonly style="background:#f1f5f9;">
+                                    <input type="text" id="regDni" class="form-control" readonly
+                                        style="background:#f1f5f9;">
                                 </div>
                                 <div class="form-group">
                                     <label>Nombres y apellidos *</label>
-                                    <input type="text" id="regNombres" class="form-control" required placeholder="Ej: María Pérez López">
+                                    <input type="text" id="regNombres" class="form-control" required
+                                        placeholder="Ej: María Pérez López">
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label>Celular *</label>
-                                        <input type="tel" id="regCelular" class="form-control" required placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                                        <input type="tel" id="regCelular" class="form-control" required
+                                            placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
                                     </div>
                                     <div class="form-group">
                                         <label>Sexo *</label>
@@ -293,7 +328,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Líder</label>
-                                    <input type="text" id="regLider" class="form-control" placeholder="Nombre de tu líder">
+                                    <input type="text" id="regLider" class="form-control"
+                                        placeholder="Nombre de tu líder">
                                 </div>
                                 <button class="btn btn-primary" onclick="registrarMaestroYAsistencia()"
                                     style="justify-content:center;width:100%;margin-top:16px;">
@@ -312,7 +348,8 @@
                             style="display:none;background:#dcfce7;border-radius:24px;padding:32px;text-align:center;margin-top:16px;">
                             <div style="font-size:48px;margin-bottom:12px;">✅</div>
                             <h3 style="color:#166534;margin-bottom:8px;">¡Asistencia registrada!</h3>
-                            <p style="color:#065f46;">Tu ingreso ha sido registrado correctamente. ¡Gracias por servir!</p>
+                            <p style="color:#065f46;">Tu ingreso ha sido registrado correctamente. ¡Gracias por servir!
+                            </p>
                         </div>
                     </div>
 
@@ -329,11 +366,13 @@
                             🔥 <strong>Requisito:</strong> Ser parte del discipulado y tener corazón de servicio.
                         </p>
                     </div>
-                </div>
+                    </div> <!-- /kidsGuestContent -->
 
-            </div>
-        </div>
-    </div>
+                </div> <!-- /guest-only -->
+
+            </div> <!-- /container -->
+        </div> <!-- /main-content -->
+    </div> <!-- /page-wrapper -->
 
     <!-- Modal Maestro -->
     <div id="modalMaestro" class="modal">
@@ -358,8 +397,8 @@
                         </div>
                         <div class="form-group">
                             <label>Celular *</label>
-                            <input type="tel" id="mCelular" class="form-control" required
-                                placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                            <input type="tel" id="mCelular" class="form-control" required placeholder="999888777"
+                                maxlength="9" inputmode="numeric" pattern="[0-9]*">
                         </div>
                     </div>
                     <div class="form-row">
@@ -402,6 +441,23 @@
         } else {
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'block');
+            if (sessionStorage.getItem('kidsPasswordOK') === '1') {
+                document.getElementById('kidsPasswordGate').style.display = 'none';
+                document.getElementById('kidsGuestContent').style.display = 'block';
+            }
+        }
+
+        function verificarPasswordKids() {
+            const input = document.getElementById('kidsPasswordInput').value.trim();
+            if (input === 'AguaViva26') {
+                sessionStorage.setItem('kidsPasswordOK', '1');
+                document.getElementById('kidsPasswordGate').style.display = 'none';
+                document.getElementById('kidsGuestContent').style.display = 'block';
+            } else {
+                document.getElementById('passwordError').style.display = 'block';
+                document.getElementById('kidsPasswordInput').value = '';
+                document.getElementById('kidsPasswordInput').focus();
+            }
         }
 
         const dbKids = db.collection('kids_maestros');
