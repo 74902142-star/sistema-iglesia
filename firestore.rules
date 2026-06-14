@@ -16,5 +16,11 @@ service cloud.firestore {
     match /inscripciones/{docId} {
       allow read, write: if true;
     }
+    match /kids_maestros/{docId} {
+      allow read, write: if true;
+    }
+    match /kids_asistencia/{docId} {
+      allow read, write: if true;
+    }
   }
 }
