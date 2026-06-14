@@ -14,10 +14,333 @@
     <script src="firebase-config.js"></script>
     <script src="auth.js"></script>
     <script src="firebase-auth.js"></script>
+    <style>
+        /* Guest Mode - Full Screen No Sidebar */
+        body.guest-mode .sidebar,
+        body.guest-mode .sidebar-overlay,
+        body.guest-mode .sidebar-mobile-toggle,
+        body.guest-mode .header {
+            display: none !important;
+        }
+        body.guest-mode .app-layout {
+            display: block;
+        }
+        body.guest-mode .main-content {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #00334f 0%, #1c6390 50%, #00334f 100%);
+        }
+        body.guest-mode .container {
+            padding: 0;
+            max-width: 100%;
+        }
+        body.guest-mode .guest-only {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        /* Hero Password Gate */
+        .kids-hero {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .kids-hero-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .kids-hero h1 {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .kids-hero p {
+            color: rgba(255,255,255,0.7);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Password Card */
+        .kids-pass-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .kids-pass-card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #00334f;
+            margin-bottom: 8px;
+        }
+        .kids-pass-card p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+        .kids-pass-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 4px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .kids-pass-input:focus {
+            border-color: #00334f;
+        }
+        .kids-pass-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00334f, #1c6390);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kids-pass-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,51,79,0.3);
+        }
+        .kids-pass-error {
+            color: #dc2626;
+            font-size: 13px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        /* Guest Content Styles */
+        .kids-guest-hero {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .kids-guest-hero h1 {
+            color: #fff;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        .kids-guest-hero p {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+        }
+
+        .kids-search-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .kids-dni-input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .kids-dni-input:focus {
+            border-color: #00334f;
+        }
+        .kids-dni-input::placeholder {
+            letter-spacing: 2px;
+            font-weight: 400;
+            font-size: 16px;
+        }
+        .kids-search-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00334f, #1c6390);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kids-search-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,51,79,0.3);
+        }
+
+        /* Profile Card */
+        .kids-profile {
+            text-align: center;
+            padding: 32px 24px;
+            animation: slideUp 0.4s ease;
+        }
+        .kids-profile-name {
+            font-size: 24px;
+            font-weight: 800;
+            color: #00334f;
+            margin: 12px 0 4px;
+        }
+        .kids-profile-info {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .kids-confirm-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kids-confirm-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(5,150,105,0.3);
+        }
+
+        /* Success Card */
+        .kids-success {
+            text-align: center;
+            padding: 40px 24px;
+            animation: slideUp 0.5s ease;
+        }
+        .kids-success-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        .kids-success h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #065f46;
+            margin-bottom: 8px;
+        }
+        .kids-success p {
+            color: #065f46;
+            font-size: 15px;
+        }
+
+        /* Register Form */
+        .kids-register-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
+        }
+        .kids-register-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #c2410c;
+            margin-bottom: 6px;
+        }
+        .kids-register-card .subtitle {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .kids-field {
+            margin-bottom: 16px;
+        }
+        .kids-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .kids-field input,
+        .kids-field select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .kids-field input:focus,
+        .kids-field select:focus {
+            border-color: #00334f;
+        }
+        .kids-field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .kids-register-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00334f, #1c6390);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: transform 0.2s;
+        }
+        .kids-cancel-btn {
+            width: 100%;
+            padding: 14px;
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+    </style>
 </head>
 
-<body>
-    <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
+<body class="guest-mode">
+    <button class="sidebar-mobile-toggle" id="sidebarMobileToggle" style="display:none;">☰</button>
     <div class="app-layout">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -229,143 +552,133 @@
                 <div class="guest-only">
 
                     <!-- Password Gate -->
-                    <div id="kidsPasswordGate" class="section-card" style="text-align:center;padding:40px 32px;">
-                        <div style="font-size:48px;margin-bottom:16px;">🔒</div>
-                        <h2 style="font-size:20px;font-weight:700;color:#00334f;margin-bottom:8px;">Acceso Restringido</h2>
-                        <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">
-                            Ingresa la contraseña para acceder al registro de asistencia KIDS.
-                        </p>
-                        <div style="max-width:300px;margin:0 auto;">
-                            <input type="password" id="kidsPasswordInput" class="form-control"
-                                placeholder="Contraseña" style="text-align:center;font-size:16px;margin-bottom:16px;"
-                                onkeydown="if(event.key==='Enter')verificarPasswordKids()">
-                            <button class="btn btn-primary" onclick="verificarPasswordKids()"
-                                style="width:100%;justify-content:center;">
-                                <i data-lucide="unlock" style="width:16px;height:16px;"></i> Ingresar
-                            </button>
+                    <div id="kidsPasswordGate">
+                        <div class="kids-hero">
+                            <div class="kids-hero-icon">
+                                <i data-lucide="heart" style="width:48px;height:48px;color:#fff;"></i>
+                            </div>
+                            <h1>Agua Viva KIDS</h1>
+                            <p>Registro de Asistencia de Maestros</p>
                         </div>
-                        <p id="passwordError" style="color:#dc2626;font-size:13px;margin-top:12px;display:none;">
-                            ❌ Contraseña incorrecta. Intenta de nuevo.
-                        </p>
+                        <div class="kids-pass-card">
+                            <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+                            <h2>Acceso Restringido</h2>
+                            <p>Ingresa la contraseña para continuar</p>
+                            <input type="password" id="kidsPasswordInput" class="kids-pass-input"
+                                placeholder="••••••••"
+                                onkeydown="if(event.key==='Enter')verificarPasswordKids()">
+                            <button class="kids-pass-btn" onclick="verificarPasswordKids()">
+                                Ingresar
+                            </button>
+                            <p id="passwordError" class="kids-pass-error">
+                                ❌ Contraseña incorrecta
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Guest Content (hidden until password verified) -->
                     <div id="kidsGuestContent" style="display:none;">
-                    <div class="section-card">
-                        <div class="section-header">
-                            <div class="section-title">🧒 Registro de Asistencia KIDS</div>
-                        </div>
-                        <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">
-                            Ingresa tu DNI para registrar tu asistencia como maestro del ministerio KIDS.
-                        </p>
 
-                        <!-- Guest DNI Input -->
-                        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:24px;">
-                            <div class="filter-group" style="flex:1;min-width:200px;">
-                                <label>📇 Ingresa tu DNI</label>
-                                <input type="text" id="guestDniInput" class="filter-input" placeholder="Ej: 12345678"
-                                    maxlength="8" inputmode="numeric" pattern="[0-9]*">
+                        <!-- Step 1: DNI Search -->
+                        <div id="kidsStepDNI">
+                            <div class="kids-guest-hero">
+                                <div class="kids-hero-icon" style="width:80px;height:80px;border-radius:22px;">
+                                    <i data-lucide="heart" style="width:36px;height:36px;color:#fff;"></i>
+                                </div>
+                                <h1>Registro de Asistencia</h1>
+                                <p>Ingresa tu DNI para marcar tu asistencia</p>
                             </div>
-                            <button class="btn btn-primary" onclick="buscarMaestroGuest()"><i data-lucide="search"
-                                    style="width:16px;height:16px;"></i> Buscar</button>
-                        </div>
-
-                        <!-- Guest Profile (hidden until found) -->
-                        <div id="guestProfile" style="display:none;">
-                            <div class="section-card"
-                                style="background:linear-gradient(135deg,#f8fafc,#f1f4f9);text-align:center;padding:32px;">
-                                <div class="kids-silhouette" id="guestSilhouette"
-                                    style="margin:0 auto 16px;width:80px;height:80px;">
-                                    <i data-lucide="user" style="width:40px;height:40px;"></i>
-                                </div>
-                                <h3 id="guestNombre" style="font-size:22px;font-weight:700;margin-bottom:4px;">—</h3>
-                                <div style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">
-                                    <span id="guestDniTexto">—</span> · <span id="guestCelularTexto">—</span>
-                                    <br><span id="guestLiderTexto">Líder: —</span>
-                                </div>
-                                <button class="btn btn-primary" onclick="registrarAsistenciaGuest()"
-                                    style="justify-content:center;width:100%;max-width:300px;">
-                                    <i data-lucide="calendar-check" style="width:18px;height:18px;"></i>
-                                    Registrar mi Asistencia
+                            <div class="kids-search-card">
+                                <label style="display:block;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;text-align:center;">Número de DNI</label>
+                                <input type="text" id="guestDniInput" class="kids-dni-input"
+                                    placeholder="12345678" maxlength="8" inputmode="numeric" pattern="[0-9]*">
+                                <button class="kids-search-btn" onclick="buscarMaestroGuest()">
+                                    Buscar
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Guest Register Form (shown when DNI not found) -->
-                        <div id="guestRegisterForm" style="display:none;">
-                            <div class="section-card"
-                                style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fed7aa;padding:24px;">
-                                <h3 style="font-size:16px;font-weight:700;color:#c2410c;margin-bottom:16px;">📝 Maestro
-                                    no encontrado</h3>
-                                <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">
-                                    Tu DNI no está registrado en el sistema. Completa tus datos para registrarte y
-                                    marcar asistencia.
-                                </p>
-                                <div class="form-group">
-                                    <label>📇 DNI</label>
-                                    <input type="text" id="regDni" class="form-control" readonly
-                                        style="background:#f1f5f9;">
-                                </div>
-                                <div class="form-group">
-                                    <label>Nombres y apellidos *</label>
-                                    <input type="text" id="regNombres" class="form-control" required
-                                        placeholder="Ej: María Pérez López">
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Celular *</label>
-                                        <input type="tel" id="regCelular" class="form-control" required
-                                            placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                        <!-- Step 2: Profile Found -->
+                        <div id="kidsStepProfile" style="display:none;">
+                            <div class="kids-search-card">
+                                <div class="kids-profile">
+                                    <div class="kids-silhouette" id="guestSilhouette"
+                                        style="margin:0 auto;width:90px;height:90px;">
+                                        <i data-lucide="user" style="width:44px;height:44px;"></i>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="kids-profile-name" id="guestNombre">—</div>
+                                    <div class="kids-profile-info">
+                                        <span id="guestDniTexto">—</span> · <span id="guestCelularTexto">—</span>
+                                        <br><span id="guestLiderTexto">Líder: —</span>
+                                    </div>
+                                    <button class="kids-confirm-btn" onclick="registrarAsistenciaGuest()">
+                                        Registrar mi Asistencia
+                                    </button>
+                                    <button class="kids-cancel-btn" onclick="volverBusqueda()" style="margin-top:10px;">
+                                        ← Volver
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Register New (DNI not found) -->
+                        <div id="kidsStepRegister" style="display:none;">
+                            <div class="kids-register-card">
+                                <div style="text-align:center;margin-bottom:20px;">
+                                    <div style="font-size:40px;margin-bottom:8px;">📝</div>
+                                    <h3>DNI no registrado</h3>
+                                    <p class="subtitle">Completa tus datos para registrarte y marcar asistencia</p>
+                                </div>
+                                <div class="kids-field">
+                                    <label>DNI</label>
+                                    <input type="text" id="regDni" readonly style="background:#f1f5f9;color:#64748b;">
+                                </div>
+                                <div class="kids-field">
+                                    <label>Nombres y apellidos *</label>
+                                    <input type="text" id="regNombres" placeholder="Ej: María Pérez López">
+                                </div>
+                                <div class="kids-field-row">
+                                    <div class="kids-field">
+                                        <label>Celular *</label>
+                                        <input type="tel" id="regCelular" placeholder="999888777" maxlength="9" inputmode="numeric">
+                                    </div>
+                                    <div class="kids-field">
                                         <label>Sexo *</label>
-                                        <select id="regSexo" class="form-control" required>
+                                        <select id="regSexo">
                                             <option value="">Seleccionar...</option>
                                             <option value="Masculino">Masculino</option>
                                             <option value="Femenino">Femenino</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="kids-field">
                                     <label>Líder</label>
-                                    <input type="text" id="regLider" class="form-control"
-                                        placeholder="Nombre de tu líder">
+                                    <input type="text" id="regLider" placeholder="Nombre de tu líder">
                                 </div>
-                                <button class="btn btn-primary" onclick="registrarMaestroYAsistencia()"
-                                    style="justify-content:center;width:100%;margin-top:16px;">
-                                    <i data-lucide="calendar-check" style="width:18px;height:18px;"></i>
+                                <button class="kids-register-btn" onclick="registrarMaestroYAsistencia()">
                                     Registrarme y marcar asistencia
                                 </button>
-                                <button class="btn" onclick="cancelarRegistro()"
-                                    style="justify-content:center;width:100%;margin-top:8px;background:#e2e8f0;color:#475569;">
-                                    Cancelar
+                                <button class="kids-cancel-btn" onclick="volverBusqueda()">
+                                    ← Volver
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Guest Success -->
-                        <div id="guestSuccess"
-                            style="display:none;background:#dcfce7;border-radius:24px;padding:32px;text-align:center;margin-top:16px;">
-                            <div style="font-size:48px;margin-bottom:12px;">✅</div>
-                            <h3 style="color:#166534;margin-bottom:8px;">¡Asistencia registrada!</h3>
-                            <p style="color:#065f46;">Tu ingreso ha sido registrado correctamente. ¡Gracias por servir!
-                            </p>
+                        <!-- Step 4: Success -->
+                        <div id="kidsStepSuccess" style="display:none;">
+                            <div class="kids-search-card">
+                                <div class="kids-success">
+                                    <div class="kids-success-icon">✅</div>
+                                    <h2>¡Asistencia Registrada!</h2>
+                                    <p>Tu ingreso ha sido registrado correctamente.</p>
+                                    <p style="margin-top:4px;font-weight:600;">¡Gracias por servir!</p>
+                                    <button class="kids-confirm-btn" onclick="resetGuest()" style="margin-top:24px;">
+                                        Registrar otra asistencia
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Info Card -->
-                    <div class="section-card"
-                        style="background:linear-gradient(135deg,#f8fafc,#f1f4f9);border:1px solid var(--border-light);">
-                        <h3 style="font-size:16px;font-weight:700;color:var(--brand-blue);margin-bottom:12px;">📢
-                            Ministerio KIDS</h3>
-                        <p style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);">
-                            El ministerio KIDS está dedicado a la enseñanza y cuidado de nuestros niños.
-                            Cada maestro debe registrar su asistencia al llegar al servicio.
-                        </p>
-                        <p style="margin-top:12px;font-size:13.5px;line-height:1.6;color:var(--text-secondary);">
-                            🔥 <strong>Requisito:</strong> Ser parte del discipulado y tener corazón de servicio.
-                        </p>
-                    </div>
                     </div> <!-- /kidsGuestContent -->
 
                 </div> <!-- /guest-only -->
@@ -591,6 +904,14 @@
         }
 
         // ── Guest ──
+        // ── Guest Steps Navigation ──
+        function showStep(step) {
+            ['kidsStepDNI', 'kidsStepProfile', 'kidsStepRegister', 'kidsStepSuccess'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.getElementById(step).style.display = 'block';
+        }
+
         async function buscarMaestroGuest() {
             const dni = document.getElementById('guestDniInput').value.trim();
             if (!dni) { toast('Ingresa tu DNI', 'warning'); return; }
@@ -600,9 +921,7 @@
             const snap = await dbKids.where('dni', '==', dni).get();
             if (snap.empty) {
                 document.getElementById('regDni').value = dni;
-                document.getElementById('guestRegisterForm').style.display = 'block';
-                document.getElementById('guestProfile').style.display = 'none';
-                document.getElementById('guestSuccess').style.display = 'none';
+                showStep('kidsStepRegister');
                 return;
             }
             const doc = snap.docs[0];
@@ -618,12 +937,10 @@
             sil.className = 'kids-silhouette';
             if (m.sexo === 'Masculino') sil.classList.add('male');
             else if (m.sexo === 'Femenino') sil.classList.add('female');
-            sil.innerHTML = '<i data-lucide="user" style="width:40px;height:40px;"></i>';
+            sil.innerHTML = '<i data-lucide="user" style="width:44px;height:44px;"></i>';
             if (typeof lucide !== 'undefined') lucide.createIcons();
 
-            document.getElementById('guestRegisterForm').style.display = 'none';
-            document.getElementById('guestProfile').style.display = 'block';
-            document.getElementById('guestSuccess').style.display = 'none';
+            showStep('kidsStepProfile');
         }
 
         async function registrarAsistenciaGuest() {
@@ -636,10 +953,8 @@
                 timestamp: now.toISOString(),
                 origen: 'invitado'
             });
-            document.getElementById('guestProfile').style.display = 'none';
-            document.getElementById('guestSuccess').style.display = 'block';
             document.getElementById('guestDniInput').value = '';
-            toast('✅ Asistencia registrada. ¡Gracias ' + maestroActual.nombres + '!');
+            showStep('kidsStepSuccess');
         }
 
         async function registrarMaestroYAsistencia() {
@@ -653,9 +968,9 @@
             if (!celular) { toast('❌ Ingresa tu celular', 'warning'); return; }
             if (!sexo) { toast('❌ Selecciona tu sexo', 'warning'); return; }
 
-            const btn = document.querySelector('#guestRegisterForm .btn-primary');
+            const btn = document.querySelector('.kids-register-btn');
             btn.disabled = true;
-            btn.innerHTML = '⏳ Guardando...';
+            btn.textContent = '⏳ Guardando...';
 
             try {
                 await firebaseReady;
@@ -667,21 +982,25 @@
                 });
                 maestroActual = { id: docRef.id, dni, nombres, celular, sexo, lider: lider || 'Pendiente' };
                 await registrarAsistenciaGuest();
-                document.getElementById('guestRegisterForm').style.display = 'none';
             } catch (e) {
                 toast('❌ Error al registrarte: ' + e.message, 'error');
                 btn.disabled = false;
-                btn.innerHTML = 'Registrarme y marcar asistencia';
+                btn.textContent = 'Registrarme y marcar asistencia';
             }
         }
 
-        function cancelarRegistro() {
-            document.getElementById('guestRegisterForm').style.display = 'none';
+        function volverBusqueda() {
+            document.getElementById('guestDniInput').value = '';
+            showStep('kidsStepDNI');
+        }
+
+        function resetGuest() {
             document.getElementById('guestDniInput').value = '';
             document.getElementById('regNombres').value = '';
             document.getElementById('regCelular').value = '';
             document.getElementById('regSexo').value = '';
             document.getElementById('regLider').value = '';
+            showStep('kidsStepDNI');
         }
 
         // ── CRUD Maestro ──
