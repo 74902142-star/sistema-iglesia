@@ -46,6 +46,43 @@
             padding: 24px;
         }
 
+        /* Admin Responsive Stats */
+        @media (max-width: 900px) {
+            .kids-admin-stats-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+        @media (max-width: 500px) {
+            .kids-admin-stats-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .kids-admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .kids-search-admin .search-row {
+                flex-direction: column;
+            }
+            .kids-search-admin .field {
+                min-width: 100%;
+            }
+            .kids-admin-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .kids-profile-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            .kids-profile-card .actions {
+                flex-direction: row;
+                width: 100%;
+            }
+            .kids-profile-card .actions button {
+                flex: 1;
+            }
+        }
+
         /* Hero Password Gate */
         .kids-hero {
             text-align: center;
@@ -351,6 +388,327 @@
             cursor: pointer;
             margin-top: 8px;
         }
+
+        /* Admin KIDS Styles */
+        body:not(.guest-mode) .main-content {
+            background: #f8f9ff;
+        }
+        .kids-admin-header {
+            background: linear-gradient(135deg, #00334f 0%, #1c6390 100%);
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: #fff;
+            box-shadow: 0 8px 32px rgba(0,51,79,0.2);
+        }
+        .kids-admin-header-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .kids-admin-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .kids-admin-header p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .kids-stat-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #f1f5f9;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kids-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        .kids-stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .kids-stat-icon.blue {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .kids-stat-icon.green {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .kids-stat-icon.purple {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+        .kids-stat-icon.pink {
+            background: #fce7f3;
+            color: #db2777;
+        }
+        .kids-stat-info h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .kids-stat-info .value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #00334f;
+            line-height: 1;
+        }
+        .kids-stat-info .subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        .kids-search-admin {
+            background: #fff;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #f1f5f9;
+            margin-bottom: 20px;
+        }
+        .kids-search-admin .search-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .kids-search-admin .field {
+            flex: 2;
+            min-width: 200px;
+        }
+        .kids-search-admin .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .kids-search-admin .field input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .kids-search-admin .field input:focus {
+            border-color: #1c6390;
+        }
+        .kids-admin-btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .kids-admin-btn:hover {
+            transform: translateY(-1px);
+        }
+        .kids-admin-btn.primary {
+            background: linear-gradient(135deg, #00334f, #1c6390);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0,51,79,0.2);
+        }
+        .kids-admin-btn.primary:hover {
+            box-shadow: 0 6px 20px rgba(0,51,79,0.3);
+        }
+        .kids-admin-btn.secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .kids-admin-btn.success {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(5,150,105,0.2);
+        }
+        .kids-admin-btn.danger {
+            background: #fff;
+            color: #dc2626;
+            border: 2px solid #fecaca;
+        }
+        .kids-admin-btn.danger:hover {
+            background: #fef2f2;
+        }
+        .kids-profile-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #f1f5f9;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            animation: slideUp 0.4s ease;
+        }
+        .kids-profile-card .info {
+            flex: 1;
+            min-width: 200px;
+        }
+        .kids-profile-card .info h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #00334f;
+            margin-bottom: 12px;
+        }
+        .kids-profile-card .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .kids-profile-card .info-grid strong {
+            color: #334155;
+        }
+        .kids-profile-card .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .kids-table-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #f1f5f9;
+            margin-bottom: 20px;
+        }
+        .kids-table-card .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .kids-table-card .table-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #00334f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .kids-table-card table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .kids-table-card th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        .kids-table-card td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: #334155;
+            border-bottom: 1px solid #f8fafc;
+        }
+        .kids-table-card tr:hover td {
+            background: #f8fafc;
+        }
+        .kids-table-card .teacher-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .kids-table-card .teacher-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .kids-table-card .teacher-avatar.male {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .kids-table-card .teacher-avatar.female {
+            background: #fce7f3;
+            color: #db2777;
+        }
+        .kids-table-card .actions-cell {
+            display: flex;
+            gap: 6px;
+        }
+        .kids-table-card .action-icon {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .kids-table-card .action-icon.edit {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+        .kids-table-card .action-icon.edit:hover {
+            background: #dbeafe;
+        }
+        .kids-table-card .action-icon.delete {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .kids-table-card .action-icon.delete:hover {
+            background: #fee2e2;
+        }
+        .kids-table-card .action-icon.view {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+        .kids-table-card .action-icon.view:hover {
+            background: #dcfce7;
+        }
     </style>
 </head>
 
@@ -416,136 +774,138 @@
                 <!-- ========== ADMIN VIEW ========== -->
                 <div class="admin-only">
 
-                    <!-- Stats Grid -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-card-details">
-                                <h4>Total Maestros</h4>
-                                <div class="stat-value" id="statTotal">0</div>
-                                <div class="stat-trend up"><i data-lucide="trending-up"
-                                        style="width:14px;height:14px;vertical-align:middle;"></i> Registrados</div>
-                            </div>
-                            <div class="stat-card-icon"><i data-lucide="users"></i></div>
+                    <!-- Admin Header Banner -->
+                    <div class="kids-admin-header">
+                        <div class="kids-admin-header-icon">
+                            <i data-lucide="heart" style="width:28px;height:28px;"></i>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-card-details">
-                                <h4>Hoy</h4>
-                                <div class="stat-value" id="statHoy">0</div>
-                                <div class="stat-trend up" style="color:var(--success-text);"><i data-lucide="check"
-                                        style="width:14px;height:14px;vertical-align:middle;"></i> Asistieron</div>
-                            </div>
-                            <div class="stat-card-icon"
-                                style="background-color:var(--success-bg);color:var(--success);"><i
-                                    data-lucide="calendar-check"></i></div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-card-details">
-                                <h4>Varones / Mujeres</h4>
-                                <div class="stat-value" id="statGenero" style="font-size:22px;">0 / 0</div>
-                                <div class="stat-trend neutral">Maestros activos</div>
-                            </div>
-                            <div class="stat-card-icon"
-                                style="background-color:var(--brand-blue-light);color:var(--brand-blue);"><i
-                                    data-lucide="users"></i></div>
+                        <div>
+                            <h2>Agua Viva KIDS</h2>
+                            <p>Gestión de maestros y control de asistencia del ministerio infantil</p>
                         </div>
                     </div>
 
-                    <!-- Search Teacher by DNI -->
-                    <div class="section-card">
-                        <div class="section-header">
-                            <div class="section-title"><i data-lucide="search"
-                                    style="width:20px;height:20px;color:var(--brand-blue);"></i> Buscar Maestro por DNI
+                    <!-- Stats Grid -->
+                    <div class="kids-admin-stats-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+                        <div class="kids-stat-card">
+                            <div class="kids-stat-icon blue"><i data-lucide="users" style="width:24px;height:24px;"></i></div>
+                            <div class="kids-stat-info">
+                                <h4>Total</h4>
+                                <div class="value" id="statTotal">0</div>
+                                <div class="subtitle">Maestros</div>
                             </div>
                         </div>
-                        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-                            <div class="filter-group" style="flex:2;min-width:200px;">
-                                <label>📇 DNI del Maestro</label>
-                                <input type="text" id="dniBuscar" class="filter-input" placeholder="Ingresa DNI..."
+                        <div class="kids-stat-card">
+                            <div class="kids-stat-icon green"><i data-lucide="calendar-check" style="width:24px;height:24px;"></i></div>
+                            <div class="kids-stat-info">
+                                <h4>Hoy</h4>
+                                <div class="value" id="statHoy">0</div>
+                                <div class="subtitle">Asistieron</div>
+                            </div>
+                        </div>
+                        <div class="kids-stat-card">
+                            <div class="kids-stat-icon purple"><i data-lucide="male" style="width:24px;height:24px;"></i></div>
+                            <div class="kids-stat-info">
+                                <h4>Varones</h4>
+                                <div class="value" id="statVarones">0</div>
+                                <div class="subtitle">Registrados</div>
+                            </div>
+                        </div>
+                        <div class="kids-stat-card">
+                            <div class="kids-stat-icon pink"><i data-lucide="female" style="width:24px;height:24px;"></i></div>
+                            <div class="kids-stat-info">
+                                <h4>Mujeres</h4>
+                                <div class="value" id="statMujeres">0</div>
+                                <div class="subtitle">Registradas</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search + New Teacher -->
+                    <div class="kids-search-admin">
+                        <div class="search-row">
+                            <div class="field">
+                                <label>Buscar Maestro por DNI</label>
+                                <input type="text" id="dniBuscar" placeholder="Ingresa DNI..."
                                     maxlength="8" inputmode="numeric" pattern="[0-9]*">
                             </div>
-                            <button class="btn btn-primary" onclick="buscarMaestro()"><i data-lucide="search"
-                                    style="width:16px;height:16px;"></i> Buscar</button>
-                            <button class="btn btn-secondary" onclick="limpiarBusqueda()"><i data-lucide="x"
-                                    style="width:16px;height:16px;"></i> Limpiar</button>
-                            <button class="btn btn-primary" onclick="abrirModalNuevo()"><i data-lucide="plus"
-                                    style="width:16px;height:16px;"></i> Nuevo Maestro</button>
+                            <button class="kids-admin-btn primary" onclick="buscarMaestro()">
+                                <i data-lucide="search" style="width:16px;height:16px;"></i> Buscar
+                            </button>
+                            <button class="kids-admin-btn secondary" onclick="limpiarBusqueda()">
+                                <i data-lucide="x" style="width:16px;height:16px;"></i> Limpiar
+                            </button>
+                            <button class="kids-admin-btn success" onclick="abrirModalNuevo()">
+                                <i data-lucide="plus" style="width:16px;height:16px;"></i> Nuevo
+                            </button>
                         </div>
                     </div>
 
                     <!-- Teacher Profile Card -->
                     <div id="teacherProfile" style="display:none;">
-                        <div class="section-card" style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;">
+                        <div class="kids-profile-card">
                             <div class="kids-silhouette" id="teacherSilhouette">
                                 <i data-lucide="user" style="width:48px;height:48px;"></i>
                             </div>
-                            <div style="flex:1;min-width:200px;">
-                                <h3 id="teacherNombre" style="font-size:20px;font-weight:700;margin-bottom:4px;">—</h3>
-                                <div
-                                    style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:14px;color:var(--text-secondary);">
+                            <div class="info">
+                                <h3 id="teacherNombre">—</h3>
+                                <div class="info-grid">
                                     <div><strong>DNI:</strong> <span id="teacherDni">—</span></div>
                                     <div><strong>Celular:</strong> <span id="teacherCelular">—</span></div>
                                     <div><strong>Sexo:</strong> <span id="teacherSexo">—</span></div>
                                     <div><strong>Líder:</strong> <span id="teacherLider">—</span></div>
                                 </div>
                             </div>
-                            <div style="display:flex;flex-direction:column;gap:8px;">
-                                <button class="btn btn-primary" onclick="registrarAsistencia()"><i
-                                        data-lucide="calendar-check" style="width:16px;height:16px;"></i> Registrar
-                                    Asistencia</button>
-                                <button class="btn btn-secondary" onclick="editarMaestro()"><i data-lucide="edit"
-                                        style="width:16px;height:16px;"></i> Editar</button>
-                                <button class="btn btn-secondary"
-                                    style="color:var(--danger);border-color:var(--danger);"
-                                    onclick="eliminarMaestro()"><i data-lucide="trash"
-                                        style="width:16px;height:16px;"></i> Eliminar</button>
+                            <div class="actions">
+                                <button class="kids-admin-btn success" onclick="registrarAsistencia()">
+                                    <i data-lucide="calendar-check" style="width:16px;height:16px;"></i> Registrar
+                                </button>
+                                <button class="kids-admin-btn secondary" onclick="editarMaestro()">
+                                    <i data-lucide="edit" style="width:16px;height:16px;"></i> Editar
+                                </button>
+                                <button class="kids-admin-btn danger" onclick="eliminarMaestro()">
+                                    <i data-lucide="trash" style="width:16px;height:16px;"></i> Eliminar
+                                </button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Attendance History -->
-                    <div class="section-card" id="historySection" style="display:none;">
-                        <div class="section-header">
-                            <div class="section-title"><i data-lucide="clock"
-                                    style="width:20px;height:20px;color:var(--brand-blue);"></i> Historial de
-                                <span id="historyName">—</span>
-                            </div>
+                    <div class="kids-table-card" id="historySection" style="display:none;">
+                        <div class="table-header">
+                            <h3><i data-lucide="clock" style="width:18px;height:18px;color:#1c6390;"></i> Historial de <span id="historyName">—</span></h3>
                         </div>
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Hora</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="historyBody">
-                                    <tr>
-                                        <td colspan="2" style="text-align:center;padding:32px;color:var(--text-muted);">
-                                            Sin registros</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody">
+                                <tr>
+                                    <td colspan="2" style="text-align:center;padding:32px;color:#94a3b8;">Sin registros</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <!-- All Teachers Table -->
-                    <div class="section-card">
-                        <div class="section-header">
-                            <div class="section-title"><i data-lucide="list"
-                                    style="width:20px;height:20px;color:var(--brand-blue);"></i> Listado de Maestros
-                            </div>
-                            <button class="btn btn-secondary" onclick="exportarExcel()"><i
-                                    data-lucide="file-spreadsheet" style="width:16px;height:16px;"></i> Exportar
-                                Excel</button>
+                    <div class="kids-table-card">
+                        <div class="table-header">
+                            <h3><i data-lucide="list" style="width:18px;height:18px;color:#1c6390;"></i> Listado de Maestros</h3>
+                            <button class="kids-admin-btn secondary" onclick="exportarExcel()">
+                                <i data-lucide="file-spreadsheet" style="width:16px;height:16px;"></i> Exportar Excel
+                            </button>
                         </div>
-                        <div class="table-container">
-                            <table class="data-table">
+                        <div style="overflow-x:auto;">
+                            <table>
                                 <thead>
                                     <tr>
-                                        <th>Nombres</th>
+                                        <th>Maestro</th>
                                         <th>DNI</th>
                                         <th>Celular</th>
-                                        <th>Sexo</th>
+                                        <th> Sexo</th>
                                         <th>Líder</th>
                                         <th>Asistencia</th>
                                         <th>Acciones</th>
@@ -553,8 +913,7 @@
                                 </thead>
                                 <tbody id="tablaMaestros">
                                     <tr>
-                                        <td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">
-                                            Cargando...</td>
+                                        <td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">Cargando...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -814,36 +1173,36 @@
             });
             const varones = maestros.filter(m => m.sexo === 'Masculino').length;
             const mujeres = maestros.filter(m => m.sexo === 'Femenino').length;
-            document.getElementById('statGenero').innerText = `${varones} / ${mujeres}`;
+            document.getElementById('statVarones').innerText = varones;
+            document.getElementById('statMujeres').innerText = mujeres;
         }
 
         function renderTabla() {
             const tbody = document.getElementById('tablaMaestros');
             if (maestros.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">No hay maestros registrados</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">No hay maestros registrados</td></tr>';
                 return;
             }
             tbody.innerHTML = maestros.map(m => {
-                const sexoIcon = m.sexo === 'Masculino' ? '♂️' : m.sexo === 'Femenino' ? '♀️' : '—';
+                const isFem = m.sexo === 'Femenino';
+                const sexoIcon = isFem ? '♀️' : '♂️';
                 return `<tr>
                     <td>
-                        <div class="student-cell">
-                            <div class="student-avatar" style="background:${m.sexo === 'Femenino' ? '#fce7f3;color:#db2777' : '#dbeafe;color:#1d4ed8'}">
-                                ${(m.nombres || 'A').charAt(0)}
-                            </div>
-                            <div class="student-info">
-                                <h5>${m.nombres}</h5>
-                            </div>
+                        <div class="teacher-cell">
+                            <div class="teacher-avatar ${isFem ? 'female' : 'male'}">${(m.nombres || 'A').charAt(0)}</div>
+                            <span style="font-weight:600;">${m.nombres}</span>
                         </div>
                     </td>
-                    <td>${m.dni}</td>
+                    <td style="font-family:monospace;font-weight:600;">${m.dni}</td>
                     <td>${m.celular || '—'}</td>
                     <td>${sexoIcon}</td>
                     <td>${m.lider || '—'}</td>
-                    <td><button class="btn btn-secondary" style="padding:4px 10px;font-size:11px;" onclick="verAsistencia('${m.id}','${m.nombres}')">Ver</button></td>
+                    <td><button class="action-icon view" onclick="verAsistencia('${m.id}','${m.nombres}')" title="Ver asistencia"><i data-lucide="eye" style="width:14px;height:14px;"></i></button></td>
                     <td>
-                        <button class="action-btn btn-edit btn" style="padding:6px;border-radius:6px;" onclick="editarMaestroId('${m.id}')"><i data-lucide="edit" style="width:14px;height:14px;"></i></button>
-                        <button class="action-btn btn-del btn" style="padding:6px;border-radius:6px;" onclick="eliminarMaestroId('${m.id}','${m.nombres}')"><i data-lucide="trash" style="width:14px;height:14px;"></i></button>
+                        <div class="actions-cell">
+                            <button class="action-icon edit" onclick="editarMaestroId('${m.id}')" title="Editar"><i data-lucide="edit" style="width:14px;height:14px;"></i></button>
+                            <button class="action-icon delete" onclick="eliminarMaestroId('${m.id}','${m.nombres}')" title="Eliminar"><i data-lucide="trash" style="width:14px;height:14px;"></i></button>
+                        </div>
                     </td>
                 </tr>`;
             }).join('');
