@@ -8,6 +8,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
+    <style>
+        tr.cancelada {
+            opacity: 0.55;
+            background: #f1f5f9;
+        }
+        tr.cancelada td {
+            text-decoration: line-through;
+        }
+        .btn-cancel {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        .btn-cancel:hover {
+            background: #fee2e2;
+        }
+        .btn-ok {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+        .btn-ok:hover {
+            background: #dcfce7;
+        }
+    </style>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -752,8 +777,9 @@
                 const metodo = i.metodoPago ? i.metodoPago.charAt(0).toUpperCase() + i.metodoPago.slice(1) : '-';
                 const initials = getInitials(i.nombres);
                 const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" title="Ver captura de pago">` : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
+                const cancelada = i.cancelado ? 'cancelada' : '';
 
-                return `<tr>
+                return `<tr class="${cancelada}">
                     <td>
                         <div class="student-cell">
                             <div class="student-avatar">${initials}</div>
@@ -776,8 +802,9 @@
                         </div>
                     </td>
                     <td>
-                        <button class="action-btn btn-edit btn" style="padding: 6px; border-radius: 6px;" onclick="editarInscripcion('${i.id}')" title="Editar"><i data-lucide="edit" style="width:14px; height:14px;"></i></button>
-                        <button class="action-btn btn-del btn" style="padding: 6px; border-radius: 6px;" onclick="eliminarInscripcion('${i.id}')" title="Eliminar"><i data-lucide="trash" style="width:14px; height:14px;"></i></button>
+                        <button class="action-btn btn-edit btn" style="padding:6px;border-radius:6px;" onclick="editarInscripcion('${i.id}')" title="Editar"><i data-lucide="edit" style="width:14px;height:14px;"></i></button>
+                        <button class="action-btn ${i.cancelado ? 'btn-ok' : 'btn-cancel'} btn" style="padding:6px;border-radius:6px;" onclick="toggleCancelar('${i.id}')" title="${i.cancelado ? 'Reactivar' : 'Cancelar inscripción'}"><i data-lucide="${i.cancelado ? 'undo' : 'x-circle'}" style="width:14px;height:14px;"></i></button>
+                        <button class="action-btn btn-del btn" style="padding:6px;border-radius:6px;" onclick="eliminarInscripcion('${i.id}')" title="Eliminar"><i data-lucide="trash" style="width:14px;height:14px;"></i></button>
                     </td>
                 </tr>`;
             }).join('');
@@ -886,6 +913,15 @@
                 toast('🗑️ Inscripción eliminada');
                 cargarInscripciones();
             }
+        }
+
+        async function toggleCancelar(id) {
+            const doc = await dbIns.doc(id).get();
+            const data = doc.data();
+            const nuevoEstado = !data.cancelado;
+            await dbIns.doc(id).update({ cancelado: nuevoEstado });
+            toast(nuevoEstado ? '❌ Inscripción cancelada' : '✅ Inscripción reactivada');
+            cargarInscripciones();
         }
 
         function exportarExcel() {
