@@ -318,6 +318,7 @@
             padding: 32px;
             width: 100%;
             max-width: 480px;
+            margin: 0 auto;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: slideUp 0.5s ease;
         }
@@ -712,7 +713,7 @@
     </style>
 </head>
 
-<body class="guest-mode">
+<body id="kidsBody">
     <button class="sidebar-mobile-toggle" id="sidebarMobileToggle" style="display:none;">☰</button>
     <div class="app-layout">
         <!-- Sidebar -->
@@ -1123,21 +1124,18 @@
         document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
 
         if (esAdmin) {
+            document.body.classList.remove('guest-mode');
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
             document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'none');
         } else {
+            document.body.classList.add('guest-mode');
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'block');
-            if (sessionStorage.getItem('kidsPasswordOK') === '1') {
-                document.getElementById('kidsPasswordGate').style.display = 'none';
-                document.getElementById('kidsGuestContent').style.display = 'block';
-            }
         }
 
         function verificarPasswordKids() {
             const input = document.getElementById('kidsPasswordInput').value.trim();
             if (input === 'AguaViva26') {
-                sessionStorage.setItem('kidsPasswordOK', '1');
                 document.getElementById('kidsPasswordGate').style.display = 'none';
                 document.getElementById('kidsGuestContent').style.display = 'block';
             } else {
@@ -1244,7 +1242,7 @@
             const snap = await dbAsistencia.where('maestroId', '==', id).orderBy('timestamp', 'desc').get();
             const tbody = document.getElementById('historyBody');
             if (snap.empty) {
-                tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:32px;color:var(--text-muted);">Sin registros</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:32px;color:#94a3b8;">Sin registros</td></tr>';
             } else {
                 tbody.innerHTML = snap.docs.map(d => {
                     const data = d.data();
