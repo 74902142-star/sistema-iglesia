@@ -9,13 +9,6 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
     <style>
-        tr.cancelada {
-            opacity: 0.55;
-            background: #f1f5f9;
-        }
-        tr.cancelada td {
-            text-decoration: line-through;
-        }
         .btn-cancel {
             background: #fef2f2;
             color: #dc2626;
@@ -778,9 +771,8 @@
                 const metodo = i.metodoPago ? i.metodoPago.charAt(0).toUpperCase() + i.metodoPago.slice(1) : '-';
                 const initials = getInitials(i.nombres);
                 const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" title="Ver captura de pago">` : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
-                const cancelada = i.cancelado ? 'cancelada' : '';
 
-                return `<tr class="${cancelada}">
+                return `<tr>
                     <td>
                         <div class="student-cell">
                             <div class="student-avatar">${initials}</div>
@@ -804,7 +796,10 @@
                     </td>
                     <td>
                         <button class="action-btn btn-edit btn" style="padding:6px;border-radius:6px;" onclick="editarInscripcion('${i.id}')" title="Editar"><i data-lucide="edit" style="width:14px;height:14px;"></i></button>
-                        <button class="action-btn ${i.cancelado ? 'btn-ok' : 'btn-cancel'} btn" style="padding:6px;border-radius:6px;" onclick="toggleCancelar('${i.id}')" title="${i.cancelado ? 'Reactivar' : 'Cancelar inscripción'}"><i data-lucide="${i.cancelado ? 'undo' : 'x-circle'}" style="width:14px;height:14px;"></i></button>
+                        ${i.estadoPago === 'Canceló'
+                            ? `<button class="action-btn btn-cancel btn" style="padding:6px;border-radius:6px;" onclick="toggleEstadoPago('${i.id}','Debe')" title="Cancelar inscripción"><i data-lucide="x-circle" style="width:14px;height:14px;"></i></button>`
+                            : `<button class="action-btn btn-ok btn" style="padding:6px;border-radius:6px;" onclick="toggleEstadoPago('${i.id}','Canceló')" title="Confirmar inscripción"><i data-lucide="check-circle" style="width:14px;height:14px;"></i></button>`
+                        }
                         <button class="action-btn btn-del btn" style="padding:6px;border-radius:6px;" onclick="eliminarInscripcion('${i.id}')" title="Eliminar"><i data-lucide="trash" style="width:14px;height:14px;"></i></button>
                     </td>
                 </tr>`;
@@ -916,12 +911,9 @@
             }
         }
 
-        async function toggleCancelar(id) {
-            const doc = await dbIns.doc(id).get();
-            const data = doc.data();
-            const nuevoEstado = !data.cancelado;
-            await dbIns.doc(id).update({ cancelado: nuevoEstado });
-            toast(nuevoEstado ? '❌ Inscripción cancelada' : '✅ Inscripción reactivada');
+        async function toggleEstadoPago(id, nuevoEstado) {
+            await dbIns.doc(id).update({ estadoPago: nuevoEstado });
+            toast(nuevoEstado === 'Canceló' ? '✅ Inscripción confirmada' : '❌ Inscripción en estado Debe');
             cargarInscripciones();
         }
 
