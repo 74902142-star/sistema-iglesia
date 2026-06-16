@@ -189,7 +189,7 @@
             </div>
         </a>
 
-        <a href="kids.html" class="module-card">
+        <a href="kids.html" class="module-card" id="opt-kids">
             <div class="module-icon" style="background:#e11d48;">
                 <i data-lucide="heart" style="width: 24px; height: 24px;"></i>
             </div>
@@ -199,7 +199,7 @@
             </div>
         </a>
 
-        <a href="lideres.html" class="module-card">
+        <a href="lideres.html" class="module-card" id="opt-lideres">
             <div class="module-icon" style="background:#7c3aed;">
                 <i data-lucide="users" style="width: 24px; height: 24px;"></i>
             </div>
@@ -224,6 +224,13 @@
             window.location.href = 'index.html';
         }
         document.getElementById('userName').textContent = user.nombre || 'Invitado';
+
+        // KIDS & LIDERES only visible if name is "Agua Viva Hyo"
+        if (user.nombre !== 'Agua Viva Hyo') {
+            document.getElementById('opt-kids').style.display = 'none';
+            document.getElementById('opt-lideres').style.display = 'none';
+        }
+
         function cerrarSesion() { Auth.cerrarSesion(); }
     </script>
 </body>

@@ -1391,7 +1391,29 @@
             if (!/^\d{8}$/.test(dni)) { toast('❌ DNI debe tener 8 dígitos', 'warning'); return; }
 
             await firebaseReady;
-            const snap = await dbKids.where('dni', '==', dni).get();
+            let snap = await dbKids.where('dni', '==', dni).get();
+            if (snap.empty) {
+                const dbNinios = firebase.firestore().collection('kids_maestros');
+                snap = await dbNinios.where('dni', '==', dni).get();
+            }
+            if (snap.empty) {
+                const dbInsc = firebase.firestore().collection('inscripciones');
+                const inscSnap = await dbInsc.where('dni', '==', dni).get();
+                if (!inscSnap.empty) {
+                    const insc = inscSnap.docs[0].data();
+                    await dbKids.add({
+                        dni: insc.dni,
+                        nombres: insc.nombres,
+                        celular: insc.celular,
+                        sexo: insc.sexo || '',
+                        lider: insc.lider || 'Pendiente',
+                        createdAt: new Date().toISOString(),
+                        origen: 'edl'
+                    });
+                    toast('✅ Registro importado desde EDL');
+                    snap = await dbKids.where('dni', '==', dni).get();
+                }
+            }
             if (snap.empty) {
                 document.getElementById('regDni').value = dni;
                 showStep('kidsStepRegister');
@@ -1460,6 +1482,17 @@
                     createdAt: new Date().toISOString(),
                     origen: 'auto-registro'
                 });
+                // Also save to kids_maestros (shared members)
+                const dbNinios = firebase.firestore().collection('kids_maestros');
+                const existKids = await dbNinios.where('dni', '==', dni).get();
+                if (existKids.empty) {
+                    await dbNinios.add({
+                        dni, nombres, celular, sexo,
+                        lider: lider || 'Pendiente',
+                        createdAt: new Date().toISOString(),
+                        origen: 'auto-registro'
+                    });
+                }
                 maestroActual = { id: docRef.id, dni, nombres, celular, sexo, lider: lider || 'Pendiente' };
                 await registrarAsistenciaGuest();
             } catch (e) {
