@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>KIDS - Registro de Maestros | Iglesia Agua Viva</title>
+    <title>LIDERES - Reunión de Liderazgo | Iglesia Agua Viva</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
@@ -838,9 +838,10 @@
                             data-lucide="palette"></i></span><span>Creativos</span></a>
                 <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i
                             data-lucide="graduation-cap"></i></span><span>EDL</span></a>
-                <a href="kids.html" class="nav-link active" id="nav-kids"><span class="nav-icon"><i
+                <a href="kids.html" class="nav-link" id="nav-kids"><span class="nav-icon"><i
                             data-lucide="heart"></i></span><span>KIDS</span></a>
-                <a href="lideres.html" class="nav-link" id="nav-lideres"><span class="nav-icon"><i data-lucide="users"></i></span><span>LIDERES</span></a>
+                <a href="lideres.html" class="nav-link active" id="nav-lideres"><span class="nav-icon"><i
+                            data-lucide="users"></i></span><span>LIDERES</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
                 <a href="#" class="nav-link"><span class="nav-icon"><i
@@ -856,7 +857,7 @@
             <!-- Header -->
             <div class="header">
                 <div class="header-left">
-                    <div class="header-title">Agua Viva KIDS – Registro de Maestros</div>
+                    <div class="header-title">Agua Viva LIDERES – Reunión de Liderazgo</div>
                 </div>
                 <div class="header-right">
                     <div class="user-area">
@@ -878,11 +879,11 @@
                     <!-- Admin Header Banner -->
                     <div class="kids-admin-header">
                         <div class="kids-admin-header-icon">
-                            <i data-lucide="heart" style="width:28px;height:28px;"></i>
+                            <i data-lucide="users" style="width:28px;height:28px;"></i>
                         </div>
                         <div>
-                            <h2>Agua Viva KIDS</h2>
-                            <p>Gestión de maestros y control de asistencia del ministerio infantil</p>
+                            <h2>Agua Viva LIDERES</h2>
+                            <p>Gestión de líderes y control de asistencia a la reunión de liderazgo</p>
                         </div>
                     </div>
 
@@ -893,7 +894,7 @@
                             <div class="kids-stat-info">
                                 <h4>Total</h4>
                                 <div class="value" id="statTotal">0</div>
-                                <div class="subtitle">Maestros</div>
+                                <div class="subtitle">Líderes</div>
                             </div>
                         </div>
                         <div class="kids-stat-card">
@@ -926,11 +927,11 @@
                     <div class="kids-search-admin">
                         <div class="search-row">
                             <div class="field">
-                                <label>Buscar Maestro por DNI</label>
+                                <label>Buscar Líder por DNI</label>
                                 <input type="text" id="dniBuscar" placeholder="Ingresa DNI..."
                                     maxlength="8" inputmode="numeric" pattern="[0-9]*">
                             </div>
-                            <button class="kids-admin-btn primary" onclick="buscarMaestro()">
+                            <button class="kids-admin-btn primary" onclick="buscarLíder()">
                                 <i data-lucide="search" style="width:16px;height:16px;"></i> Buscar
                             </button>
                             <button class="kids-admin-btn secondary" onclick="limpiarBusqueda()">
@@ -961,10 +962,10 @@
                                 <button class="kids-admin-btn success" onclick="registrarAsistencia()">
                                     <i data-lucide="calendar-check" style="width:16px;height:16px;"></i> Registrar
                                 </button>
-                                <button class="kids-admin-btn secondary" onclick="editarMaestro()">
+                                <button class="kids-admin-btn secondary" onclick="editarLíder()">
                                     <i data-lucide="edit" style="width:16px;height:16px;"></i> Editar
                                 </button>
-                                <button class="kids-admin-btn danger" onclick="eliminarMaestro()">
+                                <button class="kids-admin-btn danger" onclick="eliminarLíder()">
                                     <i data-lucide="trash" style="width:16px;height:16px;"></i> Eliminar
                                 </button>
                             </div>
@@ -994,7 +995,7 @@
                     <!-- All Teachers Table -->
                     <div class="kids-table-card">
                         <div class="table-header">
-                            <h3><i data-lucide="list" style="width:18px;height:18px;color:#1c6390;"></i> Listado de Maestros</h3>
+                            <h3><i data-lucide="list" style="width:18px;height:18px;color:#1c6390;"></i> Listado de Líderes</h3>
                             <button class="kids-admin-btn secondary" onclick="exportarExcel()">
                                 <i data-lucide="file-spreadsheet" style="width:16px;height:16px;"></i> Exportar Excel
                             </button>
@@ -1003,7 +1004,7 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Maestro</th>
+                                        <th>Líder</th>
                                         <th>DNI</th>
                                         <th>Celular</th>
                                         <th> Sexo</th>
@@ -1012,7 +1013,7 @@
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tablaMaestros">
+                                <tbody id="tablaLíderes">
                                     <tr>
                                         <td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">Cargando...</td>
                                     </tr>
@@ -1030,10 +1031,10 @@
                     <div id="kidsPasswordGate">
                         <div class="kids-hero">
                             <div class="kids-hero-icon">
-                                <i data-lucide="heart" style="width:48px;height:48px;color:#fff;"></i>
+                                <i data-lucide="users" style="width:48px;height:48px;color:#fff;"></i>
                             </div>
-                            <h1>Agua Viva KIDS</h1>
-                            <p>Registro de Asistencia de Maestros</p>
+                            <h1>Agua Viva LIDERES</h1>
+                            <p>Registro de Asistencia de Líderes</p>
                         </div>
                         <div class="kids-pass-card">
                             <div style="font-size:40px;margin-bottom:12px;">🔒</div>
@@ -1058,7 +1059,7 @@
                         <div id="kidsStepDNI">
                             <div class="kids-guest-hero">
                                 <div class="kids-hero-icon" style="width:100px;height:100px;border-radius:28px;">
-                                    <i data-lucide="heart" style="width:48px;height:48px;color:#fff;"></i>
+                                    <i data-lucide="users" style="width:48px;height:48px;color:#fff;"></i>
                                 </div>
                                 <h1>Registro de Asistencia</h1>
                                 <p>Ingresa tu DNI para marcar tu asistencia</p>
@@ -1067,7 +1068,7 @@
                                 <label class="kids-dni-label">Número de DNI</label>
                                 <input type="text" id="guestDniInput" class="kids-dni-input"
                                     placeholder="12345678" maxlength="8" inputmode="numeric" pattern="[0-9]*">
-                                <button class="kids-search-btn" onclick="buscarMaestroGuest()">
+                                <button class="kids-search-btn" onclick="buscarLíderGuest()">
                                     Buscar
                                 </button>
                             </div>
@@ -1130,7 +1131,7 @@
                                     <label>Líder</label>
                                     <input type="text" id="regLider" placeholder="Nombre de tu líder">
                                 </div>
-                                <button class="kids-register-btn" onclick="registrarMaestroYAsistencia()">
+                                <button class="kids-register-btn" onclick="registrarLíderYAsistencia()">
                                     Registrarme y marcar asistencia
                                 </button>
                                 <button class="kids-cancel-btn" onclick="volverBusqueda()">
@@ -1162,15 +1163,15 @@
         </div> <!-- /main-content -->
     </div> <!-- /page-wrapper -->
 
-    <!-- Modal Maestro -->
-    <div id="modalMaestro" class="modal">
+    <!-- Modal Líder -->
+    <div id="modalLíder" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Nuevo Maestro</h3>
+                <h3 id="modalTitle">Nuevo Líder</h3>
                 <button class="modal-close" onclick="cerrarModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formMaestro">
+                <form id="formLíder">
                     <input type="hidden" id="editId">
                     <div class="form-group">
                         <label>Nombres y apellidos *</label>
@@ -1205,7 +1206,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary"
                         style="width:100%;justify-content:center;margin-top:20px;">
-                        <i data-lucide="save" style="width:16px;height:16px;"></i> Guardar Maestro
+                        <i data-lucide="save" style="width:16px;height:16px;"></i> Guardar Líder
                     </button>
                 </form>
             </div>
@@ -1235,7 +1236,7 @@
 
         function verificarPasswordKids() {
             const input = document.getElementById('kidsPasswordInput').value.trim();
-            if (input === 'AguaViva26') {
+            if (input === 'yvan2308') {
                 document.getElementById('kidsPasswordGate').style.display = 'none';
                 document.getElementById('kidsGuestContent').style.display = 'block';
             } else {
@@ -1245,13 +1246,13 @@
             }
         }
 
-        const dbKids = db.collection('kids_maestros');
-        const dbAsistencia = db.collection('kids_asistencia');
+        const dbKids = db.collection('lideres_maestros');
+        const dbAsistencia = db.collection('lideres_asistencia');
         let maestros = [];
         let maestroActual = null; // selected teacher for actions
 
         // ── Load ──
-        async function cargarMaestros() {
+        async function cargarLíderes() {
             await firebaseReady;
             const snap = await dbKids.get();
             maestros = [];
@@ -1276,9 +1277,9 @@
         }
 
         function renderTabla() {
-            const tbody = document.getElementById('tablaMaestros');
+            const tbody = document.getElementById('tablaLíderes');
             if (maestros.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">No hay maestros registrados</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">No hay líderes registrados</td></tr>';
                 return;
             }
             tbody.innerHTML = maestros.map(m => {
@@ -1298,8 +1299,8 @@
                     <td><button class="action-icon view" onclick="verAsistencia('${m.id}','${m.nombres}')" title="Ver asistencia"><i data-lucide="eye" style="width:14px;height:14px;"></i></button></td>
                     <td>
                         <div class="actions-cell">
-                            <button class="action-icon edit" onclick="editarMaestroId('${m.id}')" title="Editar"><i data-lucide="edit" style="width:14px;height:14px;"></i></button>
-                            <button class="action-icon delete" onclick="eliminarMaestroId('${m.id}','${m.nombres}')" title="Eliminar"><i data-lucide="trash" style="width:14px;height:14px;"></i></button>
+                            <button class="action-icon edit" onclick="editarLíderId('${m.id}')" title="Editar"><i data-lucide="edit" style="width:14px;height:14px;"></i></button>
+                            <button class="action-icon delete" onclick="eliminarLíderId('${m.id}','${m.nombres}')" title="Eliminar"><i data-lucide="trash" style="width:14px;height:14px;"></i></button>
                         </div>
                     </td>
                 </tr>`;
@@ -1308,15 +1309,15 @@
         }
 
         // ── Search / Auto-fill ──
-        function buscarMaestro() {
+        function buscarLíder() {
             const dni = document.getElementById('dniBuscar').value.trim();
             if (!dni) { toast('Ingresa un DNI', 'warning'); return; }
             const m = maestros.find(x => x.dni === dni);
-            if (!m) { toast('❌ Maestro no encontrado', 'warning'); return; }
-            mostrarMaestro(m);
+            if (!m) { toast('❌ Líder no encontrado', 'warning'); return; }
+            mostrarLíder(m);
         }
 
-        function mostrarMaestro(m) {
+        function mostrarLíder(m) {
             maestroActual = m;
             document.getElementById('teacherNombre').innerText = m.nombres;
             document.getElementById('teacherDni').innerText = m.dni;
@@ -1384,7 +1385,7 @@
             document.getElementById(step).style.display = 'block';
         }
 
-        async function buscarMaestroGuest() {
+        async function buscarLíderGuest() {
             const dni = document.getElementById('guestDniInput').value.trim();
             if (!dni) { toast('Ingresa tu DNI', 'warning'); return; }
             if (!/^\d{8}$/.test(dni)) { toast('❌ DNI debe tener 8 dígitos', 'warning'); return; }
@@ -1429,7 +1430,7 @@
             showStep('kidsStepSuccess');
         }
 
-        async function registrarMaestroYAsistencia() {
+        async function registrarLíderYAsistencia() {
             const dni = document.getElementById('regDni').value.trim();
             const nombres = document.getElementById('regNombres').value.trim();
             const celular = document.getElementById('regCelular').value.trim();
@@ -1482,17 +1483,17 @@
             showStep('kidsStepDNI');
         }
 
-        // ── CRUD Maestro ──
+        // ── CRUD Líder ──
         function abrirModalNuevo() {
             editandoId = null;
-            document.getElementById('formMaestro').reset();
-            document.getElementById('modalTitle').innerText = 'Nuevo Maestro';
-            document.getElementById('modalMaestro').style.display = 'flex';
+            document.getElementById('formLíder').reset();
+            document.getElementById('modalTitle').innerText = 'Nuevo Líder';
+            document.getElementById('modalLíder').style.display = 'flex';
         }
 
         let editandoId = null;
 
-        document.getElementById('formMaestro').addEventListener('submit', async (e) => {
+        document.getElementById('formLíder').addEventListener('submit', async (e) => {
             e.preventDefault();
             await firebaseReady;
             const btn = e.target.querySelector('button[type="submit"]');
@@ -1501,9 +1502,9 @@
 
             try {
                 const dni = document.getElementById('mDni').value.trim();
-                if (!/^\d{8}$/.test(dni)) { toast('❌ DNI debe tener 8 dígitos', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Maestro'; return; }
+                if (!/^\d{8}$/.test(dni)) { toast('❌ DNI debe tener 8 dígitos', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Líder'; return; }
                 const celular = document.getElementById('mCelular').value.trim();
-                if (celular && !/^9\d{8}$/.test(celular)) { toast('❌ Celular inválido', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Maestro'; return; }
+                if (celular && !/^9\d{8}$/.test(celular)) { toast('❌ Celular inválido', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Líder'; return; }
 
                 const data = {
                     nombres: document.getElementById('mNombres').value.trim(),
@@ -1515,26 +1516,26 @@
 
                 if (editandoId) {
                     await dbKids.doc(editandoId).update(data);
-                    toast('✅ Maestro actualizado');
+                    toast('✅ Líder actualizado');
                 } else {
                     await dbKids.add(data);
-                    toast('✅ Maestro registrado');
+                    toast('✅ Líder registrado');
                 }
                 cerrarModal();
-                cargarMaestros();
+                cargarLíderes();
             } catch (err) {
                 toast('❌ Error: ' + err.message, 'error');
                 btn.disabled = false;
-                btn.innerHTML = 'Guardar Maestro';
+                btn.innerHTML = 'Guardar Líder';
             }
         });
 
-        function editarMaestro() {
+        function editarLíder() {
             if (!maestroActual) return;
-            editarMaestroId(maestroActual.id);
+            editarLíderId(maestroActual.id);
         }
 
-        async function editarMaestroId(id) {
+        async function editarLíderId(id) {
             const doc = await dbKids.doc(id).get();
             const m = doc.data();
             editandoId = id;
@@ -1543,26 +1544,26 @@
             document.getElementById('mCelular').value = m.celular || '';
             document.getElementById('mSexo').value = m.sexo || '';
             document.getElementById('mLider').value = m.lider || '';
-            document.getElementById('modalTitle').innerText = 'Editar Maestro';
-            document.getElementById('modalMaestro').style.display = 'flex';
+            document.getElementById('modalTitle').innerText = 'Editar Líder';
+            document.getElementById('modalLíder').style.display = 'flex';
         }
 
-        function eliminarMaestro() {
+        function eliminarLíder() {
             if (!maestroActual) return;
-            eliminarMaestroId(maestroActual.id, maestroActual.nombres);
+            eliminarLíderId(maestroActual.id, maestroActual.nombres);
         }
 
-        async function eliminarMaestroId(id, nombre) {
+        async function eliminarLíderId(id, nombre) {
             if (!confirm('¿Eliminar a ' + nombre + '?')) return;
             await dbKids.doc(id).delete();
-            toast('🗑️ Maestro eliminado');
+            toast('🗑️ Líder eliminado');
             if (maestroActual && maestroActual.id === id) limpiarBusqueda();
-            cargarMaestros();
+            cargarLíderes();
         }
 
         function verAsistencia(id, nombre) {
             const m = maestros.find(x => x.id === id);
-            if (m) mostrarMaestro(m);
+            if (m) mostrarLíder(m);
         }
 
         // ── Export ──
@@ -1577,8 +1578,8 @@
             }));
             const ws = XLSX.utils.json_to_sheet(datos);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Maestros KIDS');
-            XLSX.writeFile(wb, `kids_maestros_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, 'Líderes LIDERES');
+            XLSX.writeFile(wb, `lideres_maestros_${new Date().toISOString().split('T')[0]}.xlsx`);
             toast('📎 Excel exportado');
         }
 
@@ -1591,7 +1592,7 @@
             setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, tipo === 'warning' ? 5000 : 3000);
         }
 
-        function cerrarModal() { document.getElementById('modalMaestro').style.display = 'none'; }
+        function cerrarModal() { document.getElementById('modalLíder').style.display = 'none'; }
 
         function cerrarSesion() {
             if (typeof Auth !== 'undefined') Auth.cerrarSesion();
@@ -1624,13 +1625,13 @@
 
         // ── Enter key search ──
         document.getElementById('dniBuscar').addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') buscarMaestro();
+            if (e.key === 'Enter') buscarLíder();
         });
         document.getElementById('guestDniInput').addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') buscarMaestroGuest();
+            if (e.key === 'Enter') buscarLíderGuest();
         });
 
-        if (esAdmin) cargarMaestros();
+        if (esAdmin) cargarLíderes();
         if (typeof lucide !== 'undefined') lucide.createIcons();
     </script>
 
