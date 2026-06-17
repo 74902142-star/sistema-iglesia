@@ -1423,10 +1423,18 @@
             const m = { id: doc.id, ...doc.data() };
             maestroActual = m;
 
+            // Auto-register attendance
+            const now = new Date();
+            await dbAsistencia.add({
+                maestroId: m.id,
+                fecha: now.toISOString().split('T')[0],
+                hora: now.toTimeString().split(' ')[0],
+                timestamp: now.toISOString(),
+                origen: 'invitado'
+            });
+
             document.getElementById('guestNombre').innerText = m.nombres;
             document.getElementById('guestDniTexto').innerText = 'DNI: ' + m.dni;
-            document.getElementById('guestCelularTexto').innerText = '📱 ' + (m.celular || '—');
-            document.getElementById('guestLiderTexto').innerText = 'Líder: ' + (m.lider || '—');
 
             const sil = document.getElementById('guestSilhouette');
             sil.className = 'kids-silhouette';
@@ -1435,7 +1443,7 @@
             sil.innerHTML = '<i data-lucide="user" style="width:44px;height:44px;"></i>';
             if (typeof lucide !== 'undefined') lucide.createIcons();
 
-            showStep('kidsStepProfile');
+            showStep('kidsStepSuccess');
         }
 
         async function registrarAsistenciaGuest() {

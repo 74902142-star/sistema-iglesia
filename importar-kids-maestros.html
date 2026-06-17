@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importar Maestros KIDS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f4ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .card { background: #fff; border-radius: 20px; padding: 40px; max-width: 600px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.1); }
+        h1 { font-size: 24px; font-weight: 800; color: #00334f; margin-bottom: 8px; }
+        .subtitle { color: #64748b; font-size: 14px; margin-bottom: 24px; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+        .stat { background: #f8fafc; border-radius: 12px; padding: 16px; text-align: center; }
+        .stat .value { font-size: 28px; font-weight: 800; color: #00334f; }
+        .stat .label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+        .btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: linear-gradient(135deg, #00334f, #1c6390); color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,51,79,0.3); }
+        .btn-danger { background: #dc2626; color: #fff; margin-top: 12px; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .log { margin-top: 24px; max-height: 300px; overflow-y: auto; background: #f8fafc; border-radius: 12px; padding: 16px; font-family: monospace; font-size: 13px; line-height: 1.8; }
+        .log .ok { color: #16a34a; }
+        .log .err { color: #dc2626; }
+        .log .info { color: #1c6390; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Importar Maestros KIDS</h1>
+        <p class="subtitle">33 maestros pre-registrados desde WhatsApp</p>
+        <div class="stats">
+            <div class="stat"><div class="value" id="totalMaestros">33</div><div class="label">Total</div></div>
+            <div class="stat"><div class="value" id="importados">0</div><div class="label">Importados</div></div>
+            <div class="stat"><div class="value" id="duplicados">0</div><div class="label">Duplicados</div></div>
+        </div>
+        <button class="btn btn-primary" id="btnImportar" onclick="importar()">Importar Maestros</button>
+        <button class="btn btn-danger" onclick="if(confirm('¿Eliminar TODOS los maestros KIDS?'))limpiar()">Limpiar colección</button>
+        <div class="log" id="log"></div>
+    </div>
+    <script>
+        const maestros = [
+            { dni: "70886764", nombres: "Nataly Quispe Bendezu", celular: "986404890", sexo: "Femenino", lider: "Pastora Diana" },
+            { dni: "75183069", nombres: "Danitza Fiorella Perez Suasnabar", celular: "952731465", sexo: "Femenino", lider: "Pastora Diana" },
+            { dni: "41874382", nombres: "Reyna Rosa Chamorro Munguia", celular: "937503040", sexo: "Femenino", lider: "Elizabeth Ceras" },
+            { dni: "47523360", nombres: "Carla Verónica Galvan Francia", celular: "926078692", sexo: "Femenino", lider: "Carmen Zamora" },
+            { dni: "44865466", nombres: "Rocio Barreto Cajincho", celular: "959499092", sexo: "Femenino", lider: "Carmencita Zamora de Mauricio" },
+            { dni: "77082812", nombres: "Soriano Prado Arnaldo", celular: "986155478", sexo: "Masculino", lider: "Fredy Romero" },
+            { dni: "78841879", nombres: "Christely Diana Quispe Ceras", celular: "931652738", sexo: "Femenino", lider: "Ninguno" },
+            { dni: "78486137", nombres: "Camila Zoe Chavez Yaurivilca", celular: "992118016", sexo: "Femenino", lider: "Patricia Perez" },
+            { dni: "43217797", nombres: "Vanessa Torres Soto", celular: "983979031", sexo: "Femenino", lider: "Carmen Zamora" },
+            { dni: "74833600", nombres: "Medrano Solis Gabriela", celular: "979453704", sexo: "Femenino", lider: "Celia de la Cruz" },
+            { dni: "48189319", nombres: "Angela Roxana Gómez Briceño", celular: "949827232", sexo: "Femenino", lider: "Mirella Yupanqui" },
+            { dni: "45542817", nombres: "Vanessa Yaurivilca", celular: "964831940", sexo: "Femenino", lider: "Carmen Zamora" },
+            { dni: "005847578", nombres: "María Acosta Mendoza", celular: "930390116", sexo: "Femenino", lider: "Carmen Zamora" },
+            { dni: "61445015", nombres: "Daniela Ramos Chamorro", celular: "984633318", sexo: "Femenino", lider: "Stheffany Quispe" },
+            { dni: "72698361", nombres: "Evelyn Mariel Larrazabal Pando", celular: "947029548", sexo: "Femenino", lider: "Stefany Jibaja" },
+            { dni: "43141509", nombres: "Raquel Mancco Pariona", celular: "992930192", sexo: "Femenino", lider: "Elizabeth Ceras" },
+            { dni: "72153398", nombres: "Marlith Yanira Cabello Angel", celular: "920820664", sexo: "Femenino", lider: "Lindacristal Jimenez" },
+            { dni: "44938988", nombres: "Helen Angely Huatuco León", celular: "968662614", sexo: "Femenino", lider: "Diana Quiroz" },
+            { dni: "41713755", nombres: "Elizabeth Bertha Mauricio Osorio", celular: "916222116", sexo: "Femenino", lider: "Carmen Zamora" },
+            { dni: "40946381", nombres: "María Ines Zambrano Verástegui", celular: "989206367", sexo: "Femenino", lider: "Carolina Zambrano" },
+            { dni: "75006884", nombres: "Raquel Huarcaya Lunasco", celular: "912680025", sexo: "Femenino", lider: "Elizabeth Ceras" },
+            { dni: "73175561", nombres: "Karla Winnie Ñaupari Torres", celular: "967208099", sexo: "Femenino", lider: "Fiorela Perez" },
+            { dni: "42660629", nombres: "Rhoda Arirama Tapayuri", celular: "903397565", sexo: "Femenino", lider: "Carolina Zambrano" },
+            { dni: "72489257", nombres: "Patsy Omayra Romero Zevallos", celular: "947393147", sexo: "Femenino", lider: "Raquel Huarcaya" },
+            { dni: "72608402", nombres: "Emanuel Martínez Vásquez", celular: "920698951", sexo: "Masculino", lider: "Giovanni Aldana" },
+            { dni: "45258119", nombres: "Gustavo Nerson Mercado Carhuas", celular: "936923111", sexo: "Masculino", lider: "Fredy Ronald Romero" },
+            { dni: "72718799", nombres: "María Montañez Paz", celular: "901697346", sexo: "Femenino", lider: "Fiorela Pérez" },
+            { dni: "71017811", nombres: "Elizabeth Karen Palomino Zevallos", celular: "964733715", sexo: "Femenino", lider: "Raquel Huarcaya" },
+            { dni: "74364265", nombres: "Geraldine Enriquez Sosa", celular: "902842016", sexo: "Femenino", lider: "Linda Jiménez" },
+            { dni: "73063501", nombres: "Khan Phey Ayala Rupay", celular: "975708308", sexo: "Femenino", lider: "Carmen Zamora" },
+            { dni: "20119535", nombres: "Carmen Zamora De Mauricio", celular: "963696961", sexo: "Femenino", lider: "Diana Quiroz" },
+            { dni: "79279209", nombres: "Sol Mariana Ramos Chamorro", celular: "964964244", sexo: "Femenino", lider: "Ninguno" }
+        ];
+
+        let logEl;
+        function log(msg, cls = '') {
+            if (!logEl) logEl = document.getElementById('log');
+            logEl.innerHTML += `<div class="${cls}">${msg}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        async function importar() {
+            const btn = document.getElementById('btnImportar');
+            btn.disabled = true;
+            btn.textContent = '⏳ Importando...';
+            let importados = 0, duplicados = 0;
+
+            const db = firebase.firestore();
+            const col = db.collection('kids_maestros');
+
+            for (const m of maestros) {
+                try {
+                    const exist = await col.where('dni', '==', m.dni).get();
+                    if (!exist.empty) {
+                        duplicados++;
+                        log(`⏭️ ${m.nombres} (DNI ${m.dni}) — ya existe`, 'info');
+                        continue;
+                    }
+                    await col.add({
+                        ...m,
+                        createdAt: new Date().toISOString(),
+                        origen: 'importacion'
+                    });
+                    importados++;
+                    log(`✅ ${m.nombres} (DNI ${m.dni}) — importado`, 'ok');
+                } catch (e) {
+                    log(`❌ ${m.nombres} — error: ${e.message}`, 'err');
+                }
+                document.getElementById('importados').textContent = importados;
+                document.getElementById('duplicados').textContent = duplicados;
+            }
+
+            log(`\n🏁 Fin: ${importados} importados, ${duplicados} duplicados`, 'info');
+            btn.textContent = '✅ Importación completa';
+        }
+
+        async function limpiar() {
+            const db = firebase.firestore();
+            const snap = await db.collection('kids_maestros').get();
+            let count = 0;
+            for (const doc of snap.docs) {
+                await doc.ref.delete();
+                count++;
+            }
+            log(`🗑️ ${count} documentos eliminados`, 'err');
+        }
+    </script>
+</body>
+</html>
