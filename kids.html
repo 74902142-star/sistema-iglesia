@@ -809,6 +809,31 @@
             border-color: #94a3b8;
             color: #64748b;
         }
+
+        /* Admin Tabs */
+        .kids-tabs { display:flex; gap:4px; margin-bottom:24px; background:#f1f5f9; border-radius:14px; padding:4px; }
+        .kids-tab { flex:1; padding:12px 16px; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; background:transparent; color:#64748b; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .kids-tab.active { background:#fff; color:#00334f; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+        .kids-tab:hover:not(.active) { color:#00334f; }
+        .kids-tab-panel { display:none; }
+        .kids-tab-panel.active { display:block; }
+        /* Weekly Chart */
+        .weekly-chart { display:flex; align-items:flex-end; gap:8px; height:200px; padding:16px 0; }
+        .weekly-bar { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+        .weekly-bar-fill { width:100%; border-radius:8px 8px 0 0; background:linear-gradient(180deg,#1c6390,#00334f); transition:height 0.5s ease; min-height:4px; }
+        .weekly-bar-label { font-size:11px; color:#94a3b8; font-weight:600; }
+        .weekly-bar-count { font-size:13px; color:#00334f; font-weight:700; }
+        .weekly-nav { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+        .weekly-nav button { padding:8px 16px; border:1.5px solid #e2e8f0; border-radius:10px; background:#fff; cursor:pointer; font-weight:600; font-size:13px; color:#00334f; transition:all 0.2s; }
+        .weekly-nav button:hover { border-color:#1c6390; color:#1c6390; }
+        .weekly-nav .week-label { font-size:15px; font-weight:700; color:#00334f; }
+        .daily-section { margin-bottom:20px; }
+        .daily-section h4 { font-size:14px; font-weight:700; color:#00334f; margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid #e2e8f0; }
+        .daily-attendee { display:flex; align-items:center; gap:12px; padding:10px 16px; background:#f8fafc; border-radius:10px; margin-bottom:6px; }
+        .daily-attendee .avatar { width:36px; height:36px; border-radius:10px; background:#e0f2fe; color:#00334f; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; }
+        .daily-attendee .info { flex:1; }
+        .daily-attendee .info h5 { font-size:13px; font-weight:600; color:#00334f; }
+        .daily-attendee .info span { font-size:11px; color:#94a3b8; }
     </style>
 </head>
 
@@ -922,102 +947,133 @@
                         </div>
                     </div>
 
-                    <!-- Search + New Teacher -->
-                    <div class="kids-search-admin">
-                        <div class="search-row">
-                            <div class="field">
-                                <label>Buscar Maestro por DNI</label>
-                                <input type="text" id="dniBuscar" placeholder="Ingresa DNI..."
-                                    maxlength="8" inputmode="numeric" pattern="[0-9]*">
-                            </div>
-                            <button class="kids-admin-btn primary" onclick="buscarMaestro()">
-                                <i data-lucide="search" style="width:16px;height:16px;"></i> Buscar
-                            </button>
-                            <button class="kids-admin-btn secondary" onclick="limpiarBusqueda()">
-                                <i data-lucide="x" style="width:16px;height:16px;"></i> Limpiar
-                            </button>
-                            <button class="kids-admin-btn success" onclick="abrirModalNuevo()">
-                                <i data-lucide="plus" style="width:16px;height:16px;"></i> Nuevo
-                            </button>
-                        </div>
+                    <!-- Tabs Navigation -->
+                    <div class="kids-tabs">
+                        <button class="kids-tab active" onclick="switchTab('hoy')"><i data-lucide="calendar-check" style="width:16px;height:16px;"></i> Hoy</button>
+                        <button class="kids-tab" onclick="switchTab('database')"><i data-lucide="database" style="width:16px;height:16px;"></i> Base de datos</button>
+                        <button class="kids-tab" onclick="switchTab('weekly')"><i data-lucide="bar-chart-3" style="width:16px;height:16px;"></i> Semanal</button>
                     </div>
 
-                    <!-- Teacher Profile Card -->
-                    <div id="teacherProfile" style="display:none;">
-                        <div class="kids-profile-card">
-                            <div class="kids-silhouette" id="teacherSilhouette">
-                                <i data-lucide="user" style="width:48px;height:48px;"></i>
+                    <!-- TAB: Hoy -->
+                    <div class="kids-tab-panel active" id="tabHoy">
+                        <div class="kids-search-admin">
+                            <div class="search-row">
+                                <div class="field">
+                                    <label>Buscar Maestro por DNI</label>
+                                    <input type="text" id="dniBuscar" placeholder="Ingresa DNI..."
+                                        maxlength="8" inputmode="numeric" pattern="[0-9]*">
+                                </div>
+                                <button class="kids-admin-btn primary" onclick="buscarMaestro()">
+                                    <i data-lucide="search" style="width:16px;height:16px;"></i> Buscar
+                                </button>
+                                <button class="kids-admin-btn secondary" onclick="limpiarBusqueda()">
+                                    <i data-lucide="x" style="width:16px;height:16px;"></i> Limpiar
+                                </button>
+                                <button class="kids-admin-btn success" onclick="abrirModalNuevo()">
+                                    <i data-lucide="plus" style="width:16px;height:16px;"></i> Nuevo
+                                </button>
                             </div>
-                            <div class="info">
-                                <h3 id="teacherNombre">—</h3>
-                                <div class="info-grid">
-                                    <div><strong>DNI:</strong> <span id="teacherDni">—</span></div>
-                                    <div><strong>Celular:</strong> <span id="teacherCelular">—</span></div>
-                                    <div><strong>Sexo:</strong> <span id="teacherSexo">—</span></div>
-                                    <div><strong>Líder:</strong> <span id="teacherLider">—</span></div>
+                        </div>
+
+                        <!-- Teacher Profile Card -->
+                        <div id="teacherProfile" style="display:none;">
+                            <div class="kids-profile-card">
+                                <div class="kids-silhouette" id="teacherSilhouette">
+                                    <i data-lucide="user" style="width:48px;height:48px;"></i>
+                                </div>
+                                <div class="info">
+                                    <h3 id="teacherNombre">—</h3>
+                                    <div class="info-grid">
+                                        <div><strong>DNI:</strong> <span id="teacherDni">—</span></div>
+                                        <div><strong>Celular:</strong> <span id="teacherCelular">—</span></div>
+                                        <div><strong>Sexo:</strong> <span id="teacherSexo">—</span></div>
+                                        <div><strong>Líder:</strong> <span id="teacherLider">—</span></div>
+                                    </div>
+                                </div>
+                                <div class="actions">
+                                    <button class="kids-admin-btn success" onclick="registrarAsistencia()">
+                                        <i data-lucide="calendar-check" style="width:16px;height:16px;"></i> Registrar
+                                    </button>
+                                    <button class="kids-admin-btn secondary" onclick="editarMaestro()">
+                                        <i data-lucide="edit" style="width:16px;height:16px;"></i> Editar
+                                    </button>
+                                    <button class="kids-admin-btn danger" onclick="eliminarMaestro()">
+                                        <i data-lucide="trash" style="width:16px;height:16px;"></i> Eliminar
+                                    </button>
                                 </div>
                             </div>
-                            <div class="actions">
-                                <button class="kids-admin-btn success" onclick="registrarAsistencia()">
-                                    <i data-lucide="calendar-check" style="width:16px;height:16px;"></i> Registrar
-                                </button>
-                                <button class="kids-admin-btn secondary" onclick="editarMaestro()">
-                                    <i data-lucide="edit" style="width:16px;height:16px;"></i> Editar
-                                </button>
-                                <button class="kids-admin-btn danger" onclick="eliminarMaestro()">
-                                    <i data-lucide="trash" style="width:16px;height:16px;"></i> Eliminar
-                                </button>
+                        </div>
+
+                        <!-- Today's Attendance List -->
+                        <div class="kids-table-card">
+                            <div class="table-header">
+                                <h3><i data-lucide="calendar-check" style="width:18px;height:18px;color:#16a34a;"></i> Asistencia de Hoy — <span id="todayDate">—</span></h3>
+                            </div>
+                            <div style="overflow-x:auto;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Maestro</th>
+                                            <th>DNI</th>
+                                            <th>Celular</th>
+                                            <th>Hora</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaHoy">
+                                        <tr>
+                                            <td colspan="4" style="text-align:center;padding:40px;color:#94a3b8;">Cargando...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Attendance History -->
-                    <div class="kids-table-card" id="historySection" style="display:none;">
-                        <div class="table-header">
-                            <h3><i data-lucide="clock" style="width:18px;height:18px;color:#1c6390;"></i> Historial de <span id="historyName">—</span></h3>
+                    <!-- TAB: Base de datos -->
+                    <div class="kids-tab-panel" id="tabDatabase">
+                        <div class="kids-table-card">
+                            <div class="table-header">
+                                <h3><i data-lucide="database" style="width:18px;height:18px;color:#1c6390;"></i> Listado de Maestros</h3>
+                                <button class="kids-admin-btn secondary" onclick="exportarExcel()">
+                                    <i data-lucide="file-spreadsheet" style="width:16px;height:16px;"></i> Exportar Excel
+                                </button>
+                            </div>
+                            <div style="overflow-x:auto;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Maestro</th>
+                                            <th>DNI</th>
+                                            <th>Celular</th>
+                                            <th>Sexo</th>
+                                            <th>Líder</th>
+                                            <th>Asistencia</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaMaestros">
+                                        <tr>
+                                            <td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">Cargando...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Hora</th>
-                                </tr>
-                            </thead>
-                            <tbody id="historyBody">
-                                <tr>
-                                    <td colspan="2" style="text-align:center;padding:32px;color:#94a3b8;">Sin registros</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
 
-                    <!-- All Teachers Table -->
-                    <div class="kids-table-card">
-                        <div class="table-header">
-                            <h3><i data-lucide="list" style="width:18px;height:18px;color:#1c6390;"></i> Listado de Maestros</h3>
-                            <button class="kids-admin-btn secondary" onclick="exportarExcel()">
-                                <i data-lucide="file-spreadsheet" style="width:16px;height:16px;"></i> Exportar Excel
-                            </button>
-                        </div>
-                        <div style="overflow-x:auto;">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Maestro</th>
-                                        <th>DNI</th>
-                                        <th>Celular</th>
-                                        <th> Sexo</th>
-                                        <th>Líder</th>
-                                        <th>Asistencia</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tablaMaestros">
-                                    <tr>
-                                        <td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">Cargando...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <!-- TAB: Semanal -->
+                    <div class="kids-tab-panel" id="tabWeekly">
+                        <div class="kids-table-card">
+                            <div class="table-header">
+                                <h3><i data-lucide="bar-chart-3" style="width:18px;height:18px;color:#7c3aed;"></i> Asistencia Semanal</h3>
+                            </div>
+                            <div class="weekly-nav">
+                                <button onclick="cambiarSemana(-1)">← Anterior</button>
+                                <span class="week-label" id="weekLabel">—</span>
+                                <button onclick="cambiarSemana(1)">Siguiente →</button>
+                            </div>
+                            <div class="weekly-chart" id="weeklyChart"></div>
+                            <div id="weeklyDetails"></div>
                         </div>
                     </div>
 
@@ -1273,6 +1329,7 @@
             const mujeres = maestros.filter(m => m.sexo === 'Femenino').length;
             document.getElementById('statVarones').innerText = varones;
             document.getElementById('statMujeres').innerText = mujeres;
+            cargarHoy();
         }
 
         function renderTabla() {
@@ -1671,7 +1728,123 @@
             if (e.key === 'Enter') buscarMaestroGuest();
         });
 
-        if (esAdmin) cargarMaestros();
+        // ── Tab switching ──
+        let currentTab = 'hoy';
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.kids-tab').forEach((t, i) => {
+                t.classList.toggle('active', ['hoy','database','weekly'][i] === tab);
+            });
+            document.querySelectorAll('.kids-tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            if (tab === 'hoy') cargarHoy();
+            if (tab === 'weekly') cargarSemanal();
+        }
+
+        // ── Today's attendance ──
+        async function cargarHoy() {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('todayDate').innerText = hoy;
+            const snap = await dbAsistencia.where('fecha', '==', hoy).orderBy('timestamp', 'desc').get();
+            const tbody = document.getElementById('tablaHoy');
+            if (snap.empty) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:#94a3b8;">Sin asistencia hoy</td></tr>';
+                return;
+            }
+            const rows = [];
+            for (const doc of snap.docs) {
+                const a = doc.data();
+                const m = maestros.find(x => x.id === a.maestroId);
+                const initials = (m?.nombres || '?').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+                const time = a.hora ? a.hora.substring(0, 5) : '—';
+                rows.push(`<tr>
+                    <td><div style="display:flex;align-items:center;gap:10px;"><div style="width:36px;height:36px;border-radius:10px;background:#e0f2fe;color:#00334f;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;">${initials}</div><span style="font-weight:600;">${m?.nombres || '—'}</span></div></td>
+                    <td>${m?.dni || '—'}</td>
+                    <td>${m?.celular || '—'}</td>
+                    <td><span style="color:#16a34a;font-weight:600;">${time}</span></td>
+                </tr>`);
+            }
+            tbody.innerHTML = rows.join('');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // ── Weekly attendance ──
+        let weekOffset = 0;
+        function getWeekDates(offset) {
+            const now = new Date();
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - now.getDay() + 1 + (offset * 7));
+            const dates = [];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                dates.push(d.toISOString().split('T')[0]);
+            }
+            return dates;
+        }
+
+        function cambiarSemana(dir) {
+            weekOffset += dir;
+            if (weekOffset > 0) weekOffset = 0;
+            cargarSemanal();
+        }
+
+        async function cargarSemanal() {
+            const dates = getWeekDates(weekOffset);
+            const start = dates[0];
+            const end = dates[6];
+            document.getElementById('weekLabel').innerText = `${formatDateShort(start)} — ${formatDateShort(end)}`;
+
+            const snap = await dbAsistencia.where('fecha', '>=', start).where('fecha', '<=', end).get();
+            const byDate = {};
+            dates.forEach(d => byDate[d] = []);
+            snap.forEach(doc => {
+                const a = doc.data();
+                if (byDate[a.fecha]) byDate[a.fecha].push(a);
+            });
+
+            const dayNames = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+            const maxCount = Math.max(1, ...Object.values(byDate).map(v => v.length));
+
+            let chartHtml = '';
+            dates.forEach((d, i) => {
+                const count = byDate[d].length;
+                const pct = Math.round((count / maxCount) * 100);
+                chartHtml += `<div class="weekly-bar">
+                    <div class="weekly-bar-count">${count}</div>
+                    <div class="weekly-bar-fill" style="height:${pct}%;"></div>
+                    <div class="weekly-bar-label">${dayNames[i]}</div>
+                </div>`;
+            });
+            document.getElementById('weeklyChart').innerHTML = chartHtml;
+
+            let detailsHtml = '';
+            dates.forEach((d, i) => {
+                if (byDate[d].length === 0) return;
+                const attendees = byDate[d].map(a => {
+                    const m = maestros.find(x => x.id === a.maestroId);
+                    const initials = (m?.nombres || '?').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+                    const time = a.hora ? a.hora.substring(0, 5) : '—';
+                    return `<div class="daily-attendee">
+                        <div class="avatar">${initials}</div>
+                        <div class="info"><h5>${m?.nombres || '—'}</h5><span>${m?.dni || ''} • ${time}</span></div>
+                    </div>`;
+                }).join('');
+                detailsHtml += `<div class="daily-section">
+                    <h4>${dayNames[i]} ${formatDateShort(d)} (${byDate[d].length})</h4>
+                    ${attendees}
+                </div>`;
+            });
+            if (!detailsHtml) detailsHtml = '<p style="text-align:center;padding:32px;color:#94a3b8;">Sin asistencia esta semana</p>';
+            document.getElementById('weeklyDetails').innerHTML = detailsHtml;
+        }
+
+        function formatDateShort(dateStr) {
+            const d = new Date(dateStr + 'T12:00:00');
+            return d.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' });
+        }
+
+        if (esAdmin) { cargarMaestros(); cargarHoy(); }
         if (typeof lucide !== 'undefined') lucide.createIcons();
     </script>
 
