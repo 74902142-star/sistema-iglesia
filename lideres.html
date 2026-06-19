@@ -1069,8 +1069,9 @@
                             </div>
                             <div class="weekly-nav">
                                 <button onclick="cambiarSemana(-1)">← Anterior</button>
-                                <span class="week-label" id="weekLabel">—</span>
+                                <input type="week" id="weekPicker" onchange="seleccionarSemana()" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-weight:600;font-size:13px;color:#00334f;cursor:pointer;">
                                 <button onclick="cambiarSemana(1)">Siguiente →</button>
+                                <button onclick="irSemanaActual()" class="kids-admin-btn primary" style="padding:8px 16px;font-size:13px;">Hoy</button>
                             </div>
                             <div class="weekly-chart" id="weeklyChart"></div>
                             <div id="weeklyDetails"></div>
@@ -1770,6 +1771,8 @@
 
         // ── Weekly attendance ──
         let weekOffset = 0;
+        let allAsistencia = [];
+
         function getWeekDates(offset) {
             const now = new Date();
             const monday = new Date(now);
@@ -1783,28 +1786,86 @@
             return dates;
         }
 
+        function getWeekStart(offset) {
+            const now = new Date();
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - now.getDay() + 1 + (offset * 7));
+            return monday.toISOString().split('T')[0];
+        }
+
+        function initWeekPicker() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const weekNum = getWeekNumber(now);
+            document.getElementById('weekPicker').value = `${year}-W${weekNum.toString().padStart(2, '0')}`;
+        }
+
+        function getWeekNumber(d) {
+            const date = new Date(d);
+            date.setHours(0, 0, 0, 0);
+            date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+            const week1 = new Date(date.getFullYear(), 0, 4);
+            return 1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+        }
+
+        function seleccionarSemana() {
+            const val = document.getElementById('weekPicker').value;
+            if (!val) return;
+            const [year, week] = val.split('-W');
+            const jan4 = new Date(parseInt(year), 0, 4);
+            const dayOfWeek = jan4.getDay() || 7;
+            const monday = new Date(jan4);
+            monday.setDate(jan4.getDate() - dayOfWeek + 1 + (parseInt(week) - 1) * 7);
+            const dates = [];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                dates.push(d.toISOString().split('T')[0]);
+            }
+            renderWeek(dates);
+        }
+
         function cambiarSemana(dir) {
             weekOffset += dir;
             if (weekOffset > 0) weekOffset = 0;
-            cargarSemanal();
+            const dates = getWeekDates(weekOffset);
+            const d = new Date(dates[0] + 'T12:00:00');
+            const year = d.getFullYear();
+            const weekNum = getWeekNumber(d);
+            document.getElementById('weekPicker').value = `${year}-W${weekNum.toString().padStart(2, '0')}`;
+            renderWeek(dates);
+        }
+
+        function irSemanaActual() {
+            weekOffset = 0;
+            initWeekPicker();
+            const dates = getWeekDates(0);
+            renderWeek(dates);
         }
 
         async function cargarSemanal() {
-            const dates = getWeekDates(weekOffset);
+            if (allAsistencia.length === 0) {
+                const snap = await dbAsistencia.get();
+                allAsistencia = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            }
+            initWeekPicker();
+            const dates = getWeekDates(0);
+            renderWeek(dates);
+        }
+
+        function renderWeek(dates) {
             const start = dates[0];
             const end = dates[6];
-            document.getElementById('weekLabel').innerText = `${formatDateShort(start)} — ${formatDateShort(end)}`;
-
-            const snap = await dbAsistencia.where('fecha', '>=', start).where('fecha', '<=', end).get();
+            const filtered = allAsistencia.filter(a => a.fecha >= start && a.fecha <= end);
             const byDate = {};
             dates.forEach(d => byDate[d] = []);
-            snap.forEach(doc => {
-                const a = doc.data();
+            filtered.forEach(a => {
                 if (byDate[a.fecha]) byDate[a.fecha].push(a);
             });
 
             const dayNames = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-            const maxCount = Math.max(1, ...Object.values(byDate).map(v => v.length));
+            const counts = Object.values(byDate).map(v => v.length);
+            const maxCount = Math.max(1, ...counts);
 
             let chartHtml = '';
             dates.forEach((d, i) => {
