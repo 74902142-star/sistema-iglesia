@@ -192,16 +192,18 @@
                                             <th>Correo</th>
                                             <th>Líder</th>
                                             <th>Curso</th>
+                                            <th>Sede</th>
                                             <th>Fecha/Horario</th>
                                             <th>Monto</th>
                                             <th>Estado</th>
                                             <th>Método</th>
+                                            <th>Creado por</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tablaInscripciones">
                                         <tr>
-                                            <td colspan="11"
+                                            <td colspan="13"
                                                 style="text-align:center;padding:48px;color:var(--text-muted);">
                                                 Cargando...</td>
                                         </tr>
@@ -256,6 +258,15 @@
                                 <label>Líder de GC *</label>
                                 <input type="text" id="guestLider" class="form-control" required
                                     placeholder="Nombre del líder">
+                            </div>
+                            <div class="form-group">
+                                <label>Sede / Iglesia *</label>
+                                <select id="guestSede" class="form-control" required>
+                                    <option value="">Seleccionar sede...</option>
+                                    <option value="Agua Viva Hyo">Agua Viva Hyo</option>
+                                    <option value="Belén">Belén</option>
+                                    <option value="Transformando ciudades">Transformando ciudades</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label>Curso *</label>
@@ -390,6 +401,15 @@
                     <div class="form-group">
                         <label>Líder de GC *</label>
                         <input type="text" id="insLider" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sede / Iglesia *</label>
+                        <select id="insSede" class="form-control" required>
+                            <option value="">Seleccionar sede...</option>
+                            <option value="Agua Viva Hyo">Agua Viva Hyo</option>
+                            <option value="Belén">Belén</option>
+                            <option value="Transformando ciudades">Transformando ciudades</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Curso *</label>
@@ -681,6 +701,7 @@
                     celular: celular,
                     correo: document.getElementById('guestCorreo').value.trim(),
                     lider: document.getElementById('guestLider').value.trim(),
+                    sede: document.getElementById('guestSede').value,
                     cursoId: cursoId,
                     cursoNombre: curso.nombre,
                     fechaHorario: `${curso.dia} ${curso.hora} (Inicio: ${curso.inicio})`,
@@ -689,6 +710,7 @@
                     metodoPago: metodoPago,
                     pagoCaptura: pagoCaptura || '',
                     origen: 'invitado',
+                    creadoPor: usuarioActual ? usuarioActual.nombre : 'Invitado',
                     timestamp: new Date().toISOString()
                 };
 
@@ -761,7 +783,7 @@
         function renderTabla() {
             const tbody = document.getElementById('tablaInscripciones');
             if (inscripcionesFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:48px;color:var(--text-muted);">No hay inscripciones</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:48px;color:var(--text-muted);">No hay inscripciones</td></tr>';
                 return;
             }
             tbody.innerHTML = inscripcionesFiltradas.map(i => {
@@ -786,6 +808,7 @@
                     <td><span style="font-size:11.5px;color:var(--text-secondary);">${i.correo}</span></td>
                     <td>${i.lider}</td>
                     <td><span class="badge rol-badge badge-produccion">${i.cursoNombre || curso?.nombre || '-'}</span></td>
+                    <td><span style="font-size:11.5px;padding:3px 8px;border-radius:6px;background:#f0fdf4;color:#16a34a;font-weight:600;">${i.sede || '-'}</span></td>
                     <td>${horario}</td>
                     <td><strong>${formatMonto(i.monto || 0)}</strong></td>
                     <td><span class="estado-badge badge ${estadoCls}">${i.estadoPago}</span></td>
@@ -794,6 +817,7 @@
                             ${metodo} ${capturaHtml}
                         </div>
                     </td>
+                    <td><span style="font-size:11.5px;color:var(--text-secondary);">${i.creadoPor || '-'}</span></td>
                     <td>
                         <button class="action-btn btn-edit btn" style="padding:6px;border-radius:6px;" onclick="editarInscripcion('${i.id}')" title="Editar"><i data-lucide="edit" style="width:14px;height:14px;"></i></button>
                         ${i.estadoPago === 'Canceló'
@@ -838,6 +862,7 @@
                 celular: celular,
                 correo: document.getElementById('insCorreo').value.trim(),
                 lider: document.getElementById('insLider').value.trim(),
+                sede: document.getElementById('insSede').value,
                 cursoId: cursoId,
                 cursoNombre: curso.nombre,
                 fechaHorario: `${curso.dia} ${curso.hora} (Inicio: ${curso.inicio})`,
@@ -845,6 +870,7 @@
                 estadoPago: document.getElementById('insEstado').value,
                 metodoPago: document.getElementById('insMetodoPago').value || '',
                 pagoCaptura: pagoCaptura,
+                creadoPor: usuarioActual ? usuarioActual.nombre : 'Admin',
                 timestamp: new Date().toISOString()
             };
             if (data.pagoCaptura === undefined) delete data.pagoCaptura;
@@ -864,6 +890,7 @@
             editandoId = null;
             document.getElementById('formInscripcion').reset();
             document.getElementById('insEstado').value = 'Debe';
+            document.getElementById('insSede').value = '';
             document.getElementById('insMetodoPago').value = '';
             document.getElementById('insCapturaGroup').style.display = 'none';
             document.getElementById('insCapturaPreview').classList.remove('visible');
@@ -886,6 +913,7 @@
             document.getElementById('insCelular').value = i.celular;
             document.getElementById('insCorreo').value = i.correo;
             document.getElementById('insLider').value = i.lider;
+            document.getElementById('insSede').value = i.sede || '';
             document.getElementById('insCurso').value = i.cursoId;
             document.getElementById('insCurso').dispatchEvent(new Event('change'));
             document.getElementById('insEstado').value = i.estadoPago;
@@ -922,9 +950,10 @@
                 const curso = getCurso(i.cursoId);
                 return {
                     Nombres: i.nombres, DNI: i.dni, Celular: i.celular, Correo: i.correo,
-                    Lider: i.lider, Curso: i.cursoNombre || curso?.nombre,
+                    Lider: i.lider, Sede: i.sede || '-', Curso: i.cursoNombre || curso?.nombre,
                     'Fecha/Horario': i.fechaHorario || (curso ? `${curso.dia} ${curso.hora}` : ''),
-                    Monto: i.monto, 'Estado pago': i.estadoPago, 'Metodo pago': i.metodoPago || '-'
+                    Monto: i.monto, 'Estado pago': i.estadoPago, 'Metodo pago': i.metodoPago || '-',
+                    'Creado por': i.creadoPor || '-'
                 };
             });
             const ws = XLSX.utils.json_to_sheet(datos);
