@@ -951,12 +951,34 @@
                 return {
                     Nombres: i.nombres, DNI: i.dni, Celular: i.celular, Correo: i.correo,
                     Lider: i.lider, Sede: i.sede || '-', Curso: i.cursoNombre || curso?.nombre,
-                    'Fecha/Horario': i.fechaHorario || (curso ? `${curso.dia} ${curso.hora}` : ''),
-                    Monto: i.monto, 'Estado pago': i.estadoPago, 'Metodo pago': i.metodoPago || '-',
-                    'Creado por': i.creadoPor || '-'
+                    'Fecha/Horario': i.fechaHorario || (curso ? `${curso.dia} ${curso.hora}` : '')
                 };
-            });
-            const ws = XLSX.utils.json_to_sheet(datos);
+            }).sort((a, b) => (a.Curso || '').localeCompare(b.Curso || ''));
+
+            const rows = [
+                ['INSCRIPCIONES ESCUELA DE LIDERAZGO 2026'],
+                [],
+                ['Nombres', 'DNI', 'Celular', 'Correo', 'Lider', 'Sede', 'Curso', 'Fecha/Horario'],
+                ...datos.map(d => [d.Nombres, d.DNI, d.Celular, d.Correo, d.Lider, d.Sede, d.Curso, d['Fecha/Horario']])
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+
+            // Merge title row
+            ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }];
+
+            // Column widths
+            ws['!cols'] = [
+                { wch: 35 }, // Nombres
+                { wch: 10 }, // DNI
+                { wch: 12 }, // Celular
+                { wch: 32 }, // Correo
+                { wch: 25 }, // Lider
+                { wch: 22 }, // Sede
+                { wch: 28 }, // Curso
+                { wch: 40 }  // Fecha/Horario
+            ];
+
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Inscripciones EDL');
             XLSX.writeFile(wb, `edl_inscripciones_${new Date().toISOString().split('T')[0]}.xlsx`);
