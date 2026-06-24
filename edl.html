@@ -9,6 +9,11 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
     <style>
+        .sortable { cursor: pointer; user-select: none; position: relative; padding-right: 18px !important; }
+        .sortable:hover { background: #f1f5f9; }
+        .sortable::after { content: '⇅'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #94a3b8; }
+        .sortable.asc::after { content: '↑'; color: #00334f; }
+        .sortable.desc::after { content: '↓'; color: #00334f; }
         .btn-cancel {
             background: #fef2f2;
             color: #dc2626;
@@ -186,13 +191,13 @@
                                 <table class="data-table">
                                     <thead>
                                         <tr>
-                                            <th>Nombres</th>
-                                            <th>DNI</th>
-                                            <th>Celular</th>
+                                            <th class="sortable" onclick="ordenarTabla('nombres')">Nombres</th>
+                                            <th class="sortable" onclick="ordenarTabla('dni')">DNI</th>
+                                            <th class="sortable" onclick="ordenarTabla('celular')">Celular</th>
                                             <th>Correo</th>
-                                            <th>Líder</th>
-                                            <th>Curso</th>
-                                            <th>Sede</th>
+                                            <th class="sortable" onclick="ordenarTabla('lider')">Líder</th>
+                                            <th class="sortable" onclick="ordenarTabla('curso')">Curso</th>
+                                            <th class="sortable" onclick="ordenarTabla('sede')">Sede</th>
                                             <th>Fecha/Horario</th>
                                             <th>Monto</th>
                                             <th>Estado</th>
@@ -673,6 +678,8 @@
                 const docNum = document.getElementById('guestDocNum').value.trim();
                 const celular = document.getElementById('guestCelular').value.trim();
                 const metodoPago = document.getElementById('guestMetodoPago').value;
+                const sede = document.getElementById('guestSede').value;
+                if (!sede) { toast('❌ Selecciona una sede', 'warning'); return; }
                 if (!metodoPago) { toast('❌ Selecciona un método de pago', 'warning'); return; }
 
                 const isDigital = ['yape', 'plin', 'transferencia'].includes(metodoPago);
@@ -833,57 +840,70 @@
 
         document.getElementById('formInscripcion').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const cursoId = document.getElementById('insCurso').value;
-            const curso = getCurso(cursoId);
-            if (!curso) return;
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = 'Guardando...';
 
-            const docTipo = document.getElementById('insDocTipo').value;
-            const docNum = document.getElementById('insDocNum').value.trim();
-            const celular = document.getElementById('insCelular').value.trim();
+            try {
+                const cursoId = document.getElementById('insCurso').value;
+                const curso = getCurso(cursoId);
+                if (!curso) { btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
 
-            if (!validarDocNum(docTipo, docNum)) {
-                toast('❌ ' + (docTipo === 'DNI' ? 'DNI debe tener 8 dígitos' : 'Carnet de Extranjería inválido'), 'warning');
-                return;
+                const docTipo = document.getElementById('insDocTipo').value;
+                const docNum = document.getElementById('insDocNum').value.trim();
+                const celular = document.getElementById('insCelular').value.trim();
+                const sede = document.getElementById('insSede').value;
+
+                if (!sede) { toast('❌ Selecciona una sede', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
+                if (!validarDocNum(docTipo, docNum)) {
+                    toast('❌ ' + (docTipo === 'DNI' ? 'DNI debe tener 8 dígitos' : 'Carnet de Extranjería inválido'), 'warning');
+                    btn.disabled = false; btn.innerHTML = 'Guardar'; return;
+                }
+                if (!validarCelular(celular)) {
+                    toast('❌ Celular debe tener 9 dígitos y comenzar con 9', 'warning');
+                    btn.disabled = false; btn.innerHTML = 'Guardar'; return;
+                }
+
+                const capturaFile = getCapturaFile('ins');
+                if (capturaFile && capturaFile.size > 5000000) { toast('❌ La imagen es muy grande (máx 5MB)', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
+                let pagoCaptura = editandoId ? undefined : '';
+                if (capturaFile) pagoCaptura = await fileToBase64(capturaFile);
+
+                const data = {
+                    nombres: document.getElementById('insNombres').value.trim(),
+                    docTipo: docTipo,
+                    dni: docNum,
+                    celular: celular,
+                    correo: document.getElementById('insCorreo').value.trim(),
+                    lider: document.getElementById('insLider').value.trim(),
+                    sede: document.getElementById('insSede').value,
+                    cursoId: cursoId,
+                    cursoNombre: curso.nombre,
+                    fechaHorario: `${curso.dia} ${curso.hora} (Inicio: ${curso.inicio})`,
+                    monto: curso.monto,
+                    estadoPago: document.getElementById('insEstado').value,
+                    metodoPago: document.getElementById('insMetodoPago').value || '',
+                    pagoCaptura: pagoCaptura,
+                    creadoPor: usuarioActual ? usuarioActual.nombre : 'Admin',
+                    timestamp: new Date().toISOString()
+                };
+                if (data.pagoCaptura === undefined) delete data.pagoCaptura;
+
+                if (editandoId) {
+                    await dbIns.doc(editandoId).update(data);
+                    toast('✅ Inscripción actualizada');
+                } else {
+                    await dbIns.add(data);
+                    toast('✅ Inscripción registrada');
+                }
+                cerrarModal();
+                cargarInscripciones();
+            } catch (err) {
+                toast('❌ Error: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Guardar';
             }
-            if (!validarCelular(celular)) {
-                toast('❌ Celular debe tener 9 dígitos y comenzar con 9', 'warning');
-                return;
-            }
-
-            const capturaFile = getCapturaFile('ins');
-            if (capturaFile && capturaFile.size > 5000000) { toast('❌ La imagen es muy grande (máx 5MB)', 'warning'); return; }
-            let pagoCaptura = editandoId ? undefined : '';
-            if (capturaFile) pagoCaptura = await fileToBase64(capturaFile);
-
-            const data = {
-                nombres: document.getElementById('insNombres').value.trim(),
-                docTipo: docTipo,
-                dni: docNum,
-                celular: celular,
-                correo: document.getElementById('insCorreo').value.trim(),
-                lider: document.getElementById('insLider').value.trim(),
-                sede: document.getElementById('insSede').value,
-                cursoId: cursoId,
-                cursoNombre: curso.nombre,
-                fechaHorario: `${curso.dia} ${curso.hora} (Inicio: ${curso.inicio})`,
-                monto: curso.monto,
-                estadoPago: document.getElementById('insEstado').value,
-                metodoPago: document.getElementById('insMetodoPago').value || '',
-                pagoCaptura: pagoCaptura,
-                creadoPor: usuarioActual ? usuarioActual.nombre : 'Admin',
-                timestamp: new Date().toISOString()
-            };
-            if (data.pagoCaptura === undefined) delete data.pagoCaptura;
-
-            if (editandoId) {
-                await dbIns.doc(editandoId).update(data);
-                toast('✅ Inscripción actualizada');
-            } else {
-                await dbIns.add(data);
-                toast('✅ Inscripción registrada');
-            }
-            cerrarModal();
-            cargarInscripciones();
         });
 
         function abrirModal() {
