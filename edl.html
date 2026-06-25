@@ -725,6 +725,13 @@
                     };
 
                     await firebaseReady;
+
+                    const existente = await verificarDuplicado(docNum, cursoId);
+                    if (existente) {
+                        const ok = confirm('⚠️ Ya existe una inscripción de ' + existente.nombres + ' (DNI: ' + docNum + ') en el curso ' + curso.nombre + '.\n\n¿Deseas inscribirte de todas formas?');
+                        if (!ok) { throw new Error('Inscripción cancelada'); }
+                    }
+
                     await db.collection('inscripciones').add(data);
                     document.getElementById('guestSuccess').style.display = 'block';
                     guestForm.style.display = 'none';
@@ -842,6 +849,12 @@
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
+        async function verificarDuplicado(dni, cursoId) {
+            await firebaseReady;
+            const snap = await dbIns.where('dni', '==', dni).where('cursoId', '==', cursoId).get();
+            return snap.empty ? null : snap.docs[0].data();
+        }
+
         document.getElementById('formInscripcion').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
@@ -892,6 +905,14 @@
                     timestamp: new Date().toISOString()
                 };
                 if (data.pagoCaptura === undefined) delete data.pagoCaptura;
+
+                if (!editandoId) {
+                    const existente = await verificarDuplicado(docNum, cursoId);
+                    if (existente) {
+                        const ok = confirm('⚠️ Ya existe una inscripción de ' + existente.nombres + ' (DNI: ' + docNum + ') en el curso ' + curso.nombre + '.\n\n¿Deseas inscribirlo de todas formas?');
+                        if (!ok) { btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
+                    }
+                }
 
                 if (editandoId) {
                     await dbIns.doc(editandoId).update(data);
