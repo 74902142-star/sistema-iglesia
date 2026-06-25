@@ -739,12 +739,18 @@
         }
 
         async function cargarInscripciones() {
-            await firebaseReady;
-            const snapshot = await dbIns.get();
-            inscripciones = [];
-            snapshot.forEach(doc => inscripciones.push({ id: doc.id, ...doc.data() }));
-            inscripciones.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-            aplicarFiltros();
+            try {
+                await firebaseReady;
+                const snapshot = await dbIns.get();
+                inscripciones = [];
+                snapshot.forEach(doc => inscripciones.push({ id: doc.id, ...doc.data() }));
+                inscripciones.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+                aplicarFiltros();
+            } catch (err) {
+                console.error('Error cargando inscripciones:', err);
+                document.getElementById('statInscripciones').innerText = '0';
+                document.getElementById('tablaInscripciones').innerHTML = '<tr><td colspan="13" style="text-align:center;padding:48px;color:#dc2626;">⚠️ Error de conexión con la base de datos.<br><small>' + err.message + '</small></td></tr>';
+            }
         }
 
         function aplicarFiltros() {

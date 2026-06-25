@@ -1309,12 +1309,18 @@
 
         // ── Load ──
         async function cargarLíderes() {
-            await firebaseReady;
-            const snap = await dbKids.get();
-            maestros = [];
-            snap.forEach(d => maestros.push({ id: d.id, ...d.data() }));
-            actualizarStats();
-            renderTabla();
+            try {
+                await firebaseReady;
+                const snap = await dbKids.get();
+                maestros = [];
+                snap.forEach(d => maestros.push({ id: d.id, ...d.data() }));
+                actualizarStats();
+                renderTabla();
+            } catch (err) {
+                console.error('Error cargando líderes:', err);
+                document.getElementById('statTotal').innerText = '0';
+                document.getElementById('tablaMaestros').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:48px;color:#dc2626;">⚠️ Error de conexión con la base de datos.<br><small>' + err.message + '</small></td></tr>';
+            }
         }
 
         function actualizarStats() {
