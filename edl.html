@@ -31,6 +31,9 @@
             background: #dcfce7;
         }
     </style>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -748,18 +751,36 @@
             });
         }
 
+        function cargarCacheLocal() {
+            try {
+                const cache = JSON.parse(localStorage.getItem('edl_inscripciones') || '[]');
+                if (cache.length > 0) {
+                    inscripciones = cache;
+                    inscripciones.sort(function(a, b) { return (b.timestamp || '').localeCompare(a.timestamp || ''); });
+                    aplicarFiltros();
+                }
+            } catch(e) {}
+        }
+
+        function guardarCacheLocal(data) {
+            try { localStorage.setItem('edl_inscripciones', JSON.stringify(data)); } catch(e) {}
+        }
+
         async function cargarInscripciones() {
+            cargarCacheLocal();
             try {
                 await firebaseReady;
-                const snapshot = await dbIns.get();
-                inscripciones = [];
-                snapshot.forEach(doc => inscripciones.push({ id: doc.id, ...doc.data() }));
-                inscripciones.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-                aplicarFiltros();
+                dbIns.onSnapshot(function(snapshot) {
+                    inscripciones = [];
+                    snapshot.forEach(function(doc) { inscripciones.push({ id: doc.id, ...doc.data() }); });
+                    inscripciones.sort(function(a, b) { return (b.timestamp || '').localeCompare(a.timestamp || ''); });
+                    guardarCacheLocal(inscripciones);
+                    aplicarFiltros();
+                }, function(err) {
+                    console.error('Error cargando inscripciones:', err);
+                });
             } catch (err) {
                 console.error('Error cargando inscripciones:', err);
-                document.getElementById('statInscripciones').innerText = '0';
-                document.getElementById('tablaInscripciones').innerHTML = '<tr><td colspan="13" style="text-align:center;padding:48px;color:#dc2626;">⚠️ Error de conexión con la base de datos.<br><small>' + err.message + '</small></td></tr>';
             }
         }
 

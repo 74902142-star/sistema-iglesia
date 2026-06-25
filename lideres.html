@@ -1308,18 +1308,36 @@
         let maestroActual = null; // selected teacher for actions
 
         // ── Load ──
+        function cargarCacheLocal() {
+            try {
+                const cache = JSON.parse(localStorage.getItem('lideres_maestros') || '[]');
+                if (cache.length > 0) {
+                    maestros = cache;
+                    actualizarStats();
+                    renderTabla();
+                }
+            } catch(e) {}
+        }
+
+        function guardarCacheLocal(data) {
+            try { localStorage.setItem('lideres_maestros', JSON.stringify(data)); } catch(e) {}
+        }
+
         async function cargarLíderes() {
+            cargarCacheLocal();
             try {
                 await firebaseReady;
-                const snap = await dbKids.get();
-                maestros = [];
-                snap.forEach(d => maestros.push({ id: d.id, ...d.data() }));
-                actualizarStats();
-                renderTabla();
+                dbKids.onSnapshot(function(snap) {
+                    maestros = [];
+                    snap.forEach(function(d) { maestros.push({ id: d.id, ...d.data() }); });
+                    guardarCacheLocal(maestros);
+                    actualizarStats();
+                    renderTabla();
+                }, function(err) {
+                    console.error('Error cargando líderes:', err);
+                });
             } catch (err) {
                 console.error('Error cargando líderes:', err);
-                document.getElementById('statTotal').innerText = '0';
-                document.getElementById('tablaMaestros').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:48px;color:#dc2626;">⚠️ Error de conexión con la base de datos.<br><small>' + err.message + '</small></td></tr>';
             }
         }
 
