@@ -738,7 +738,7 @@
                         if (!ok) { throw new Error('Inscripción cancelada'); }
                     }
 
-                    await db.collection('inscripciones').add(data);
+                    await firestoreAdd('inscripciones', data);
                     document.getElementById('guestSuccess').style.display = 'block';
                     guestForm.style.display = 'none';
                     toast('✅ ¡Inscripción registrada exitosamente!');
@@ -766,20 +766,87 @@
             try { localStorage.setItem('edl_inscripciones', JSON.stringify(data)); } catch(e) {}
         }
 
+        async function firestoreGet(collection) {
+            try {
+                const snap = await db.collection(collection).get();
+                const results = [];
+                snap.forEach(function(doc) { results.push({ id: doc.id, ...doc.data() }); });
+                return results;
+            } catch(e) {
+                console.warn('SDK falló, usando REST API para', collection);
+                return await firestoreGetREST(collection);
+            }
+        }
+
+        async function firestoreGetREST(collection) {
+            var projectId = firebaseConfig.projectId;
+            var apiKey = firebaseConfig.apiKey;
+            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?key=' + apiKey;
+            var resp = await fetch(url);
+            var json = await resp.json();
+            if (!json.documents) return [];
+            return json.documents.map(function(doc) {
+                var data = {};
+                var fields = doc.fields || {};
+                Object.keys(fields).forEach(function(key) {
+                    var f = fields[key];
+                    if (f.stringValue !== undefined) data[key] = f.stringValue;
+                    else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
+                    else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
+                    else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
+                    else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
+                    else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || v.integerValue || v.doubleValue || v.booleanValue || ''; }) : [];
+                    else if (f.mapValue !== undefined) data[key] = f.mapValue.fields || {};
+                    else data[key] = '';
+                });
+                var parts = doc.name.split('/');
+                return { id: parts[parts.length - 1], _path: doc.name, ...data };
+            });
+        }
+
+        function toFirestoreFields(data) {
+            var fields = {};
+            Object.keys(data).forEach(function(key) {
+                var v = data[key];
+                if (v === undefined || v === null) return;
+                if (typeof v === 'string') fields[key] = { stringValue: v };
+                else if (typeof v === 'number') fields[key] = Number.isInteger(v) ? { integerValue: v } : { doubleValue: v };
+                else if (typeof v === 'boolean') fields[key] = { booleanValue: v };
+                else if (Array.isArray(v)) fields[key] = { arrayValue: { values: v.map(function(item) { return typeof item === 'string' ? { stringValue: item } : { stringValue: String(item) }; }) } };
+                else if (typeof v === 'object') fields[key] = { mapValue: { fields: toFirestoreFields(v) } };
+            });
+            return fields;
+        }
+
+        async function firestoreAddREST(collection, data) {
+            var projectId = firebaseConfig.projectId;
+            var apiKey = firebaseConfig.apiKey;
+            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?key=' + apiKey;
+            var resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: toFirestoreFields(data) }) });
+            if (!resp.ok) throw new Error('Error guardando: ' + resp.status);
+            return await resp.json();
+        }
+
+        async function firestoreAdd(collection, data) {
+            try {
+                return await db.collection(collection).add(data);
+            } catch(e) {
+                console.warn('SDK falló para add, usando REST API');
+                return await firestoreAddREST(collection, data);
+            }
+        }
+
         async function cargarInscripciones() {
             cargarCacheLocal();
             try {
-                await firebaseReady;
-                const snapshot = await dbIns.get();
-                const nuevas = [];
-                snapshot.forEach(function(doc) { nuevas.push({ id: doc.id, ...doc.data() }); });
+                var nuevas = await firestoreGet('inscripciones');
                 console.log('EDL Firestore:', nuevas.length, 'documentos leidos');
                 if (nuevas.length > 0) {
                     inscripciones = nuevas;
                     inscripciones.sort(function(a, b) { return (b.timestamp || '').localeCompare(a.timestamp || ''); });
                     guardarCacheLocal(inscripciones);
                 } else {
-                    console.log('EDL: Firestore devolvió 0 documentos. Colección inscripciones vacía o sin permisos.');
+                    console.log('EDL: Firestore devolvió 0 documentos.');
                 }
                 aplicarFiltros();
             } catch (err) {
@@ -878,9 +945,14 @@
         }
 
         async function verificarDuplicado(dni, cursoId) {
-            await firebaseReady;
-            const snap = await dbIns.where('dni', '==', dni).where('cursoId', '==', cursoId).get();
-            return snap.empty ? null : snap.docs[0].data();
+            try {
+                const snap = await dbIns.where('dni', '==', dni).where('cursoId', '==', cursoId).get();
+                return snap.empty ? null : snap.docs[0].data();
+            } catch(e) {
+                var all = await firestoreGet('inscripciones');
+                var found = all.find(function(i) { return i.dni === dni && i.cursoId === cursoId; });
+                return found || null;
+            }
         }
 
         document.getElementById('formInscripcion').addEventListener('submit', async (e) => {
@@ -946,7 +1018,7 @@
                     await dbIns.doc(editandoId).update(data);
                     toast('✅ Inscripción actualizada');
                 } else {
-                    await dbIns.add(data);
+                    await firestoreAdd('inscripciones', data);
                     toast('✅ Inscripción registrada');
                 }
                 cerrarModal();

@@ -1323,13 +1323,48 @@
             try { localStorage.setItem('kids_maestros', JSON.stringify(data)); } catch(e) {}
         }
 
+        async function firestoreGet(collection) {
+            try {
+                var snap = await firebase.firestore().collection(collection).get();
+                var results = [];
+                snap.forEach(function(doc) { results.push({ id: doc.id, ...doc.data() }); });
+                return results;
+            } catch(e) {
+                console.warn('SDK falló, usando REST API para', collection);
+                return await firestoreGetREST(collection);
+            }
+        }
+
+        async function firestoreGetREST(collection) {
+            var projectId = firebaseConfig.projectId;
+            var apiKey = firebaseConfig.apiKey;
+            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?key=' + apiKey;
+            var resp = await fetch(url);
+            var json = await resp.json();
+            if (!json.documents) return [];
+            return json.documents.map(function(doc) {
+                var data = {};
+                var fields = doc.fields || {};
+                Object.keys(fields).forEach(function(key) {
+                    var f = fields[key];
+                    if (f.stringValue !== undefined) data[key] = f.stringValue;
+                    else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
+                    else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
+                    else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
+                    else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
+                    else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || ''; }) : [];
+                    else data[key] = '';
+                });
+                var parts = doc.name.split('/');
+                return { id: parts[parts.length - 1], ...data };
+            });
+        }
+
         async function cargarMaestros() {
             cargarCacheLocal();
             try {
-                await firebaseReady;
-                const snap = await dbKids.get();
-                maestros = [];
-                snap.forEach(function(d) { maestros.push({ id: d.id, ...d.data() }); });
+                maestros = await firestoreGet('kids_maestros');
+                console.log('KIDS Firestore:', maestros.length, 'documentos leidos');
                 guardarCacheLocal(maestros);
                 actualizarStats();
                 renderTabla();
