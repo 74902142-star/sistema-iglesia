@@ -9,6 +9,9 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
     <style>
+        .phone-group { display: flex; gap: 8px; align-items: stretch; }
+        .phone-group select { width: 130px; min-width: 130px; flex-shrink: 0; font-size: 14px; }
+        .phone-group input { flex: 1; min-width: 0; }
         .sortable { cursor: pointer; user-select: none; position: relative; padding-right: 18px !important; }
         .sortable:hover { background: #f1f5f9; }
         .sortable::after { content: '⇅'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #94a3b8; }
@@ -246,10 +249,35 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Celular *</label>
-                                    <input type="tel" id="guestCelular" class="form-control" required
-                                        placeholder="+51 999 888 777" maxlength="15" inputmode="tel">
-                                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe
-                                        comenzar con 9</div>
+                                    <div class="phone-group">
+                                        <select id="guestPais" class="form-control">
+                                            <option value="+51" selected>🇵🇪 +51 Peru</option>
+                                            <option value="+52">🇲🇽 +52 Mexico</option>
+                                            <option value="+57">🇨🇴 +57 Colombia</option>
+                                            <option value="+56">🇨🇱 +56 Chile</option>
+                                            <option value="+54">🇦🇷 +54 Argentina</option>
+                                            <option value="+593">🇪🇨 +593 Ecuador</option>
+                                            <option value="+591">🇧🇴 +591 Bolivia</option>
+                                            <option value="+58">🇻🇪 +58 Venezuela</option>
+                                            <option value="+1">🇺🇸 +1 USA/Canada</option>
+                                            <option value="+34">🇪🇸 +34 España</option>
+                                            <option value="+502">🇬🇹 +502 Guatemala</option>
+                                            <option value="+504">🇭🇳 +504 Honduras</option>
+                                            <option value="+505">🇳🇮 +505 Nicaragua</option>
+                                            <option value="+503">🇸🇻 +503 El Salvador</option>
+                                            <option value="+506">🇨🇷 +506 Costa Rica</option>
+                                            <option value="+507">🇵🇦 +507 Panama</option>
+                                            <option value="+595">🇵🇾 +595 Paraguay</option>
+                                            <option value="+598">🇺🇾 +598 Uruguay</option>
+                                            <option value="+55">🇧🇷 +55 Brasil</option>
+                                            <option value="+44">🇬🇧 +44 UK</option>
+                                            <option value="+49">🇩🇪 +49 Alemania</option>
+                                            <option value="+39">🇮🇹 +39 Italia</option>
+                                            <option value="+33">🇫🇷 +33 Francia</option>
+                                        </select>
+                                        <input type="tel" id="guestCelular" class="form-control" required placeholder="999 888 777" maxlength="12" inputmode="tel">
+                                    </div>
+                                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Selecciona país y escribe el número local</div>
                                 </div>
                                 <div class="form-group">
                                     <label>Correo personal *</label>
@@ -391,10 +419,35 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Celular *</label>
-                            <input type="tel" id="insCelular" class="form-control" required placeholder="+51 999 888 777"
-                                maxlength="15" inputmode="tel">
-                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">7 a 15 dígitos, incluir código de país
-                                con 9</div>
+                            <div class="phone-group">
+                                <select id="insPais" class="form-control">
+                                    <option value="+51" selected>🇵🇪 +51 Peru</option>
+                                    <option value="+52">🇲🇽 +52 Mexico</option>
+                                    <option value="+57">🇨🇴 +57 Colombia</option>
+                                    <option value="+56">🇨🇱 +56 Chile</option>
+                                    <option value="+54">🇦🇷 +54 Argentina</option>
+                                    <option value="+593">🇪🇨 +593 Ecuador</option>
+                                    <option value="+591">🇧🇴 +591 Bolivia</option>
+                                    <option value="+58">🇻🇪 +58 Venezuela</option>
+                                    <option value="+1">🇺🇸 +1 USA/Canada</option>
+                                    <option value="+34">🇪🇸 +34 España</option>
+                                    <option value="+502">🇬🇹 +502 Guatemala</option>
+                                    <option value="+504">🇭🇳 +504 Honduras</option>
+                                    <option value="+505">🇳🇮 +505 Nicaragua</option>
+                                    <option value="+503">🇸🇻 +503 El Salvador</option>
+                                    <option value="+506">🇨🇷 +506 Costa Rica</option>
+                                    <option value="+507">🇵🇦 +507 Panama</option>
+                                    <option value="+595">🇵🇾 +595 Paraguay</option>
+                                    <option value="+598">🇺🇾 +598 Uruguay</option>
+                                    <option value="+55">🇧🇷 +55 Brasil</option>
+                                    <option value="+44">🇬🇧 +44 UK</option>
+                                    <option value="+49">🇩🇪 +49 Alemania</option>
+                                    <option value="+39">🇮🇹 +39 Italia</option>
+                                    <option value="+33">🇫🇷 +33 Francia</option>
+                                </select>
+                                <input type="tel" id="insCelular" class="form-control" required placeholder="999 888 777" maxlength="12" inputmode="tel">
+                            </div>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Selecciona país y escribe el número local</div>
                         </div>
                         <div class="form-group">
                             <label>Correo personal *</label>
@@ -642,8 +695,8 @@
         }
 
         function validarCelular(val) {
-            var v = val.replace(/[\s\-\(\)\+]/g, '');
-            return v.length >= 7 && v.length <= 15 && /^\d+$/.test(v);
+            var v = val.replace(/[\s\-\(\)]/g, '');
+            return v.length >= 6 && v.length <= 12 && /^\d+$/.test(v);
         }
 
         function validarDocNum(tipo, num) {
@@ -680,7 +733,7 @@
 
                     const docTipo = document.getElementById('guestDocTipo').value;
                     const docNum = document.getElementById('guestDocNum').value.trim();
-                    const celular = document.getElementById('guestCelular').value.trim();
+                    const celular = document.getElementById('guestPais').value + ' ' + document.getElementById('guestCelular').value.trim();
                     const metodoPago = document.getElementById('guestMetodoPago').value;
                     const sede = document.getElementById('guestSede').value;
                     if (!sede) { throw new Error('Selecciona una sede'); }
@@ -700,7 +753,7 @@
                         throw new Error(docTipo === 'DNI' ? 'DNI debe tener 8 dígitos' : 'Carnet de Extranjería inválido');
                     }
                     if (!validarCelular(celular)) {
-                        throw new Error('Celular debe tener entre 7 y 15 dígitos');
+                        throw new Error('Ingresa un número de celular válido');
                     }
 
                     const data = {
@@ -1004,7 +1057,7 @@
 
                 const docTipo = document.getElementById('insDocTipo').value;
                 const docNum = document.getElementById('insDocNum').value.trim();
-                const celular = document.getElementById('insCelular').value.trim();
+                const celular = document.getElementById('insPais').value + ' ' + document.getElementById('insCelular').value.trim();
                 const sede = document.getElementById('insSede').value;
 
                 if (!sede) { toast('❌ Selecciona una sede', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
@@ -1013,7 +1066,7 @@
                     btn.disabled = false; btn.innerHTML = 'Guardar'; return;
                 }
                 if (!validarCelular(celular)) {
-                    toast('❌ Celular debe tener entre 7 y 15 dígitos', 'warning');
+                    toast('❌ Ingresa un número de celular válido', 'warning');
                     btn.disabled = false; btn.innerHTML = 'Guardar'; return;
                 }
 
@@ -1090,7 +1143,15 @@
             document.getElementById('insDocTipo').value = i.docTipo || 'DNI';
             document.getElementById('insDocTipo').dispatchEvent(new Event('change'));
             document.getElementById('insDocNum').value = i.dni || '';
-            document.getElementById('insCelular').value = i.celular;
+            var telGuardado = i.celular || '';
+            var telMatch = telGuardado.match(/^(\+\d+)\s*(.*)/);
+            if (telMatch) {
+                document.getElementById('insPais').value = telMatch[1];
+                document.getElementById('insCelular').value = telMatch[2];
+            } else {
+                document.getElementById('insPais').value = '+51';
+                document.getElementById('insCelular').value = telGuardado;
+            }
             document.getElementById('insCorreo').value = i.correo;
             document.getElementById('insLider').value = i.lider;
             document.getElementById('insSede').value = i.sede || '';
