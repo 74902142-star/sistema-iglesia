@@ -9,10 +9,6 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
     <style>
-        .phone-group { display: flex; gap: 0; align-items: stretch; }
-        .phone-group .phone-code { width: 70px; min-width: 70px; flex-shrink: 0; border-radius: var(--radius-md) 0 0 var(--radius-md); border-right: 1px solid var(--border-light); text-align: center; font-weight: 600; }
-        .phone-group .phone-num { flex: 1; min-width: 0; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
-        .phone-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
         .sortable { cursor: pointer; user-select: none; position: relative; padding-right: 18px !important; }
         .sortable:hover { background: #f1f5f9; }
         .sortable::after { content: '⇅'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #94a3b8; }
@@ -250,11 +246,9 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Celular *</label>
-                                    <div class="phone-group">
-                                        <input type="tel" id="guestPais" class="form-control phone-code" placeholder="+51" maxlength="5" inputmode="tel" value="+51">
-                                        <input type="tel" id="guestCelular" class="form-control phone-num" required placeholder="999 888 777" maxlength="12" inputmode="tel">
-                                    </div>
-                                    <div class="phone-hint" id="guestPaisHint">🇵🇪 Peru</div>
+                                    <input type="tel" id="guestCelular" class="form-control" required placeholder="+51 999 888 777"
+                                        maxlength="15" inputmode="tel">
+                                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">7 a 15 dígitos, incluir código de país</div>
                                 </div>
                                 <div class="form-group">
                                     <label>Correo personal *</label>
@@ -396,11 +390,9 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Celular *</label>
-                            <div class="phone-group">
-                                <input type="tel" id="insPais" class="form-control phone-code" placeholder="+51" maxlength="5" inputmode="tel" value="+51">
-                                <input type="tel" id="insCelular" class="form-control phone-num" required placeholder="999 888 777" maxlength="12" inputmode="tel">
-                            </div>
-                            <div class="phone-hint" id="insPaisHint">🇵🇪 Peru</div>
+                            <input type="tel" id="insCelular" class="form-control" required placeholder="+51 999 888 777"
+                                maxlength="15" inputmode="tel">
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">7 a 15 dígitos, incluir código de país</div>
                         </div>
                         <div class="form-group">
                             <label>Correo personal *</label>
@@ -591,38 +583,6 @@
                 document.getElementById('insCapturaGroup').style.display = isDigital ? 'block' : 'none';
             });
         }
-
-        var PAISES = {
-            '+51':'🇵🇪 Peru','+52':'🇲🇽 Mexico','+57':'🇨🇴 Colombia','+56':'🇨🇱 Chile','+54':'🇦🇷 Argentina',
-            '+593':'🇪🇨 Ecuador','+591':'🇧🇴 Bolivia','+58':'🇻🇪 Venezuela','+1':'🇺🇸 USA/Canada',
-            '+34':'🇪🇸 España','+502':'🇬🇹 Guatemala','+504':'🇭🇳 Honduras','+505':'🇳🇮 Nicaragua',
-            '+503':'🇸🇻 El Salvador','+506':'🇨🇷 Costa Rica','+507':'🇵🇦 Panama','+595':'🇵🇾 Paraguay',
-            '+598':'🇺🇾 Uruguay','+55':'🇧🇷 Brasil','+44':'🇬🇧 UK','+49':'🇩🇪 Alemania',
-            '+39':'🇮🇹 Italia','+33':'🇫🇷 Francia','+31':'🇳🇱 Paises Bajos','+46':'🇸🇪 Suecia',
-            '+47':'🇳🇴 Noruega','+45':'🇩🇰 Dinamarca','+358':'🇫🇮 Finlandia','+48':'🇵🇱 Polonia',
-            '+420':'🇨🇿 Republica Checa','+36':'🇭🇺 Hungria','+40':'🇷🇴 Rumania','+381':'🇷🇸 Serbia',
-            '+385':'🇭🇷 Croacia','+386':'🇸🇮 Eslovenia','+421':'🇸🇰 Eslovaquia','+355':'🇦🇱 Albania',
-            '+389':'🇲🇰 Macedonia','+382':'🇲🇪 Montenegro','+387':'🇧🇦 Bosnia','+354':'🇮🇸 Islandia',
-            '+352':'🇱🇺 Luxembourg','+356':'🇲🇹 Malta','+357':'🇨🇾 Chipre','+90':'🇹🇷 Turquia',
-            '+972':'🇮🇱 Israel','+971':'🇦🇪 UAE','+966':'🇸🇦 Arabi Saudita','+92':'🇵🇰 Pakistan',
-            '+91':'🇮🇳 India','+86':'🇨🇳 China','+81':'🇯🇵 Japon','+82':'🇰🇷 Korea',
-            '+66':'🇹🇭 Tailandia','+60':'🇲🇾 Malasia','+63':'🇵🇭 Filipinas','+62':'🇮🇩 Indonesia',
-            '+61':'🇦🇺 Australia','+64':'🇳🇿 Nueva Zelanda','+27':'🇿🇦 Sudafrica','+234':'🇳🇬 Nigeria',
-            '+254':'🇰🇪 Kenya','+20':'🇪🇬 Egipto','+212':'🇲🇦 Marruecos','+216':'🇹🇳 Tunez',
-            '+598':'🇺🇾 Uruguay','+263':'🇿🇼 Zimbabwe','+260':'🇿🇲 Zambia','+267':'🇧🇼 Botswana'
-        };
-
-        function detectarPais(inputId, hintId) {
-            var input = document.getElementById(inputId);
-            var hint = document.getElementById(hintId);
-            input.addEventListener('input', function() {
-                var val = this.value.replace(/\s/g, '');
-                hint.textContent = PAISES[val] || '';
-            });
-        }
-
-        detectarPais('insPais', 'insPaisHint');
-        detectarPais('guestPais', 'guestPaisHint');
                 });
             });
         }
@@ -672,8 +632,8 @@
         }
 
         function validarCelular(val) {
-            var v = val.replace(/[\s\-\(\)]/g, '');
-            return v.length >= 6 && v.length <= 12 && /^\d+$/.test(v);
+            var v = val.replace(/[\s\-\(\)\+]/g, '');
+            return v.length >= 7 && v.length <= 15 && /^\d+$/.test(v);
         }
 
         function validarDocNum(tipo, num) {
@@ -710,7 +670,7 @@
 
                     const docTipo = document.getElementById('guestDocTipo').value;
                     const docNum = document.getElementById('guestDocNum').value.trim();
-                    const celular = document.getElementById('guestPais').value + ' ' + document.getElementById('guestCelular').value.trim();
+                    const celular = document.getElementById('guestCelular').value.trim();
                     const metodoPago = document.getElementById('guestMetodoPago').value;
                     const sede = document.getElementById('guestSede').value;
                     if (!sede) { throw new Error('Selecciona una sede'); }
@@ -730,7 +690,7 @@
                         throw new Error(docTipo === 'DNI' ? 'DNI debe tener 8 dígitos' : 'Carnet de Extranjería inválido');
                     }
                     if (!validarCelular(celular)) {
-                        throw new Error('Ingresa un número de celular válido');
+                        throw new Error('Celular debe tener entre 7 y 15 dígitos');
                     }
 
                     const data = {
@@ -1034,7 +994,7 @@
 
                 const docTipo = document.getElementById('insDocTipo').value;
                 const docNum = document.getElementById('insDocNum').value.trim();
-                const celular = document.getElementById('insPais').value + ' ' + document.getElementById('insCelular').value.trim();
+                const celular = document.getElementById('insCelular').value.trim();
                 const sede = document.getElementById('insSede').value;
 
                 if (!sede) { toast('❌ Selecciona una sede', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
@@ -1043,7 +1003,7 @@
                     btn.disabled = false; btn.innerHTML = 'Guardar'; return;
                 }
                 if (!validarCelular(celular)) {
-                    toast('❌ Ingresa un número de celular válido', 'warning');
+                    toast('❌ Celular debe tener entre 7 y 15 dígitos', 'warning');
                     btn.disabled = false; btn.innerHTML = 'Guardar'; return;
                 }
 
@@ -1120,17 +1080,7 @@
             document.getElementById('insDocTipo').value = i.docTipo || 'DNI';
             document.getElementById('insDocTipo').dispatchEvent(new Event('change'));
             document.getElementById('insDocNum').value = i.dni || '';
-            var telGuardado = i.celular || '';
-            var telMatch = telGuardado.match(/^(\+\d+)\s*(.*)/);
-            if (telMatch) {
-                document.getElementById('insPais').value = telMatch[1];
-                document.getElementById('insCelular').value = telMatch[2];
-                document.getElementById('insPaisHint').textContent = PAISES[telMatch[1]] || '';
-            } else {
-                document.getElementById('insPais').value = '+51';
-                document.getElementById('insCelular').value = telGuardado;
-                document.getElementById('insPaisHint').textContent = PAISES['+51'];
-            }
+            document.getElementById('insCelular').value = i.celular;
             document.getElementById('insCorreo').value = i.correo;
             document.getElementById('insLider').value = i.lider;
             document.getElementById('insSede').value = i.sede || '';
