@@ -12,4 +12,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+db.enablePersistence({ synchronizeTabs: true }).catch(function(err) {
+    if (err.code === 'failed-precondition') {
+        console.warn('Persistence: múltiples pestañas abiertas');
+    } else if (err.code === 'unimplemented') {
+        console.warn('Persistence: navegador no soporta');
+    }
+});
+
 console.log('✅ Firebase conectado correctamente');
