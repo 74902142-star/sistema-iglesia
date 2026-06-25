@@ -69,9 +69,6 @@ body {
     padding: 0;
     line-height: 1.6;
     color: var(--text-primary);
-    touch-action: manipulation;
-    -webkit-text-size-adjust: 100%;
-    -ms-text-size-adjust: 100%;
 }
 
 /* ── Glass Card ── */
