@@ -1327,15 +1327,12 @@
             cargarCacheLocal();
             try {
                 await firebaseReady;
-                dbKids.onSnapshot(function(snap) {
-                    maestros = [];
-                    snap.forEach(function(d) { maestros.push({ id: d.id, ...d.data() }); });
-                    guardarCacheLocal(maestros);
-                    actualizarStats();
-                    renderTabla();
-                }, function(err) {
-                    console.error('Error cargando líderes:', err);
-                });
+                const snap = await dbKids.get();
+                maestros = [];
+                snap.forEach(function(d) { maestros.push({ id: d.id, ...d.data() }); });
+                guardarCacheLocal(maestros);
+                actualizarStats();
+                renderTabla();
             } catch (err) {
                 console.error('Error cargando líderes:', err);
             }

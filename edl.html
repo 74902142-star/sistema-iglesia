@@ -770,15 +770,12 @@
             cargarCacheLocal();
             try {
                 await firebaseReady;
-                dbIns.onSnapshot(function(snapshot) {
-                    inscripciones = [];
-                    snapshot.forEach(function(doc) { inscripciones.push({ id: doc.id, ...doc.data() }); });
-                    inscripciones.sort(function(a, b) { return (b.timestamp || '').localeCompare(a.timestamp || ''); });
-                    guardarCacheLocal(inscripciones);
-                    aplicarFiltros();
-                }, function(err) {
-                    console.error('Error cargando inscripciones:', err);
-                });
+                const snapshot = await dbIns.get();
+                inscripciones = [];
+                snapshot.forEach(function(doc) { inscripciones.push({ id: doc.id, ...doc.data() }); });
+                inscripciones.sort(function(a, b) { return (b.timestamp || '').localeCompare(a.timestamp || ''); });
+                guardarCacheLocal(inscripciones);
+                aplicarFiltros();
             } catch (err) {
                 console.error('Error cargando inscripciones:', err);
             }
