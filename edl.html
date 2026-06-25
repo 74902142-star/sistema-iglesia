@@ -771,13 +771,20 @@
             try {
                 await firebaseReady;
                 const snapshot = await dbIns.get();
-                inscripciones = [];
-                snapshot.forEach(function(doc) { inscripciones.push({ id: doc.id, ...doc.data() }); });
-                inscripciones.sort(function(a, b) { return (b.timestamp || '').localeCompare(a.timestamp || ''); });
-                guardarCacheLocal(inscripciones);
+                const nuevas = [];
+                snapshot.forEach(function(doc) { nuevas.push({ id: doc.id, ...doc.data() }); });
+                console.log('EDL Firestore:', nuevas.length, 'documentos leidos');
+                if (nuevas.length > 0) {
+                    inscripciones = nuevas;
+                    inscripciones.sort(function(a, b) { return (b.timestamp || '').localeCompare(a.timestamp || ''); });
+                    guardarCacheLocal(inscripciones);
+                } else {
+                    console.log('EDL: Firestore devolvió 0 documentos. Colección inscripciones vacía o sin permisos.');
+                }
                 aplicarFiltros();
             } catch (err) {
-                console.error('Error cargando inscripciones:', err);
+                console.error('EDL Error:', err);
+                document.getElementById('tablaInscripciones').innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:#dc2626;">⚠️ Error: ' + err.message + '</td></tr>';
             }
         }
 
