@@ -255,7 +255,7 @@
                                 <div class="form-group">
                                     <label>Celular *</label>
                                     <input type="tel" id="guestCelular" class="form-control" required
-                                        placeholder="999888777" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                                        placeholder="+51 999 888 777" maxlength="15" inputmode="tel">
                                     <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe
                                         comenzar con 9</div>
                                 </div>
@@ -399,9 +399,9 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Celular *</label>
-                            <input type="tel" id="insCelular" class="form-control" required placeholder="999888777"
-                                maxlength="9" inputmode="numeric" pattern="[0-9]*">
-                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">9 dígitos, debe comenzar
+                            <input type="tel" id="insCelular" class="form-control" required placeholder="+51 999 888 777"
+                                maxlength="15" inputmode="tel">
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">7 a 15 dígitos, incluir código de país
                                 con 9</div>
                         </div>
                         <div class="form-group">
@@ -650,7 +650,8 @@
         }
 
         function validarCelular(val) {
-            return /^9\d{8}$/.test(val.replace(/\s/g, ''));
+            var v = val.replace(/[\s\-\(\)\+]/g, '');
+            return v.length >= 7 && v.length <= 15 && /^\d+$/.test(v);
         }
 
         function validarDocNum(tipo, num) {
@@ -707,7 +708,7 @@
                         throw new Error(docTipo === 'DNI' ? 'DNI debe tener 8 dígitos' : 'Carnet de Extranjería inválido');
                     }
                     if (!validarCelular(celular)) {
-                        throw new Error('Celular debe tener 9 dígitos y comenzar con 9');
+                        throw new Error('Celular debe tener entre 7 y 15 dígitos');
                     }
 
                     const data = {
@@ -766,16 +767,55 @@
             try { localStorage.setItem('edl_inscripciones', JSON.stringify(data)); } catch(e) {}
         }
 
+        function fetchWithTimeout(url, options, ms) {
+            return new Promise(function(resolve, reject) {
+                var timer = setTimeout(function() { reject(new Error('Timeout ' + ms + 'ms')); }, ms);
+                fetch(url, options).then(function(res) { clearTimeout(timer); resolve(res); }, function(err) { clearTimeout(timer); reject(err); });
+            });
+        }
+
         async function firestoreGet(collection) {
             try {
-                const snap = await db.collection(collection).get();
-                const results = [];
-                snap.forEach(function(doc) { results.push({ id: doc.id, ...doc.data() }); });
+                var sdkResult = await Promise.race([
+                    db.collection(collection).get(),
+                    new Promise(function(_, reject) { setTimeout(function() { reject(new Error('SDK timeout')); }, 5000); })
+                ]);
+                var results = [];
+                sdkResult.forEach(function(doc) { results.push({ id: doc.id, ...doc.data() }); });
                 return results;
             } catch(e) {
-                console.warn('SDK falló, usando REST API para', collection);
+                console.warn('SDK falló, usando REST API para', collection, e.message);
                 return await firestoreGetREST(collection);
             }
+        }
+
+        async function firestoreGetREST(collection) {
+            var projectId = firebaseConfig.projectId;
+            var apiKey = firebaseConfig.apiKey;
+            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?key=' + apiKey;
+            console.log('REST API:', url);
+            var resp = await fetchWithTimeout(url, {}, 15000);
+            var json = await resp.json();
+            console.log('REST API response:', json);
+            if (!json.documents) return [];
+            return json.documents.map(function(doc) {
+                var data = {};
+                var fields = doc.fields || {};
+                Object.keys(fields).forEach(function(key) {
+                    var f = fields[key];
+                    if (f.stringValue !== undefined) data[key] = f.stringValue;
+                    else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
+                    else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
+                    else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
+                    else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
+                    else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || v.integerValue || v.doubleValue || v.booleanValue || ''; }) : [];
+                    else if (f.mapValue !== undefined) data[key] = f.mapValue.fields || {};
+                    else data[key] = '';
+                });
+                var parts = doc.name.split('/');
+                return { id: parts[parts.length - 1], _path: doc.name, ...data };
+            });
+        }
         }
 
         async function firestoreGetREST(collection) {
@@ -977,7 +1017,7 @@
                     btn.disabled = false; btn.innerHTML = 'Guardar'; return;
                 }
                 if (!validarCelular(celular)) {
-                    toast('❌ Celular debe tener 9 dígitos y comenzar con 9', 'warning');
+                    toast('❌ Celular debe tener entre 7 y 15 dígitos', 'warning');
                     btn.disabled = false; btn.innerHTML = 'Guardar'; return;
                 }
 
