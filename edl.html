@@ -1192,9 +1192,12 @@
             document.getElementById('lightboxCaptura').classList.remove('active');
         }
 
-        document.getElementById('lightboxCaptura').addEventListener('click', function (e) {
-            if (e.target === this || e.target.classList.contains('lightbox-close')) cerrarCaptura();
-        });
+        var lightboxEl = document.getElementById('lightboxCaptura');
+        if (lightboxEl) {
+            lightboxEl.addEventListener('click', function (e) {
+                if (e.target === this || e.target.classList.contains('lightbox-close')) cerrarCaptura();
+            });
+        }
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') cerrarCaptura();
         });
