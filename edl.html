@@ -210,13 +210,6 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tablaInscripciones">
-                                        <tr><td colspan="13" style="text-align:center;padding:48px;color:var(--text-muted);">
-                                        </td></tr>
-                                        <tr>
-                                            <td colspan="13"
-                                                style="text-align:center;padding:48px;color:var(--text-muted);">
-                                                Cargando...</td>
-                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -801,7 +794,6 @@
                 var parts = doc.name.split('/');
                 return { id: parts[parts.length - 1], _path: doc.name, ...data };
             });
-        }
         }
 
         async function firestoreGetREST(collection) {
