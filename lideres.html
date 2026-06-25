@@ -1324,15 +1324,7 @@
         }
 
         async function firestoreGet(collection) {
-            try {
-                var snap = await firebase.firestore().collection(collection).get();
-                var results = [];
-                snap.forEach(function(doc) { results.push({ id: doc.id, ...doc.data() }); });
-                return results;
-            } catch(e) {
-                console.warn('SDK falló, usando REST API para', collection);
-                return await firestoreGetREST(collection);
-            }
+            return await firestoreGetREST(collection);
         }
 
         async function firestoreGetREST(collection) {

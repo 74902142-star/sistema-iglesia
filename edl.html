@@ -211,7 +211,6 @@
                                     </thead>
                                     <tbody id="tablaInscripciones">
                                         <tr><td colspan="13" style="text-align:center;padding:48px;color:var(--text-muted);">
-                                            <div style="margin-bottom:8px;font-size:24px;">⏳</div>Cargando inscripciones...
                                         </td></tr>
                                         <tr>
                                             <td colspan="13"
@@ -775,28 +774,15 @@
         }
 
         async function firestoreGet(collection) {
-            try {
-                var sdkResult = await Promise.race([
-                    db.collection(collection).get(),
-                    new Promise(function(_, reject) { setTimeout(function() { reject(new Error('SDK timeout')); }, 5000); })
-                ]);
-                var results = [];
-                sdkResult.forEach(function(doc) { results.push({ id: doc.id, ...doc.data() }); });
-                return results;
-            } catch(e) {
-                console.warn('SDK falló, usando REST API para', collection, e.message);
-                return await firestoreGetREST(collection);
-            }
+            return await firestoreGetREST(collection);
         }
 
         async function firestoreGetREST(collection) {
             var projectId = firebaseConfig.projectId;
             var apiKey = firebaseConfig.apiKey;
             var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?key=' + apiKey;
-            console.log('REST API:', url);
             var resp = await fetchWithTimeout(url, {}, 15000);
             var json = await resp.json();
-            console.log('REST API response:', json);
             if (!json.documents) return [];
             return json.documents.map(function(doc) {
                 var data = {};
@@ -868,11 +854,54 @@
         }
 
         async function firestoreAdd(collection, data) {
+            return await firestoreAddREST(collection, data);
+        }
+
+        async function firestoreUpdateDoc(collection, docId, data) {
             try {
-                return await db.collection(collection).add(data);
+                await dbIns.doc(docId).update(data);
             } catch(e) {
-                console.warn('SDK falló para add, usando REST API');
-                return await firestoreAddREST(collection, data);
+                var projectId = firebaseConfig.projectId;
+                var apiKey = firebaseConfig.apiKey;
+                var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
+                await fetchWithTimeout(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: toFirestoreFields(data) }) }, 15000);
+            }
+        }
+
+        async function firestoreDeleteDoc(collection, docId) {
+            try {
+                await dbIns.doc(docId).delete();
+            } catch(e) {
+                var projectId = firebaseConfig.projectId;
+                var apiKey = firebaseConfig.apiKey;
+                var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
+                await fetchWithTimeout(url, { method: 'DELETE' }, 15000);
+            }
+        }
+
+        async function firestoreGetDoc(collection, docId) {
+            try {
+                var doc = await dbIns.doc(docId).get();
+                return doc.data();
+            } catch(e) {
+                var projectId = firebaseConfig.projectId;
+                var apiKey = firebaseConfig.apiKey;
+                var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
+                var resp = await fetchWithTimeout(url, {}, 15000);
+                var json = await resp.json();
+                var data = {};
+                var fields = json.fields || {};
+                Object.keys(fields).forEach(function(key) {
+                    var f = fields[key];
+                    if (f.stringValue !== undefined) data[key] = f.stringValue;
+                    else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
+                    else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
+                    else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
+                    else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
+                    else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || ''; }) : [];
+                    else data[key] = '';
+                });
+                return data;
             }
         }
 
@@ -985,14 +1014,9 @@
         }
 
         async function verificarDuplicado(dni, cursoId) {
-            try {
-                const snap = await dbIns.where('dni', '==', dni).where('cursoId', '==', cursoId).get();
-                return snap.empty ? null : snap.docs[0].data();
-            } catch(e) {
-                var all = await firestoreGet('inscripciones');
-                var found = all.find(function(i) { return i.dni === dni && i.cursoId === cursoId; });
-                return found || null;
-            }
+            var all = await firestoreGet('inscripciones');
+            var found = all.find(function(i) { return i.dni === dni && i.cursoId === cursoId; });
+            return found || null;
         }
 
         document.getElementById('formInscripcion').addEventListener('submit', async (e) => {
@@ -1055,7 +1079,7 @@
                 }
 
                 if (editandoId) {
-                    await dbIns.doc(editandoId).update(data);
+                    await firestoreUpdateDoc('inscripciones', editandoId, data);
                     toast('✅ Inscripción actualizada');
                 } else {
                     await firestoreAdd('inscripciones', data);
@@ -1088,8 +1112,7 @@
         }
 
         async function editarInscripcion(id) {
-            const doc = await dbIns.doc(id).get();
-            const i = doc.data();
+            const i = await firestoreGetDoc('inscripciones', id);
             editandoId = id;
             document.getElementById('insNombres').value = i.nombres;
             document.getElementById('insDocTipo').value = i.docTipo || 'DNI';
@@ -1118,14 +1141,14 @@
 
         async function eliminarInscripcion(id) {
             if (confirm('¿Eliminar esta inscripción?')) {
-                await dbIns.doc(id).delete();
+                await firestoreDeleteDoc('inscripciones', id);
                 toast('🗑️ Inscripción eliminada');
                 cargarInscripciones();
             }
         }
 
         async function toggleEstadoPago(id, nuevoEstado) {
-            await dbIns.doc(id).update({ estadoPago: nuevoEstado });
+            await firestoreUpdateDoc('inscripciones', id, { estadoPago: nuevoEstado });
             toast(nuevoEstado === 'Canceló' ? '✅ Inscripción confirmada' : '❌ Inscripción en estado Debe');
             cargarInscripciones();
         }
