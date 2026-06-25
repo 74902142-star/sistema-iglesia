@@ -1911,7 +1911,8 @@
             return d.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' });
         }
 
-        if (esAdmin) { cargarLíderes(); cargarHoy(); }
+        cargarLíderes();
+        cargarHoy();
         if (typeof lucide !== 'undefined') lucide.createIcons();
     </script>
 

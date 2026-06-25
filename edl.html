@@ -207,6 +207,9 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tablaInscripciones">
+                                        <tr><td colspan="13" style="text-align:center;padding:48px;color:var(--text-muted);">
+                                            <div style="margin-bottom:8px;font-size:24px;">⏳</div>Cargando inscripciones...
+                                        </td></tr>
                                         <tr>
                                             <td colspan="13"
                                                 style="text-align:center;padding:48px;color:var(--text-muted);">
@@ -1073,7 +1076,7 @@
         initCursosSelect();
         initDocTipo();
         initMetodoPagoToggles();
-        if (esAdmin) cargarInscripciones();
+        cargarInscripciones();
 
         // Event delegation for captura thumbnails (avoids inline onclick with huge base64)
         document.getElementById('tablaInscripciones').addEventListener('click', function (e) {
