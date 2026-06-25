@@ -225,7 +225,7 @@
                         </div>
                         <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Completa tus datos
                             para inscribirte a un curso o seminario.</p>
-                        <form id="formInscripcionGuest">
+                        <form id="formInscripcionGuest" novalidate>
                             <div class="form-group">
                                 <label>Nombres y apellidos completos *</label>
                                 <input type="text" id="guestNombres" class="form-control" required
@@ -370,7 +370,7 @@
                 <button class="modal-close" onclick="cerrarModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formInscripcion">
+                <form id="formInscripcion" novalidate>
                     <input type="hidden" id="editId">
                     <div class="form-group">
                         <label>Nombres y apellidos completos *</label>
@@ -670,69 +670,67 @@
         if (guestForm) {
             guestForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const cursoId = document.getElementById('guestCurso').value;
-                const curso = getCurso(cursoId);
-                if (!curso) return;
-
-                const docTipo = document.getElementById('guestDocTipo').value;
-                const docNum = document.getElementById('guestDocNum').value.trim();
-                const celular = document.getElementById('guestCelular').value.trim();
-                const metodoPago = document.getElementById('guestMetodoPago').value;
-                const sede = document.getElementById('guestSede').value;
-                if (!sede) { toast('❌ Selecciona una sede', 'warning'); return; }
-                if (!metodoPago) { toast('❌ Selecciona un método de pago', 'warning'); return; }
-
-                const isDigital = ['yape', 'plin', 'transferencia'].includes(metodoPago);
-                const capturaFile = getCapturaFile('guest');
-                if (isDigital && !capturaFile) { toast('❌ Sube la captura de tu pago', 'warning'); return; }
-
-                let pagoCaptura = '';
-                if (capturaFile) {
-                    if (capturaFile.size > 5000000) { toast('❌ La imagen es muy grande (máx 5MB)', 'warning'); return; }
-                    pagoCaptura = await fileToBase64(capturaFile);
-                }
-
-                if (!validarDocNum(docTipo, docNum)) {
-                    toast('❌ ' + (docTipo === 'DNI' ? 'DNI debe tener 8 dígitos' : 'Carnet de Extranjería inválido'), 'warning');
-                    return;
-                }
-                if (!validarCelular(celular)) {
-                    toast('❌ Celular debe tener 9 dígitos y comenzar con 9', 'warning');
-                    return;
-                }
-
-                const data = {
-                    nombres: document.getElementById('guestNombres').value.trim(),
-                    docTipo: docTipo,
-                    dni: docNum,
-                    celular: celular,
-                    correo: document.getElementById('guestCorreo').value.trim(),
-                    lider: document.getElementById('guestLider').value.trim(),
-                    sede: document.getElementById('guestSede').value,
-                    cursoId: cursoId,
-                    cursoNombre: curso.nombre,
-                    fechaHorario: `${curso.dia} ${curso.hora} (Inicio: ${curso.inicio})`,
-                    monto: curso.monto,
-                    estadoPago: 'Debe',
-                    metodoPago: metodoPago,
-                    pagoCaptura: pagoCaptura || '',
-                    origen: 'invitado',
-                    creadoPor: usuarioActual ? usuarioActual.nombre : 'Invitado',
-                    timestamp: new Date().toISOString()
-                };
-
                 const btn = guestForm.querySelector('button[type="submit"]');
                 btn.disabled = true;
                 btn.innerHTML = 'Registrando...';
 
                 try {
+                    const cursoId = document.getElementById('guestCurso').value;
+                    const curso = getCurso(cursoId);
+                    if (!curso) { throw new Error('Selecciona un curso'); }
+
+                    const docTipo = document.getElementById('guestDocTipo').value;
+                    const docNum = document.getElementById('guestDocNum').value.trim();
+                    const celular = document.getElementById('guestCelular').value.trim();
+                    const metodoPago = document.getElementById('guestMetodoPago').value;
+                    const sede = document.getElementById('guestSede').value;
+                    if (!sede) { throw new Error('Selecciona una sede'); }
+                    if (!metodoPago) { throw new Error('Selecciona un método de pago'); }
+
+                    const isDigital = ['yape', 'plin', 'transferencia'].includes(metodoPago);
+                    const capturaFile = getCapturaFile('guest');
+                    if (isDigital && !capturaFile) { throw new Error('Sube la captura de tu pago'); }
+
+                    let pagoCaptura = '';
+                    if (capturaFile) {
+                        if (capturaFile.size > 5000000) { throw new Error('La imagen es muy grande (máx 5MB)'); }
+                        pagoCaptura = await fileToBase64(capturaFile);
+                    }
+
+                    if (!validarDocNum(docTipo, docNum)) {
+                        throw new Error(docTipo === 'DNI' ? 'DNI debe tener 8 dígitos' : 'Carnet de Extranjería inválido');
+                    }
+                    if (!validarCelular(celular)) {
+                        throw new Error('Celular debe tener 9 dígitos y comenzar con 9');
+                    }
+
+                    const data = {
+                        nombres: document.getElementById('guestNombres').value.trim(),
+                        docTipo: docTipo,
+                        dni: docNum,
+                        celular: celular,
+                        correo: document.getElementById('guestCorreo').value.trim(),
+                        lider: document.getElementById('guestLider').value.trim(),
+                        sede: sede,
+                        cursoId: cursoId,
+                        cursoNombre: curso.nombre,
+                        fechaHorario: `${curso.dia} ${curso.hora} (Inicio: ${curso.inicio})`,
+                        monto: curso.monto,
+                        estadoPago: 'Debe',
+                        metodoPago: metodoPago,
+                        pagoCaptura: pagoCaptura || '',
+                        origen: 'invitado',
+                        creadoPor: usuarioActual ? usuarioActual.nombre : 'Invitado',
+                        timestamp: new Date().toISOString()
+                    };
+
                     await firebaseReady;
                     await db.collection('inscripciones').add(data);
                     document.getElementById('guestSuccess').style.display = 'block';
                     guestForm.style.display = 'none';
                     toast('✅ ¡Inscripción registrada exitosamente!');
                 } catch (err) {
-                    toast('❌ Error al inscribir: ' + err.message, 'warning');
+                    toast('❌ ' + err.message, 'warning');
                     btn.disabled = false;
                     btn.innerHTML = '<i data-lucide="check" style="width:16px; height:16px;"></i> Inscribirme';
                     if (typeof lucide !== 'undefined') lucide.createIcons();
