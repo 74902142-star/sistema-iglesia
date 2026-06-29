@@ -559,6 +559,13 @@
             }
         }
 
+        // Auto-disable password gate until Sunday July 5 2026
+        var fechaReactivar = new Date('2026-06-28T00:00:00');
+        if (esInvitado && new Date() < fechaReactivar) {
+            document.getElementById('edlPasswordGate').style.display = 'none';
+            document.getElementById('edlGuestContent').style.display = 'block';
+        }
+
         const CURSOS = [
             { id: 'disc1_next', nombre: 'Discipulado 1 NEXT', inicio: '27 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 30 },
             { id: 'disc2_next', nombre: 'Discipulado 2 NEXT', inicio: '27 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 50 },
