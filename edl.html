@@ -1051,9 +1051,7 @@
         }
 
         async function verificarDuplicado(dni, cursoId) {
-            var all = inscripciones.length > 0 ? inscripciones : [];
-            try { all = await firestoreGet('inscripciones'); } catch(e) { all = inscripciones; }
-            var found = all.find(function(i) { return i.dni === dni && i.cursoId === cursoId; });
+            var found = inscripciones.find(function(i) { return i.dni === dni && i.cursoId === cursoId; });
             return found || null;
         }
 
