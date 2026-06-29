@@ -721,7 +721,11 @@
                         if (!ok) { throw new Error('Inscripción cancelada'); }
                     }
 
-                    await firestoreAdd('inscripciones', data);
+                    var gResult = null;
+                    try { gResult = await firestoreAdd('inscripciones', data); } catch(e) { gResult = { name: 'local_' + Date.now() }; }
+                    data.id = gResult.name ? gResult.name.split('/').pop() : 'local_' + Date.now();
+                    inscripciones.unshift(data);
+                    guardarCacheLocal(inscripciones);
                     document.getElementById('guestSuccess').style.display = 'block';
                     guestForm.style.display = 'none';
                     toast('✅ ¡Inscripción registrada exitosamente!');
@@ -881,8 +885,12 @@
                 }
                 aplicarFiltros();
             } catch (err) {
-                console.error('EDL Error:', err);
-                document.getElementById('tablaInscripciones').innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:#dc2626;">⚠️ Error: ' + err.message + '</td></tr>';
+                console.warn('EDL: Firestore no disponible, usando cache local:', err.message);
+                if (inscripciones.length > 0) {
+                    aplicarFiltros();
+                } else {
+                    document.getElementById('tablaInscripciones').innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:#dc2626;">⚠️ Sin conexión. Intenta de nuevo más tarde.</td></tr>';
+                }
             }
         }
 
@@ -976,7 +984,8 @@
         }
 
         async function verificarDuplicado(dni, cursoId) {
-            var all = await firestoreGet('inscripciones');
+            var all = inscripciones.length > 0 ? inscripciones : [];
+            try { all = await firestoreGet('inscripciones'); } catch(e) { all = inscripciones; }
             var found = all.find(function(i) { return i.dni === dni && i.cursoId === cursoId; });
             return found || null;
         }
@@ -1042,13 +1051,18 @@
 
                 if (editandoId) {
                     await firestoreUpdateDoc('inscripciones', editandoId, data);
+                    Object.assign(inscripciones.find(x => x.id === editandoId) || {}, data);
                     toast('✅ Inscripción actualizada');
                 } else {
-                    await firestoreAdd('inscripciones', data);
+                    var result = await firestoreAdd('inscripciones', data);
+                    var newId = result.name ? result.name.split('/').pop() : 'local_' + Date.now();
+                    data.id = newId;
+                    inscripciones.unshift(data);
                     toast('✅ Inscripción registrada');
                 }
+                guardarCacheLocal(inscripciones);
                 cerrarModal();
-                cargarInscripciones();
+                aplicarFiltros();
             } catch (err) {
                 toast('❌ Error: ' + err.message, 'error');
             } finally {
