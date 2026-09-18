@@ -891,51 +891,43 @@
         }
 
         async function firestoreUpdateDoc(collection, docId, data) {
-            try {
-                await dbIns.doc(docId).update(data);
-            } catch(e) {
-                var projectId = firebaseConfig.projectId;
-                var apiKey = firebaseConfig.apiKey;
-                var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
-                await fetchWithTimeout(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: toFirestoreFields(data) }) }, 15000);
-            }
+            var projectId = firebaseConfig.projectId;
+            var apiKey = firebaseConfig.apiKey;
+            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
+            var resp = await fetchWithTimeout(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: toFirestoreFields(data) }) }, 15000);
+            if (!resp.ok) throw new Error('Error actualizando: ' + resp.status);
+            return await resp.json();
         }
 
         async function firestoreDeleteDoc(collection, docId) {
-            try {
-                await dbIns.doc(docId).delete();
-            } catch(e) {
-                var projectId = firebaseConfig.projectId;
-                var apiKey = firebaseConfig.apiKey;
-                var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
-                await fetchWithTimeout(url, { method: 'DELETE' }, 15000);
-            }
+            var projectId = firebaseConfig.projectId;
+            var apiKey = firebaseConfig.apiKey;
+            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
+            var resp = await fetchWithTimeout(url, { method: 'DELETE' }, 15000);
+            if (!resp.ok) throw new Error('Error eliminando: ' + resp.status);
         }
 
         async function firestoreGetDoc(collection, docId) {
-            try {
-                var doc = await dbIns.doc(docId).get();
-                return doc.data();
-            } catch(e) {
-                var projectId = firebaseConfig.projectId;
-                var apiKey = firebaseConfig.apiKey;
-                var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
-                var resp = await fetchWithTimeout(url, {}, 15000);
-                var json = await resp.json();
-                var data = {};
-                var fields = json.fields || {};
-                Object.keys(fields).forEach(function(key) {
-                    var f = fields[key];
-                    if (f.stringValue !== undefined) data[key] = f.stringValue;
-                    else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
-                    else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
-                    else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
-                    else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
-                    else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || ''; }) : [];
-                    else data[key] = '';
-                });
-                return data;
-            }
+            var projectId = firebaseConfig.projectId;
+            var apiKey = firebaseConfig.apiKey;
+            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
+            var resp = await fetchWithTimeout(url, {}, 15000);
+            var json = await resp.json();
+            var data = {};
+            var fields = json.fields || {};
+            Object.keys(fields).forEach(function(key) {
+                var f = fields[key];
+                if (f.stringValue !== undefined) data[key] = f.stringValue;
+                else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
+                else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
+                else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
+                else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
+                else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || ''; }) : [];
+                else data[key] = '';
+            });
+            var parts = json.name.split('/');
+            data.id = parts[parts.length - 1];
+            return data;
         }
 
         async function cargarInscripciones() {
@@ -1188,16 +1180,26 @@
 
         async function eliminarInscripcion(id) {
             if (confirm('¿Eliminar esta inscripción?')) {
-                await firestoreDeleteDoc('inscripciones', id);
+                try {
+                    await firestoreDeleteDoc('inscripciones', id);
+                } catch(e) { console.warn('Delete from Firestore failed, removing locally'); }
+                inscripciones = inscripciones.filter(x => x.id !== id);
+                guardarCacheLocal(inscripciones);
+                aplicarFiltros();
                 toast('🗑️ Inscripción eliminada');
-                cargarInscripciones();
             }
         }
 
         async function toggleEstadoPago(id, nuevoEstado) {
-            await firestoreUpdateDoc('inscripciones', id, { estadoPago: nuevoEstado });
+            try {
+                await firestoreUpdateDoc('inscripciones', id, { estadoPago: nuevoEstado });
+            } catch(e) { console.warn('Update Firestore failed, updating locally'); }
+            var item = inscripciones.find(x => x.id === id);
+            if (item) item.estadoPago = nuevoEstado;
+            guardarCacheLocal(inscripciones);
+            renderTabla();
+            actualizarStats(inscripcionesFiltradas);
             toast(nuevoEstado === 'Canceló' ? '✅ Inscripción confirmada' : '❌ Inscripción en estado Debe');
-            cargarInscripciones();
         }
 
         function exportarExcel() {
