@@ -251,6 +251,67 @@ service cloud.firestore {
         let chartSedes, chartTendencia, chartGenero;
         let registroEditando = null;
 
+        function fetchWithTimeout(url, options, ms) {
+            return new Promise(function(resolve, reject) {
+                var timer = setTimeout(function() { reject(new Error('Timeout ' + ms + 'ms')); }, ms);
+                fetch(url, options).then(function(res) { clearTimeout(timer); resolve(res); }, function(err) { clearTimeout(timer); reject(err); });
+            });
+        }
+
+        async function firestoreGetREST(collection) {
+            var projectId = firebaseConfig.projectId;
+            var apiKey = firebaseConfig.apiKey;
+            var allDocs = [];
+            var pageToken = '';
+            do {
+                var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?key=' + apiKey + '&pageSize=1000' + (pageToken ? '&pageToken=' + pageToken : '');
+                var resp = await fetchWithTimeout(url, {}, 15000);
+                var json = await resp.json();
+                if (json.documents) allDocs = allDocs.concat(json.documents);
+                pageToken = json.nextPageToken || '';
+            } while (pageToken);
+            if (allDocs.length === 0) return [];
+            return allDocs.map(function(doc) {
+                var data = {};
+                var fields = doc.fields || {};
+                Object.keys(fields).forEach(function(key) {
+                    var f = fields[key];
+                    if (f.stringValue !== undefined) data[key] = f.stringValue;
+                    else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
+                    else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
+                    else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
+                    else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
+                    else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || ''; }) : [];
+                    else data[key] = '';
+                });
+                var parts = doc.name.split('/');
+                return { firebaseId: parts[parts.length - 1], ...data };
+            });
+        }
+
+        function cargarCacheLocal() {
+            try {
+                var cache = JSON.parse(localStorage.getItem('dashboard_registros') || '[]');
+                if (cache.length > 0) { registros = cache; }
+            } catch(e) {}
+        }
+        function guardarCacheLocal(data) {
+            try { localStorage.setItem('dashboard_registros', JSON.stringify(data)); } catch(e) {}
+        }
+
+        function toFirestoreFields(data) {
+            var fields = {};
+            Object.keys(data).forEach(function(key) {
+                var v = data[key];
+                if (v === undefined || v === null) return;
+                if (typeof v === 'string') fields[key] = { stringValue: v };
+                else if (typeof v === 'number') fields[key] = Number.isInteger(v) ? { integerValue: v } : { doubleValue: v };
+                else if (typeof v === 'boolean') fields[key] = { booleanValue: v };
+                else fields[key] = { stringValue: String(v) };
+            });
+            return fields;
+        }
+
         function formatearSede(sedeId) {
             const sedes = {
                 'san_carlos_10am': 'San Carlos 10am', 'san_carlos_12pm': 'San Carlos 12pm',
@@ -272,36 +333,19 @@ service cloud.firestore {
         }
 
         async function cargarDatos() {
+            cargarCacheLocal();
             try {
-                await firebaseReady;
-                const snapshot = await db.collection('registros').orderBy('fecha', 'desc').get();
-                registros = [];
-                snapshot.forEach(doc => {
-                    registros.push({ firebaseId: doc.id, ...doc.data() });
-                });
+                var datos = await firestoreGetREST('registros');
+                registros = datos;
+                registros.sort(function(a, b) { return (b.fecha || '').localeCompare(a.fecha || ''); });
+                guardarCacheLocal(registros);
                 document.getElementById('permAlert').classList.remove('visible');
             } catch (err) {
-                console.warn('Firestore error (primer intento):', err.message);
-                if (err.code === 'permission-denied' || (err.message || '').includes('permission')) {
-                    document.getElementById('permAlert').classList.add('visible');
-                    toast('🔒 Firestore bloqueado. Sigue las instrucciones del recuadro rojo.', 'error');
-                } else {
-                    // Network/timeout error — reintentar después de 3s
-                    setTimeout(() => {
-                        db.collection('registros').orderBy('fecha', 'desc').get().then(snapshot => {
-                            registros = [];
-                            snapshot.forEach(doc => registros.push({ firebaseId: doc.id, ...doc.data() }));
-                            document.getElementById('permAlert').classList.remove('visible');
-                            procesarDatos();
-                        }).catch(e => {
-                            console.warn('Firestore error (segundo intento):', e.message);
-                            toast('⏳ Error de conexión con Firebase. Recarga si persiste.', 'warning');
-                        });
-                    }, 3000);
-                    return; // ← sale para no procesar datos vacíos
+                console.warn('Dashboard: Firestore no disponible, usando cache:', err.message);
+                if (registros.length === 0) {
+                    toast('⏳ Sin conexión. Datos del cache local.', 'warning');
                 }
             }
-
             procesarDatos();
         }
 
@@ -527,7 +571,7 @@ service cloud.firestore {
                     totalKV: kids,
                     totalKM: 0
                 };
-                await db.collection('registros').doc(registroEditando.firebaseId).update(datosActualizados);
+                await fetchWithTimeout('https://firestore.googleapis.com/v1/projects/' + firebaseConfig.projectId + '/databases/(default)/documents/registros/' + registroEditando.firebaseId + '?key=' + firebaseConfig.apiKey, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: toFirestoreFields(datosActualizados) }) }, 15000);
                 toast('✅ Registro actualizado');
                 cerrarModal();
                 cargarDatos();
@@ -541,7 +585,7 @@ service cloud.firestore {
             if (confirm('¿Eliminar este registro permanentemente?')) {
                 try {
                     await firebaseReady;
-                    await db.collection('registros').doc(firebaseId).delete();
+                    await fetchWithTimeout('https://firestore.googleapis.com/v1/projects/' + firebaseConfig.projectId + '/databases/(default)/documents/registros/' + firebaseId + '?key=' + firebaseConfig.apiKey, { method: 'DELETE' }, 15000);
                     toast('🗑️ Registro eliminado');
                     cargarDatos();
                 } catch (err) {

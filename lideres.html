@@ -1360,11 +1360,11 @@
                 maestros = await firestoreGet('lideres_maestros');
                 console.log('LIDERES Firestore:', maestros.length, 'documentos leidos');
                 guardarCacheLocal(maestros);
-                actualizarStats();
-                renderTabla();
             } catch (err) {
-                console.error('Error cargando líderes:', err);
+                console.warn('LIDERES: Firestore no disponible, usando cache:', err.message);
             }
+            actualizarStats();
+            renderTabla();
         }
 
         function actualizarStats() {

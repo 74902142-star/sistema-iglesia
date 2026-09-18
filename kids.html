@@ -1360,11 +1360,11 @@
                 maestros = await firestoreGet('kids_maestros');
                 console.log('KIDS Firestore:', maestros.length, 'documentos leidos');
                 guardarCacheLocal(maestros);
-                actualizarStats();
-                renderTabla();
             } catch (err) {
-                console.error('Error cargando maestros KIDS:', err);
+                console.warn('KIDS: Firestore no disponible, usando cache:', err.message);
             }
+            actualizarStats();
+            renderTabla();
         }
 
         function actualizarStats() {
