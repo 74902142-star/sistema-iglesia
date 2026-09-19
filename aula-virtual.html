@@ -495,11 +495,13 @@ table tr:hover { background: #f8f9fa; }
     <div class="sidebar-section">Navegacion</div>
     <a href="#" onclick="showPage('home')" class="active" data-page="home"><i class="fas fa-home"></i> Inicio</a>
     <a href="#" onclick="showPage('courses')" data-page="courses"><i class="fas fa-book"></i> Cursos</a>
-    <div class="sidebar-section">Mi Cuenta</div>
-    <a href="#" onclick="showPage('dashboard')" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Mi Panel</a>
-    <a href="#" onclick="showPage('my-courses')" data-page="my-courses"><i class="fas fa-book-open"></i> Mis Cursos</a>
-    <a href="#" onclick="showPage('my-exams')" data-page="my-exams"><i class="fas fa-file-alt"></i> Mis Examenes</a>
-    <a href="#" onclick="showPage('my-assignments')" data-page="my-assignments"><i class="fas fa-upload"></i> Mis Trabajos</a>
+    <div id="sidebarMiCuenta" style="display:none">
+      <div class="sidebar-section">Mi Cuenta</div>
+      <a href="#" onclick="showPage('dashboard')" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Mi Panel</a>
+      <a href="#" onclick="showPage('my-courses')" data-page="my-courses"><i class="fas fa-book-open"></i> Mis Cursos</a>
+      <a href="#" onclick="showPage('my-exams')" data-page="my-exams"><i class="fas fa-file-alt"></i> Mis Examenes</a>
+      <a href="#" onclick="showPage('my-assignments')" data-page="my-assignments"><i class="fas fa-upload"></i> Mis Trabajos</a>
+    </div>
     <div id="sidebarAdmin" style="display:none">
       <div class="sidebar-section">Administracion</div>
       <a href="#" onclick="showPage('admin')" data-page="admin"><i class="fas fa-cog"></i> Admin Panel</a>
@@ -523,8 +525,8 @@ table tr:hover { background: #f8f9fa; }
     <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--primary);display:none" class="hamburger-btn"><i class="fas fa-bars"></i></button>
     <h2 id="pageTitle">AULA VIRTUAL</h2>
   </div>
-  <div class="user-info">
-    <span id="headerUserName"></span>
+    <div class="user-info" id="headerUserInfo" style="display:none">
+      <span id="headerUserName"></span>
     <div class="user-menu">
       <button class="user-menu-btn" onclick="toggleUserMenu()">
         <i class="fas fa-circle-user"></i>
@@ -1134,16 +1136,27 @@ function logout() {
 function updateNav() {
   const sidebarAdmin = document.getElementById('sidebarAdmin');
   const sidebarGuest = document.getElementById('sidebarGuest');
+  const sidebarMiCuenta = document.getElementById('sidebarMiCuenta');
   const adminNav = document.getElementById('navAdmin');
+  const headerUserInfo = document.getElementById('headerUserInfo');
   if (currentUser) {
     document.getElementById('navUserName').textContent = currentUser.name.split(' ')[0];
-    if (sidebarAdmin) sidebarAdmin.style.display = currentUser.role === 'admin' ? '' : 'none';
+    if (currentUser.role === 'admin') {
+      if (sidebarAdmin) sidebarAdmin.style.display = '';
+      if (sidebarMiCuenta) sidebarMiCuenta.style.display = '';
+    } else {
+      if (sidebarAdmin) sidebarAdmin.style.display = 'none';
+      if (sidebarMiCuenta) sidebarMiCuenta.style.display = '';
+    }
     if (sidebarGuest) sidebarGuest.style.display = 'none';
     if (adminNav) adminNav.style.display = currentUser.role === 'admin' ? 'block' : 'none';
+    if (headerUserInfo) headerUserInfo.style.display = '';
   } else {
     if (sidebarAdmin) sidebarAdmin.style.display = 'none';
+    if (sidebarMiCuenta) sidebarMiCuenta.style.display = 'none';
     if (sidebarGuest) sidebarGuest.style.display = '';
     if (adminNav) adminNav.style.display = 'none';
+    if (headerUserInfo) headerUserInfo.style.display = 'none';
   }
 }
 
