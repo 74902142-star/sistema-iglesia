@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aula Virtual - Agua Viva</title>
+<title>AULA VIRTUAL Agua Viva Hyo</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -489,7 +489,7 @@ table tr:hover { background: #f8f9fa; }
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <h2><i class="fas fa-graduation-cap"></i> Aula Virtual</h2>
-    <small>Agua Viva</small>
+    <small>Agua Viva Hyo</small>
   </div>
   <nav class="sidebar-menu">
     <div class="sidebar-section">Navegacion</div>
@@ -521,7 +521,7 @@ table tr:hover { background: #f8f9fa; }
 <header class="top-header">
   <div style="display:flex;align-items:center;gap:12px">
     <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--primary);display:none" class="hamburger-btn"><i class="fas fa-bars"></i></button>
-    <h2 id="pageTitle">Aula Virtual</h2>
+    <h2 id="pageTitle">AULA VIRTUAL</h2>
   </div>
   <div class="user-info">
     <span id="headerUserName"></span>
@@ -552,8 +552,8 @@ table tr:hover { background: #f8f9fa; }
 <div id="page-home">
   <div class="hero">
     <div class="container">
-      <h2>Bienvenido a la Escuela Virtual</h2>
-      <p>Aprende en linea con los mejores cursos. Registrate, inscribete en cursos, rinda examenes y suba sus trabajos.</p>
+      <h2>Bienvenido a la Aula Virtual</h2>
+      <p>Aprende en linea con los cursos de la Escuela de Liderazgo. Registrate, inscribete, rinda examenes y suba sus trabajos.</p>
       <a href="#" class="btn" onclick="showPage('courses')">Ver Cursos Disponibles</a>
     </div>
   </div>
@@ -830,7 +830,7 @@ table tr:hover { background: #f8f9fa; }
     <div class="footer-grid">
       <div>
         <h4><i class="fas fa-graduation-cap"></i> Aula Virtual</h4>
-        <p>Plataforma de aprendizaje en linea para la comunidad. Aprende a tu ritmo, desde cualquier lugar.</p>
+        <p>Plataforma de aprendizaje en linea de la Escuela de Liderazgo. Aprende a tu ritmo, desde cualquier lugar.</p>
       </div>
       <div>
         <h4>Enlaces Rapidos</h4>
@@ -844,7 +844,7 @@ table tr:hover { background: #f8f9fa; }
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2026 Aula Virtual Agua Viva. Todos los derechos reservados.</p>
+      <p>&copy; 2026 AULA VIRTUAL Agua Viva Hyo. Todos los derechos reservados.</p>
     </div>
   </div>
 </footer>
@@ -1035,30 +1035,21 @@ function setObj(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
     users.push({ id: 'admin1', name: 'Administrador', email: 'admin@escuela.com', pass: 'admin123', role: 'admin', date: new Date().toISOString() });
     setData('users', users);
   }
-  // Init sample courses if empty
+  // Init EDL courses if empty
   if (getData('courses').length === 0) {
     const samples = [
-      { id: 'c1', name: 'Liderazgo Cristiano', category: 'Liderazgo', desc: 'Aprende los principios fundamentales del liderazgo cristiano para servir en tu comunidad y ministerio de manera efectiva.', color: '1', status: 'active' },
-      { id: 'c2', name: 'Estudio Biblico Avanzado', category: 'Biblia', desc: 'Un recorrido profundo por las escrituras, analizando contextos historicos, teologicos y practicos de la Biblia.', color: '2', status: 'active' },
+      { id: 'c1', name: 'Liderazgo Cristiano', category: 'Liderazgo', desc: 'Principios fundamentales del liderazgo cristiano para servir en tu comunidad y ministerio de manera efectiva.', color: '2', status: 'active' },
+      { id: 'c2', name: 'Estudio Biblico', category: 'Biblia', desc: 'Recorrido profundo por las escrituras, analizando contextos historicos, teologicos y practicos de la Biblia.', color: '2', status: 'active' },
       { id: 'c3', name: 'Teologia Sistematica', category: 'Teologia', desc: 'Estudio organizado de las principales doctrinas de la fe cristiana con aplicacion practica.', color: '4', status: 'active' },
       { id: 'c4', name: 'Ministerio Juvenil', category: 'Ministerio', desc: 'Estrategias y herramientas para el ministerio con jovenes en la era digital.', color: '3', status: 'active' },
       { id: 'c5', name: 'Predicacion Efectiva', category: 'Ministerio', desc: 'Desarrolla habilidades para comunicar el mensaje biblico de manera clara, persuasiva y transformadora.', color: '5', status: 'active' },
       { id: 'c6', name: 'Formacion de Discipulos', category: 'Formacion', desc: 'Metodos practicos para hacer discipulos que hagan discipulos, siguiendo el mandato de Jesus.', color: '6', status: 'active' }
     ];
     setData('courses', samples);
-    // Sample exams
-    const exams = [
-      { id: 'e1', courseId: 'c1', passGrade: 60, questions: [
-        { q: 'Cual es el fundamento del liderazgo cristiano?', opts: ['El poder', 'El servicio', 'La fama', 'El dinero'], correct: 1 },
-        { q: 'Segun la Biblia, quien es el mayor lider?', opts: ['El mas rico', 'El que sirve a todos', 'El que predica', 'El que administra'], correct: 1 },
-        { q: 'Que libro habla sobre el liderazgo de Moises?', opts: ['Romanos', 'Exodo', 'Efesios', 'Proverbios'], correct: 1 }
-      ]},
-      { id: 'e2', courseId: 'c2', passGrade: 70, questions: [
-        { q: 'Cuantos libros tiene el Antiguo Testamento?', opts: ['39', '27', '66', '40'], correct: 0 },
-        { q: 'Quien escribio el libro de Génesis?', opts: ['Pablo', 'Moises', 'Pedro', 'Juan'], correct: 1 }
-      ]}
-    ];
-    setData('exams', exams);
+  }
+  // Init empty exams array if not exists
+  if (!localStorage.getItem('exams')) {
+    setData('exams', []);
   }
 })();
 
