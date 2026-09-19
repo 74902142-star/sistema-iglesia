@@ -875,7 +875,7 @@ table tr:hover { background: #f8f9fa; }
           No tienes cuenta? <a href="#" onclick="closeModal('loginModal');openModal('registerModal')" style="color:var(--primary);font-weight:600">Registrate aqui</a>
         </p>
         <p style="text-align:center;margin-top:10px;font-size:0.8rem;color:var(--text-light)">
-          Admin: admin@escuela.com / admin123
+          Admin: jhonfernandezcondor@gmail.com
         </p>
       </form>
     </div>
@@ -1031,19 +1031,23 @@ function setObj(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 // Init admin user if not exists
 (function initAdmin() {
   let users = getData('users');
-  if (!users.find(u => u.email === 'admin@escuela.com')) {
-    users.push({ id: 'admin1', name: 'Administrador', email: 'admin@escuela.com', pass: 'admin123', role: 'admin', date: new Date().toISOString() });
+  if (!users.find(u => u.email === 'jhonfernandezcondor@gmail.com')) {
+    users.push({ id: 'admin1', name: 'Jhon Smith', email: 'jhonfernandezcondor@gmail.com', pass: 'JSferco18', role: 'admin', date: new Date().toISOString() });
   }
   setData('users', users);
   // Init EDL courses if empty
   if (getData('courses').length === 0) {
     const samples = [
-      { id: 'c1', name: 'Liderazgo Cristiano', category: 'Liderazgo', desc: 'Aprende los principios fundamentales del liderazgo cristiano para servir en tu comunidad y ministerio de manera efectiva.', color: '1', status: 'active' },
-      { id: 'c2', name: 'Estudio Biblico Avanzado', category: 'Biblia', desc: 'Un recorrido profundo por las escrituras, analizando contextos historicos, teologicos y practicos de la Biblia.', color: '2', status: 'active' },
-      { id: 'c3', name: 'Teologia Sistematica', category: 'Teologia', desc: 'Estudio organizado de las principales doctrinas de la fe cristiana con aplicacion practica.', color: '4', status: 'active' },
-      { id: 'c4', name: 'Ministerio Juvenil', category: 'Ministerio', desc: 'Estrategias y herramientas para el ministerio con jovenes en la era digital.', color: '3', status: 'active' },
-      { id: 'c5', name: 'Predicacion Efectiva', category: 'Ministerio', desc: 'Desarrolla habilidades para comunicar el mensaje biblico de manera clara, persuasiva y transformadora.', color: '5', status: 'active' },
-      { id: 'c6', name: 'Formacion de Discipulos', category: 'Formacion', desc: 'Metodos practicos para hacer discipulos que hagan discipulos, siguiendo el mandato de Jesus.', color: '6', status: 'active' }
+      { id: 'disc1_next', name: 'Discipulado 1 NEXT', category: 'Discipulado', desc: 'Curso de discipulado nivel 1 en formato NEXT.', color: '2', status: 'active' },
+      { id: 'disc2_next', name: 'Discipulado 2 NEXT', category: 'Discipulado', desc: 'Curso de discipulado nivel 2 en formato NEXT.', color: '2', status: 'active' },
+      { id: 'disc1', name: 'Discipulado 1', category: 'Discipulado', desc: 'Curso de discipulado nivel 1.', color: '3', status: 'active' },
+      { id: 'disc2', name: 'Discipulado 2', category: 'Discipulado', desc: 'Curso de discipulado nivel 2.', color: '3', status: 'active' },
+      { id: 'disc3', name: 'Discipulado 3', category: 'Discipulado', desc: 'Curso de discipulado nivel 3.', color: '3', status: 'active' },
+      { id: 'lidere1', name: 'Lidere 1', category: 'Liderazgo', desc: 'Curso de liderazgo nivel 1.', color: '5', status: 'active' },
+      { id: 'lidere2', name: 'Lidere 2', category: 'Liderazgo', desc: 'Curso de liderazgo nivel 2.', color: '5', status: 'active' },
+      { id: 'lidere3', name: 'Lidere 3', category: 'Liderazgo', desc: 'Curso de liderazgo nivel 3.', color: '5', status: 'active' },
+      { id: 'sem_apologetica', name: 'Seminario: Apologética', category: 'Seminario', desc: 'Seminario de Apologética.', color: '4', status: 'active' },
+      { id: 'sem_dones', name: 'Seminario: Int. Dones del Espíritu Santo', category: 'Seminario', desc: 'Seminario de Introduccion a los Dones del Espiritu Santo. Requiere Discipulado 3.', color: '4', status: 'active' }
     ];
     setData('courses', samples);
   }
