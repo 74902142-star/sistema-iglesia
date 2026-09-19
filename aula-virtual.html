@@ -875,7 +875,7 @@ table tr:hover { background: #f8f9fa; }
           No tienes cuenta? <a href="#" onclick="closeModal('loginModal');openModal('registerModal')" style="color:var(--primary);font-weight:600">Registrate aqui</a>
         </p>
         <p style="text-align:center;margin-top:10px;font-size:0.8rem;color:var(--text-light)">
-          Admin: jhonfernandezcondor@gmail.com
+          Admin: admin@escuela.com / admin123
         </p>
       </form>
     </div>
@@ -1031,18 +1031,15 @@ function setObj(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 // Init admin user if not exists
 (function initAdmin() {
   let users = getData('users');
-  // Remove old default admin if exists
-  users = users.filter(u => u.email !== 'admin@escuela.com');
-  // Add real admin if not exists
-  if (!users.find(u => u.email === 'jhonfernandezcondor@gmail.com')) {
-    users.push({ id: 'admin1', name: 'Jhon Smith', email: 'jhonfernandezcondor@gmail.com', pass: 'JSferco18', role: 'admin', date: new Date().toISOString() });
+  if (!users.find(u => u.email === 'admin@escuela.com')) {
+    users.push({ id: 'admin1', name: 'Administrador', email: 'admin@escuela.com', pass: 'admin123', role: 'admin', date: new Date().toISOString() });
   }
   setData('users', users);
   // Init EDL courses if empty
   if (getData('courses').length === 0) {
     const samples = [
-      { id: 'c1', name: 'Liderazgo Cristiano', category: 'Liderazgo', desc: 'Principios fundamentales del liderazgo cristiano para servir en tu comunidad y ministerio de manera efectiva.', color: '2', status: 'active' },
-      { id: 'c2', name: 'Estudio Biblico', category: 'Biblia', desc: 'Recorrido profundo por las escrituras, analizando contextos historicos, teologicos y practicos de la Biblia.', color: '2', status: 'active' },
+      { id: 'c1', name: 'Liderazgo Cristiano', category: 'Liderazgo', desc: 'Aprende los principios fundamentales del liderazgo cristiano para servir en tu comunidad y ministerio de manera efectiva.', color: '1', status: 'active' },
+      { id: 'c2', name: 'Estudio Biblico Avanzado', category: 'Biblia', desc: 'Un recorrido profundo por las escrituras, analizando contextos historicos, teologicos y practicos de la Biblia.', color: '2', status: 'active' },
       { id: 'c3', name: 'Teologia Sistematica', category: 'Teologia', desc: 'Estudio organizado de las principales doctrinas de la fe cristiana con aplicacion practica.', color: '4', status: 'active' },
       { id: 'c4', name: 'Ministerio Juvenil', category: 'Ministerio', desc: 'Estrategias y herramientas para el ministerio con jovenes en la era digital.', color: '3', status: 'active' },
       { id: 'c5', name: 'Predicacion Efectiva', category: 'Ministerio', desc: 'Desarrolla habilidades para comunicar el mensaje biblico de manera clara, persuasiva y transformadora.', color: '5', status: 'active' },
