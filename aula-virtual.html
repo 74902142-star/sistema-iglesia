@@ -875,7 +875,7 @@ table tr:hover { background: #f8f9fa; }
           No tienes cuenta? <a href="#" onclick="closeModal('loginModal');openModal('registerModal')" style="color:var(--primary);font-weight:600">Registrate aqui</a>
         </p>
         <p style="text-align:center;margin-top:10px;font-size:0.8rem;color:var(--text-light)">
-          Admin: admin@escuela.com / admin123
+          Admin: jhonfernandezcondor@gmail.com
         </p>
       </form>
     </div>
@@ -1031,10 +1031,13 @@ function setObj(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 // Init admin user if not exists
 (function initAdmin() {
   let users = getData('users');
-  if (!users.find(u => u.email === 'admin@escuela.com')) {
-    users.push({ id: 'admin1', name: 'Administrador', email: 'admin@escuela.com', pass: 'admin123', role: 'admin', date: new Date().toISOString() });
-    setData('users', users);
+  // Remove old default admin if exists
+  users = users.filter(u => u.email !== 'admin@escuela.com');
+  // Add real admin if not exists
+  if (!users.find(u => u.email === 'jhonfernandezcondor@gmail.com')) {
+    users.push({ id: 'admin1', name: 'Jhon Smith', email: 'jhonfernandezcondor@gmail.com', pass: 'JSferco18', role: 'admin', date: new Date().toISOString() });
   }
+  setData('users', users);
   // Init EDL courses if empty
   if (getData('courses').length === 0) {
     const samples = [
