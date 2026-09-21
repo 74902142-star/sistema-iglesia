@@ -297,7 +297,10 @@ service cloud.firestore {
             } catch(e) {}
         }
         function guardarCacheLocal(data) {
-            try { localStorage.setItem('dashboard_registros', JSON.stringify(data)); } catch(e) {}
+            try {
+                localStorage.setItem('dashboard_registros', JSON.stringify(data));
+                localStorage.setItem('dashboard_lastSync', String(Date.now()));
+            } catch(e) {}
         }
 
         function toFirestoreFields(data) {
@@ -335,6 +338,12 @@ service cloud.firestore {
 
         async function cargarDatos() {
             cargarCacheLocal();
+            var ahora = Date.now();
+            var lastSync = parseInt(localStorage.getItem('dashboard_lastSync') || '0');
+            if (ahora - lastSync < 300000 && registros.length > 0) {
+                procesarDatos();
+                return;
+            }
             try {
                 var datos = await firestoreGetREST('registros');
                 registros = datos;
@@ -344,7 +353,7 @@ service cloud.firestore {
             } catch (err) {
                 console.warn('Dashboard: Firestore no disponible, usando cache:', err.message);
                 if (registros.length === 0) {
-                    toast('⏳ Sin conexión. Datos del cache local.', 'warning');
+                    toast('Sin conexion. Datos del cache local.', 'warning');
                 }
             }
             procesarDatos();

@@ -421,6 +421,14 @@
             try {
                 await firebaseReady;
                 await db.collection('registros').add(nuevoRegistro);
+                // Actualizar cache del dashboard
+                try {
+                    var cache = JSON.parse(localStorage.getItem('dashboard_registros') || '[]');
+                    nuevoRegistro.firebaseId = 'local_' + Date.now();
+                    cache.unshift(nuevoRegistro);
+                    localStorage.setItem('dashboard_registros', JSON.stringify(cache));
+                    localStorage.setItem('dashboard_lastSync', String(Date.now()));
+                } catch(e) {}
                 toast('✅ Registro guardado exitosamente');
                 if (esInvitado) {
                     document.getElementById('registroForm').reset();
