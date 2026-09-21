@@ -71,6 +71,12 @@
             </div>
 
             <div class="container">
+                <div id="rateLimitAlert" class="perm-alert" style="display:none;background:#fef3cd;border:1px solid #f59e0b;color:#92400e;">
+                    <h4>⏳ Limite diario de Firestore alcanzado</h4>
+                    <p>Firestore se resetea a medianoche (hora del Pacifico / ~3am Peru). Tus datos estan seguros.</p>
+                    <p>Mientras tanto, los registros nuevos se guardan localmente y se sincronizaran cuando el limite se reinicie.</p>
+                    <button class="btn btn-primary" onclick="location.reload()" style="margin-top:10px">Reintentar</button>
+                </div>
                 <div id="permAlert" class="perm-alert">
                     <h4>🔒 Firestore bloqueado — acción requerida (1 sola vez)</h4>
                     <p>Las reglas de Firebase están cerradas. El código está bien; debes publicar las reglas en la
@@ -350,10 +356,14 @@ service cloud.firestore {
                 registros.sort(function(a, b) { return (b.fecha || '').localeCompare(a.fecha || ''); });
                 guardarCacheLocal(registros);
                 document.getElementById('permAlert').classList.remove('visible');
+                document.getElementById('rateLimitAlert').style.display = 'none';
             } catch (err) {
-                console.warn('Dashboard: Firestore no disponible, usando cache:', err.message);
-                if (registros.length === 0) {
-                    toast('Sin conexion. Datos del cache local.', 'warning');
+                console.warn('Dashboard: Firestore no disponible:', err.message);
+                document.getElementById('rateLimitAlert').style.display = '';
+                if (registros.length > 0) {
+                    toast('Usando datos del cache local.', 'warning');
+                } else {
+                    toast('Sin datos. Firestore bloqueado. Espera al reinicio diario.', 'warning');
                 }
             }
             procesarDatos();
