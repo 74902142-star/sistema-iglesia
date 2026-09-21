@@ -1317,7 +1317,10 @@
         }
 
         function guardarCacheLocal(data) {
-            try { localStorage.setItem('kids_maestros', JSON.stringify(data)); } catch(e) {}
+            try {
+                localStorage.setItem('kids_maestros', JSON.stringify(data));
+                localStorage.setItem('kids_lastSync', String(Date.now()));
+            } catch(e) {}
         }
 
         async function firestoreGet(collection) {
@@ -1357,10 +1360,18 @@
 
         async function cargarMaestros() {
             cargarCacheLocal();
+            var ahora = Date.now();
+            var lastSync = parseInt(localStorage.getItem('kids_lastSync') || '0');
+            if (ahora - lastSync < 300000 && maestros.length > 0) {
+                actualizarStats();
+                renderTabla();
+                return;
+            }
             try {
                 maestros = await firestoreGet('kids_maestros');
                 console.log('KIDS Firestore:', maestros.length, 'documentos leidos');
                 guardarCacheLocal(maestros);
+                localStorage.setItem('kids_lastSync', String(ahora));
             } catch (err) {
                 console.warn('KIDS: Firestore no disponible, usando cache:', err.message);
             }

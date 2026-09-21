@@ -198,6 +198,8 @@
                             </div>
                             <button class="btn btn-primary" onclick="aplicarFiltros()"><i data-lucide="search"
                                     style="width:16px; height:16px;"></i> Filtrar</button>
+                            <button class="btn btn-secondary" onclick="forzarRefresh()" title="Forzar sincronización con Firestore"><i data-lucide="refresh-cw"
+                                    style="width:16px; height:16px;"></i> Sync</button>
                             <button class="btn btn-secondary" onclick="exportarExcel()"><i
                                     data-lucide="file-spreadsheet" style="width:16px; height:16px;"></i> Exportar a
                                 Excel</button>
@@ -818,7 +820,10 @@
         }
 
         function guardarCacheLocal(data) {
-            try { localStorage.setItem('edl_inscripciones', JSON.stringify(data)); } catch(e) {}
+            try {
+                localStorage.setItem('edl_inscripciones', JSON.stringify(data));
+                localStorage.setItem('edl_lastSync', String(Date.now()));
+            } catch(e) {}
         }
 
         function fetchWithTimeout(url, options, ms) {
@@ -931,8 +936,22 @@
             return data;
         }
 
+        function forzarRefresh() {
+            localStorage.setItem('edl_lastSync', '0');
+            cargarInscripciones();
+        }
+
         async function cargarInscripciones() {
             cargarCacheLocal();
+            var ahora = Date.now();
+            var lastSync = parseInt(localStorage.getItem('edl_lastSync') || '0');
+            var cacheAge = ahora - lastSync;
+            // Si cache tiene menos de 5 minutos, usar cache local
+            if (cacheAge < 300000 && inscripciones.length > 0) {
+                console.log('EDL: Usando cache local (age:', Math.round(cacheAge/1000), 's)');
+                aplicarFiltros();
+                return;
+            }
             try {
                 var nuevas = await firestoreGet('inscripciones');
                 console.log('EDL Firestore:', nuevas.length, 'documentos leidos');
@@ -940,6 +959,7 @@
                     inscripciones = nuevas;
                     inscripciones.sort(function(a, b) { return (b.timestamp || '').localeCompare(a.timestamp || ''); });
                     guardarCacheLocal(inscripciones);
+                    localStorage.setItem('edl_lastSync', String(ahora));
                 } else {
                     console.log('EDL: Firestore devolvió 0 documentos.');
                 }
