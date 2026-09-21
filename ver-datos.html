@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Ver Datos - Agua Viva</title>
+<style>
+body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+h2 { color: #00334f; }
+table { width: 100%; border-collapse: collapse; background: white; margin-top: 15px; }
+th, td { padding: 8px 12px; border: 1px solid #ddd; text-align: left; font-size: 0.85rem; }
+th { background: #00334f; color: white; }
+tr:nth-child(even) { background: #f9f9f9; }
+.btn { padding: 10px 20px; background: #1c6390; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+.btn:hover { background: #00334f; }
+.info { background: #fef3cd; padding: 12px; border-radius: 6px; margin-bottom: 15px; color: #856404; }
+.error { background: #f8d7da; padding: 12px; border-radius: 6px; margin-bottom: 15px; color: #721c24; }
+.ok { background: #d4edda; padding: 12px; border-radius: 6px; margin-bottom: 15px; color: #155724; }
+#resultado { margin-top: 20px; }
+</style>
+</head>
+<body>
+<h2>Datos de Firestore - Agua Viva</h2>
+<div class="info">Este script intenta leer los datos directamente. Si Firestore esta bloqueado por limite diario, no funcionara.</div>
+<button class="btn" onclick="leerRegistros()">Leer Registros (Dashboard)</button>
+<button class="btn" onclick="leerInscripciones()" style="margin-left:10px">Leer Inscripciones (EDL)</button>
+<button class="btn" onclick="leerTodos()" style="margin-left:10px">Leer Todos</button>
+<div id="resultado"></div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBpfz1h1IlYx-CZ9Km9J1TqsJOJNn1-j-E",
+  projectId: "iglesia-agua-viva"
+};
+
+async function firestoreList(collection) {
+  var url = 'https://firestore.googleapis.com/v1/projects/' + firebaseConfig.projectId + '/databases/(default)/documents/' + collection + '?key=' + firebaseConfig.apiKey + '&pageSize=1000';
+  var resp = await fetch(url);
+  var json = await resp.json();
+  if (json.error) throw new Error(json.error.message);
+  if (!json.documents) return [];
+  return json.documents.map(function(doc) {
+    var data = {};
+    var fields = doc.fields || {};
+    Object.keys(fields).forEach(function(key) {
+      var f = fields[key];
+      if (f.stringValue !== undefined) data[key] = f.stringValue;
+      else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
+      else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
+      else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
+      else data[key] = String(f.timestampValue || f.arrayValue || f.mapValue || '');
+    });
+    var parts = doc.name.split('/');
+    data._id = parts[parts.length - 1];
+    return data;
+  });
+}
+
+function renderTabla(datos, titulo) {
+  if (datos.length === 0) return '<p>No hay datos</p>';
+  var cols = Object.keys(datos[0]).filter(k => !k.startsWith('_'));
+  var html = '<h3>' + titulo + ' (' + datos.length + ' registros)</h3>';
+  html += '<table><tr>';
+  cols.forEach(c => html += '<th>' + c + '</th>');
+  html += '</tr>';
+  datos.forEach(d => {
+    html += '<tr>';
+    cols.forEach(c => html += '<td>' + (d[c] || '') + '</td>');
+    html += '</tr>';
+  });
+  html += '</table>';
+  return html;
+}
+
+async function leerRegistros() {
+  var div = document.getElementById('resultado');
+  div.innerHTML = '<div class="info">Leyendo registros...</div>';
+  try {
+    var data = await firestoreList('registros');
+    data.sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
+    div.innerHTML = '<div class="ok">Leidos ' + data.length + ' registros</div>' + renderTabla(data, 'Registros Dashboard');
+  } catch(e) {
+    div.innerHTML = '<div class="error">Error: ' + e.message + '</div>';
+  }
+}
+
+async function leerInscripciones() {
+  var div = document.getElementById('resultado');
+  div.innerHTML = '<div class="info">Leyendo inscripciones...</div>';
+  try {
+    var data = await firestoreList('inscripciones');
+    data.sort((a,b) => (b.timestamp||'').localeCompare(a.timestamp||''));
+    div.innerHTML = '<div class="ok">Leidos ' + data.length + ' inscripciones</div>' + renderTabla(data, 'Inscripciones EDL');
+  } catch(e) {
+    div.innerHTML = '<div class="error">Error: ' + e.message + '</div>';
+  }
+}
+
+async function leerTodos() {
+  var div = document.getElementById('resultado');
+  div.innerHTML = '<div class="info">Leyendo todos los datos...</div>';
+  try {
+    var registros = await firestoreList('registros');
+    registros.sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
+    var inscripciones = await firestoreList('inscripciones');
+    inscripciones.sort((a,b) => (b.timestamp||'').localeCompare(a.timestamp||''));
+    div.innerHTML = '<div class="ok">Registros: ' + registros.length + ' | Inscripciones: ' + inscripciones.length + '</div>'
+      + renderTabla(registros, 'Registros Dashboard')
+      + renderTabla(inscripciones, 'Inscripciones EDL');
+  } catch(e) {
+    div.innerHTML = '<div class="error">Error: ' + e.message + '</div>';
+  }
+}
+</script>
+</body>
+</html>
