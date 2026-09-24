@@ -578,7 +578,6 @@ service cloud.firestore {
 
         async function guardarEdicion() {
             try {
-                await firebaseReady;
                 let kids = parseInt(document.getElementById('editKids').value) || 0;
                 let datosActualizados = {
                     fecha: document.getElementById('editFecha').value,
@@ -591,12 +590,23 @@ service cloud.firestore {
                     totalKV: kids,
                     totalKM: 0
                 };
-                await fetchWithTimeout('https://firestore.googleapis.com/v1/projects/' + firebaseConfig.projectId + '/databases/(default)/documents/registros/' + registroEditando.firebaseId + '?key=' + firebaseConfig.apiKey, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: toFirestoreFields(datosActualizados) }) }, 15000);
-                toast('✅ Registro actualizado');
+                
+                // 1. Guardar localmente de inmediato
+                let idx = registros.findIndex(r => r.firebaseId === registroEditando.firebaseId);
+                if (idx !== -1) {
+                    registros[idx] = { ...registros[idx], ...datosActualizados };
+                    guardarCacheLocal(registros);
+                }
+                procesarDatos(); // Actualizar UI
                 cerrarModal();
-                cargarDatos();
+                toast('✅ Cambio guardado localmente');
+
+                // 2. Intentar guardar en Firebase
+                await firebaseReady;
+                await fetchWithTimeout('https://firestore.googleapis.com/v1/projects/' + firebaseConfig.projectId + '/databases/(default)/documents/registros/' + registroEditando.firebaseId + '?key=' + firebaseConfig.apiKey, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: toFirestoreFields(datosActualizados) }) }, 15000);
             } catch (err) {
-                toast('❌ Error al guardar: ' + err.message, 'error');
+                console.error(err);
+                toast('⚠️ Guardado localmente, pero error al sincronizar: ' + err.message, 'warning');
             }
         }
 
