@@ -19,38 +19,20 @@ tr:nth-child(even) { background: #f9f9f9; }
 </style>
 </head>
 <body>
-<h2>Datos de Firestore - Agua Viva</h2>
-<div class="info">Este script intenta leer los datos directamente. Si Firestore esta bloqueado por limite diario, no funcionara.</div>
+<h2>Datos de Supabase - Agua Viva</h2>
+<div class="info">Lee los datos directamente desde Supabase (sin limite diario de lecturas).</div>
 <button class="btn" onclick="leerRegistros()">Leer Registros (Dashboard)</button>
 <button class="btn" onclick="leerInscripciones()" style="margin-left:10px">Leer Inscripciones (EDL)</button>
 <button class="btn" onclick="leerTodos()" style="margin-left:10px">Leer Todos</button>
 <div id="resultado"></div>
 
+<script src="supabase.js?v=1"></script>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBpfz1h1IlYx-CZ9Km9J1TqsJOJNn1-j-E",
-  projectId: "iglesia-agua-viva"
-};
-
 async function firestoreList(collection) {
-  var url = 'https://firestore.googleapis.com/v1/projects/' + firebaseConfig.projectId + '/databases/(default)/documents/' + collection + '?key=' + firebaseConfig.apiKey + '&pageSize=1000';
-  var resp = await fetch(url);
-  var json = await resp.json();
-  if (json.error) throw new Error(json.error.message);
-  if (!json.documents) return [];
-  return json.documents.map(function(doc) {
-    var data = {};
-    var fields = doc.fields || {};
-    Object.keys(fields).forEach(function(key) {
-      var f = fields[key];
-      if (f.stringValue !== undefined) data[key] = f.stringValue;
-      else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
-      else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
-      else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
-      else data[key] = String(f.timestampValue || f.arrayValue || f.mapValue || '');
-    });
-    var parts = doc.name.split('/');
-    data._id = parts[parts.length - 1];
+  var rows = await SB.select(collection);
+  return rows.map(function(r) {
+    var data = Object.assign({}, r);
+    data._id = r.id;
     return data;
   });
 }

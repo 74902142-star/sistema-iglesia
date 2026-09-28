@@ -3,14 +3,15 @@
 // Pegar en: Extensiones > Apps Script del Google Sheet
 // ══════════════════════════════════════════════════════════
 
-const PROJECT_ID = 'iglesia-agua-viva';
+const SUPABASE_URL = 'https://bhuxtunecrqybnlmdspy.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_O2I6gdmeKFfxE5J6KO5kcA_2-sADXLy';
 const SHEET_NAME = 'Inscripciones EDL';
 
 function actualizarSheet() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME)
     || SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
-  // 1. Leer inscripciones de Firebase
+  // 1. Leer inscripciones de Supabase
   const inscripciones = obtenerInscripciones();
   if (inscripciones.length === 0) {
     sheet.getRange('A1').setValue('Sin datos de inscripciones');
@@ -133,47 +134,35 @@ function actualizarSheet() {
 }
 
 function obtenerInscripciones() {
-  const url = 'https://firestore.googleapis.com/v1/projects/' + PROJECT_ID + '/databases/(default)/documents/inscripciones';
-  const options = { method: 'get', muteHttpExceptions: true };
+  const url = SUPABASE_URL + '/rest/v1/inscripciones?select=*&order=timestamp.desc&limit=1000';
+  const options = {
+    method: 'get',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    },
+    muteHttpExceptions: true
+  };
 
-  let allDocs = [];
-  let pageToken = '';
+  const response = UrlFetchApp.fetch(url, options);
+  const rows = JSON.parse(response.getContentText());
+  if (!Array.isArray(rows)) {
+    Logger.log('Error Supabase: ' + response.getContentText());
+    return [];
+  }
 
-  do {
-    const requestUrl = pageToken ? url + '?pageToken=' + pageToken : url;
-    const response = UrlFetchApp.fetch(requestUrl, options);
-    const json = JSON.parse(response.getContentText());
-
-    if (json.documents) {
-      json.documents.forEach(doc => {
-        const f = doc.fields || {};
-        allDocs.push({
-          nombres:      extraerCampo(f.nombres),
-          dni:          extraerCampo(f.dni),
-          celular:      extraerCampo(f.celular),
-          correo:       extraerCampo(f.correo),
-          lider:        extraerCampo(f.lider),
-          sede:         extraerCampo(f.sede),
-          curso:        extraerCampo(f.cursoNombre),
-          fechaHorario: extraerCampo(f.fechaHorario),
-          estadoPago:   extraerCampo(f.estadoPago),
-          monto:        extraerCampo(f.monto)
-        });
-      });
-    }
-    pageToken = json.nextPageToken || '';
-  } while (pageToken);
-
-  return allDocs;
-}
-
-function extraerCampo(field) {
-  if (!field) return '';
-  if (field.stringValue !== undefined) return field.stringValue;
-  if (field.integerValue !== undefined) return field.integerValue;
-  if (field.doubleValue !== undefined) return field.doubleValue;
-  if (field.booleanValue !== undefined) return field.booleanValue ? 'Sí' : 'No';
-  return '';
+  return rows.map(r => ({
+    nombres:      r.nombres || '',
+    dni:          r.dni || '',
+    celular:      r.celular || '',
+    correo:       r.correo || '',
+    lider:        r.lider || '',
+    sede:         r.sede || '',
+    curso:        r.cursoNombre || '',
+    fechaHorario: r.fechaHorario || '',
+    estadoPago:   r.estadoPago || '',
+    monto:        r.monto || ''
+  }));
 }
 
 // ══════════════════════════════════════════════════════════
@@ -182,7 +171,7 @@ function extraerCampo(field) {
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('🔄 Actualizar')
-    .addItem('Actualizar desde Firebase', 'actualizarSheet')
+    .addItem('Actualizar desde Supabase', 'actualizarSheet')
     .addToUi();
 
   // Auto-actualizar al abrir

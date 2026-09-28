@@ -52,12 +52,8 @@
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="firebase-config.js?v=3"></script>
+    <script src="supabase.js?v=1"></script>
     <script src="auth.js"></script>
-    <script src="firebase-auth.js"></script>
 </head>
 
 <body>
@@ -191,14 +187,14 @@
                             <div class="filter-group">
                                 <label>📅 Ciclo</label>
                                 <select id="filtroCiclo" class="filter-select">
+                                    <option value="">Todos los ciclos</option>
                                     <option value="202620">202620 (Actual)</option>
                                     <option value="202610">202610 (Anterior)</option>
-                                    <option value="">Todos los ciclos</option>
                                 </select>
                             </div>
                             <button class="btn btn-primary" onclick="aplicarFiltros()"><i data-lucide="search"
                                     style="width:16px; height:16px;"></i> Filtrar</button>
-                            <button class="btn btn-secondary" onclick="forzarRefresh()" title="Forzar sincronización con Firestore"><i data-lucide="refresh-cw"
+                            <button class="btn btn-secondary" onclick="forzarRefresh()" title="Forzar sincronización con Supabase"><i data-lucide="refresh-cw"
                                     style="width:16px; height:16px;"></i> Sync</button>
                             <button class="btn btn-secondary" onclick="exportarExcel()"><i
                                     data-lucide="file-spreadsheet" style="width:16px; height:16px;"></i> Exportar a
@@ -826,115 +822,7 @@
             } catch(e) {}
         }
 
-        function fetchWithTimeout(url, options, ms) {
-            return new Promise(function(resolve, reject) {
-                var timer = setTimeout(function() { reject(new Error('Timeout ' + ms + 'ms')); }, ms);
-                fetch(url, options).then(function(res) { clearTimeout(timer); resolve(res); }, function(err) { clearTimeout(timer); reject(err); });
-            });
-        }
-
-        async function firestoreGet(collection) {
-            return await firestoreGetREST(collection);
-        }
-
-        async function firestoreGetREST(collection) {
-            var projectId = firebaseConfig.projectId;
-            var apiKey = firebaseConfig.apiKey;
-            var allDocs = [];
-            var pageToken = '';
-            do {
-                var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?key=' + apiKey + '&pageSize=1000' + (pageToken ? '&pageToken=' + pageToken : '');
-                var resp = await fetchWithTimeout(url, {}, 15000);
-                var json = await resp.json();
-                if (json.documents) allDocs = allDocs.concat(json.documents);
-                pageToken = json.nextPageToken || '';
-            } while (pageToken);
-            if (allDocs.length === 0) return [];
-            return allDocs.map(function(doc) {
-                var data = {};
-                var fields = doc.fields || {};
-                Object.keys(fields).forEach(function(key) {
-                    var f = fields[key];
-                    if (f.stringValue !== undefined) data[key] = f.stringValue;
-                    else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
-                    else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
-                    else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
-                    else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
-                    else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || v.integerValue || v.doubleValue || v.booleanValue || ''; }) : [];
-                    else if (f.mapValue !== undefined) data[key] = f.mapValue.fields || {};
-                    else data[key] = '';
-                });
-                var parts = doc.name.split('/');
-                return { id: parts[parts.length - 1], _path: doc.name, ...data };
-            });
-        }
-
-        function toFirestoreFields(data) {
-            var fields = {};
-            Object.keys(data).forEach(function(key) {
-                var v = data[key];
-                if (v === undefined || v === null) return;
-                if (typeof v === 'string') fields[key] = { stringValue: v };
-                else if (typeof v === 'number') fields[key] = Number.isInteger(v) ? { integerValue: v } : { doubleValue: v };
-                else if (typeof v === 'boolean') fields[key] = { booleanValue: v };
-                else if (Array.isArray(v)) fields[key] = { arrayValue: { values: v.map(function(item) { return typeof item === 'string' ? { stringValue: item } : { stringValue: String(item) }; }) } };
-                else if (typeof v === 'object') fields[key] = { mapValue: { fields: toFirestoreFields(v) } };
-            });
-            return fields;
-        }
-
-        async function firestoreAddREST(collection, data) {
-            var projectId = firebaseConfig.projectId;
-            var apiKey = firebaseConfig.apiKey;
-            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?key=' + apiKey;
-            var resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: toFirestoreFields(data) }) });
-            if (!resp.ok) throw new Error('Error guardando: ' + resp.status);
-            return await resp.json();
-        }
-
-        async function firestoreAdd(collection, data) {
-            return await firestoreAddREST(collection, data);
-        }
-
-        async function firestoreUpdateDoc(collection, docId, data) {
-            var projectId = firebaseConfig.projectId;
-            var apiKey = firebaseConfig.apiKey;
-            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
-            var resp = await fetchWithTimeout(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: toFirestoreFields(data) }) }, 15000);
-            if (!resp.ok) throw new Error('Error actualizando: ' + resp.status);
-            return await resp.json();
-        }
-
-        async function firestoreDeleteDoc(collection, docId) {
-            var projectId = firebaseConfig.projectId;
-            var apiKey = firebaseConfig.apiKey;
-            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
-            var resp = await fetchWithTimeout(url, { method: 'DELETE' }, 15000);
-            if (!resp.ok) throw new Error('Error eliminando: ' + resp.status);
-        }
-
-        async function firestoreGetDoc(collection, docId) {
-            var projectId = firebaseConfig.projectId;
-            var apiKey = firebaseConfig.apiKey;
-            var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId + '?key=' + apiKey;
-            var resp = await fetchWithTimeout(url, {}, 15000);
-            var json = await resp.json();
-            var data = {};
-            var fields = json.fields || {};
-            Object.keys(fields).forEach(function(key) {
-                var f = fields[key];
-                if (f.stringValue !== undefined) data[key] = f.stringValue;
-                else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
-                else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
-                else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
-                else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
-                else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || ''; }) : [];
-                else data[key] = '';
-            });
-            var parts = json.name.split('/');
-            data.id = parts[parts.length - 1];
-            return data;
-        }
+        // Acciones CRUD: firestoreGet/Add/Update/Delete vienen de supabase.js (Supabase)
 
         function forzarRefresh() {
             localStorage.setItem('edl_lastSync', '0');
@@ -954,18 +842,18 @@
             }
             try {
                 var nuevas = await firestoreGet('inscripciones');
-                console.log('EDL Firestore:', nuevas.length, 'documentos leidos');
+                console.log('EDL Supabase:', nuevas.length, 'documentos leidos');
                 if (nuevas.length > 0) {
                     inscripciones = nuevas;
                     inscripciones.sort(function(a, b) { return (b.timestamp || '').localeCompare(a.timestamp || ''); });
                     guardarCacheLocal(inscripciones);
                     localStorage.setItem('edl_lastSync', String(ahora));
                 } else {
-                    console.log('EDL: Firestore devolvió 0 documentos.');
+                    console.log('EDL: Supabase devolvió 0 documentos.');
                 }
                 aplicarFiltros();
             } catch (err) {
-                console.warn('EDL: Firestore no disponible, usando cache local:', err.message);
+                console.warn('EDL: Supabase no disponible, usando cache local:', err.message);
                 if (inscripciones.length > 0) {
                     aplicarFiltros();
                 } else {
@@ -1203,7 +1091,7 @@
             if (confirm('¿Eliminar esta inscripción?')) {
                 try {
                     await firestoreDeleteDoc('inscripciones', id);
-                } catch(e) { console.warn('Delete from Firestore failed, removing locally'); }
+                } catch(e) { console.warn('Delete from Supabase failed, removing locally'); }
                 inscripciones = inscripciones.filter(x => x.id !== id);
                 guardarCacheLocal(inscripciones);
                 aplicarFiltros();
@@ -1214,7 +1102,7 @@
         async function toggleEstadoPago(id, nuevoEstado) {
             try {
                 await firestoreUpdateDoc('inscripciones', id, { estadoPago: nuevoEstado });
-            } catch(e) { console.warn('Update Firestore failed, updating locally'); }
+            } catch(e) { console.warn('Update Supabase failed, updating locally'); }
             var item = inscripciones.find(x => x.id === id);
             if (item) item.estadoPago = nuevoEstado;
             guardarCacheLocal(inscripciones);

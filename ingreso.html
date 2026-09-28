@@ -9,10 +9,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js?v=3"></script>
-    <script src="firebase-auth.js"></script>
+    <script src="supabase.js?v=1"></script>
 </head>
 
 <body>
@@ -420,11 +417,11 @@
 
             try {
                 await firebaseReady;
-                await db.collection('registros').add(nuevoRegistro);
-                // Actualizar cache del dashboard
+                const ref = await db.collection('registros').add(nuevoRegistro);
+                // Actualizar cache del dashboard con el id real de Supabase
                 try {
                     var cache = JSON.parse(localStorage.getItem('dashboard_registros') || '[]');
-                    nuevoRegistro.firebaseId = 'local_' + Date.now();
+                    nuevoRegistro.firebaseId = ref.id;
                     cache.unshift(nuevoRegistro);
                     localStorage.setItem('dashboard_registros', JSON.stringify(cache));
                     localStorage.setItem('dashboard_lastSync', String(Date.now()));
@@ -440,7 +437,7 @@
                     setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
                 }
             } catch (err) {
-                console.error('Error Firebase:', err);
+                console.error('Error Supabase:', err);
                 toast('❌ Error al guardar: ' + err.message, 'error');
                 btn.disabled = false;
                 btn.innerHTML = '<i data-lucide="save" style="width: 16px; height: 16px;"></i> Guardar Registro';

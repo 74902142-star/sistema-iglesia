@@ -9,11 +9,8 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js?v=3"></script>
+    <script src="supabase.js?v=1"></script>
     <script src="auth.js"></script>
-    <script src="firebase-auth.js"></script>
     <style>
         /* Guest Mode - Full Screen No Sidebar */
         body.guest-mode .sidebar,
@@ -1299,8 +1296,8 @@
             }
         }
 
-        const dbKids = db.collection('kids_maestros');
-        const dbAsistencia = db.collection('kids_asistencia');
+        const dbKids = sb.collection('kids_maestros');
+        const dbAsistencia = sb.collection('kids_asistencia');
         let maestros = [];
         let maestroActual = null; // selected teacher for actions
 
@@ -1323,40 +1320,7 @@
             } catch(e) {}
         }
 
-        async function firestoreGet(collection) {
-            return await firestoreGetREST(collection);
-        }
-
-        async function firestoreGetREST(collection) {
-            var projectId = firebaseConfig.projectId;
-            var apiKey = firebaseConfig.apiKey;
-            var allDocs = [];
-            var pageToken = '';
-            do {
-                var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?key=' + apiKey + '&pageSize=1000' + (pageToken ? '&pageToken=' + pageToken : '');
-                var resp = await fetch(url);
-                var json = await resp.json();
-                if (json.documents) allDocs = allDocs.concat(json.documents);
-                pageToken = json.nextPageToken || '';
-            } while (pageToken);
-            if (allDocs.length === 0) return [];
-            return allDocs.map(function(doc) {
-                var data = {};
-                var fields = doc.fields || {};
-                Object.keys(fields).forEach(function(key) {
-                    var f = fields[key];
-                    if (f.stringValue !== undefined) data[key] = f.stringValue;
-                    else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
-                    else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
-                    else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
-                    else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
-                    else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || ''; }) : [];
-                    else data[key] = '';
-                });
-                var parts = doc.name.split('/');
-                return { id: parts[parts.length - 1], ...data };
-            });
-        }
+        // Lectura: firestoreGet/firestoreGetREST vienen de supabase.js (Supabase)
 
         async function cargarMaestros() {
             cargarCacheLocal();
@@ -1369,11 +1333,11 @@
             }
             try {
                 maestros = await firestoreGet('kids_maestros');
-                console.log('KIDS Firestore:', maestros.length, 'documentos leidos');
+                console.log('KIDS Supabase:', maestros.length, 'documentos leidos');
                 guardarCacheLocal(maestros);
                 localStorage.setItem('kids_lastSync', String(ahora));
             } catch (err) {
-                console.warn('KIDS: Firestore no disponible, usando cache:', err.message);
+                console.warn('KIDS: Supabase no disponible, usando cache:', err.message);
             }
             actualizarStats();
             renderTabla();
@@ -1515,11 +1479,11 @@
             await firebaseReady;
             let snap = await dbKids.where('dni', '==', dni).get();
             if (snap.empty) {
-                const dbLideres = firebase.firestore().collection('lideres_maestros');
+                const dbLideres = sb.collection('lideres_maestros');
                 snap = await dbLideres.where('dni', '==', dni).get();
             }
             if (snap.empty) {
-                const dbInsc = firebase.firestore().collection('inscripciones');
+                const dbInsc = sb.collection('inscripciones');
                 const inscSnap = await dbInsc.where('dni', '==', dni).get();
                 if (!inscSnap.empty) {
                     const insc = inscSnap.docs[0].data();
@@ -1613,7 +1577,7 @@
                     origen: 'auto-registro'
                 });
                 // Also save to lideres_maestros (shared members)
-                const dbLideres = firebase.firestore().collection('lideres_maestros');
+                const dbLideres = sb.collection('lideres_maestros');
                 const existLideres = await dbLideres.where('dni', '==', dni).get();
                 if (existLideres.empty) {
                     await dbLideres.add({

@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Importar Maestros KIDS | Iglesia Agua Viva</title>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js">
-    </script>
-    <script src="firebase-config.js?v=3"></script>
+    <script src="supabase.js?v=1"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -285,7 +281,7 @@
             { dni: '72549172', nombres: 'Roger Porras', celular: '999999999', sexo: 'Masculino', lider: 'Pendiente' },
         ];
 
-        const dbKids = db.collection('kids_maestros');
+        const dbKids = sb.collection('kids_maestros');
         let resultados = [];
 
         function renderPreview() {
@@ -387,18 +383,7 @@
                 const snap = await dbKids.get();
                 let count = 0;
                 const batchSize = 500;
-                let batch = db.batch();
-                let ops = 0;
-
-                snap.forEach(doc => {
-                    batch.delete(doc.ref);
-                    ops++;
-                    if (ops >= batchSize) {
-                        // Can't commit here in forEach, need different approach
-                    }
-                });
-
-                // Simpler: delete one by one
+                // Eliminar uno por uno
                 for (const doc of snap.docs) {
                     await doc.ref.delete();
                     count++;

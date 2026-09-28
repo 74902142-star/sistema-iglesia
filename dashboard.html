@@ -11,10 +11,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js?v=3"></script>
-    <script src="firebase-auth.js"></script>
+    <script src="supabase.js?v=1"></script>
 </head>
 
 <body>
@@ -72,31 +69,9 @@
 
             <div class="container">
                 <div id="rateLimitAlert" class="perm-alert" style="display:none;background:#fef3cd;border:1px solid #f59e0b;color:#92400e;">
-                    <h4>⏳ Limite diario de Firestore alcanzado</h4>
-                    <p>Firestore se resetea a medianoche (hora del Pacifico / ~3am Peru). Tus datos estan seguros.</p>
-                    <p>Mientras tanto, los registros nuevos se guardan localmente y se sincronizaran cuando el limite se reinicie.</p>
+                    <h4>⏳ Sin conexión con la base de datos</h4>
+                    <p>No se pudo conectar con Supabase. Revisa tu conexión a internet; tus datos locales siguen seguros.</p>
                     <button class="btn btn-primary" onclick="location.reload()" style="margin-top:10px">Reintentar</button>
-                </div>
-                <div id="permAlert" class="perm-alert">
-                    <h4>🔒 Firestore bloqueado — acción requerida (1 sola vez)</h4>
-                    <p>Las reglas de Firebase están cerradas. El código está bien; debes publicar las reglas en la
-                        consola:</p>
-                    <ol>
-                        <li>Abre <a href="https://console.firebase.google.com/project/iglesia-agua-viva/firestore/rules"
-                                target="_blank">Firebase Console → Reglas</a></li>
-                        <li>Borra todo el contenido y pega las reglas de abajo</li>
-                        <li>Pulsa <strong>Publicar</strong> y recarga esta página (Ctrl+F5)</li>
-                    </ol>
-                    <pre id="rulesText">rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /registros/{docId} { allow read, write: if true; }
-    match /participantes/{docId} { allow read, write: if true; }
-    match /creativos/{docId} { allow read, write: if true; }
-    match /inscripciones/{docId} { allow read, write: if true; }
-  }
-}</pre>
-                    <button class="btn-copy btn" onclick="copiarReglas()">📋 Copiar reglas</button>
                 </div>
 
                 <div class="filters-bar">
@@ -258,43 +233,7 @@ service cloud.firestore {
         let chartSedes, chartTendencia, chartGenero;
         let registroEditando = null;
 
-        function fetchWithTimeout(url, options, ms) {
-            return new Promise(function(resolve, reject) {
-                var timer = setTimeout(function() { reject(new Error('Timeout ' + ms + 'ms')); }, ms);
-                fetch(url, options).then(function(res) { clearTimeout(timer); resolve(res); }, function(err) { clearTimeout(timer); reject(err); });
-            });
-        }
-
-        async function firestoreGetREST(collection) {
-            var projectId = firebaseConfig.projectId;
-            var apiKey = firebaseConfig.apiKey;
-            var allDocs = [];
-            var pageToken = '';
-            do {
-                var url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?key=' + apiKey + '&pageSize=1000' + (pageToken ? '&pageToken=' + pageToken : '');
-                var resp = await fetchWithTimeout(url, {}, 15000);
-                var json = await resp.json();
-                if (json.documents) allDocs = allDocs.concat(json.documents);
-                pageToken = json.nextPageToken || '';
-            } while (pageToken);
-            if (allDocs.length === 0) return [];
-            return allDocs.map(function(doc) {
-                var data = {};
-                var fields = doc.fields || {};
-                Object.keys(fields).forEach(function(key) {
-                    var f = fields[key];
-                    if (f.stringValue !== undefined) data[key] = f.stringValue;
-                    else if (f.integerValue !== undefined) data[key] = parseInt(f.integerValue);
-                    else if (f.doubleValue !== undefined) data[key] = f.doubleValue;
-                    else if (f.booleanValue !== undefined) data[key] = f.booleanValue;
-                    else if (f.timestampValue !== undefined) data[key] = f.timestampValue;
-                    else if (f.arrayValue !== undefined) data[key] = f.arrayValue.values ? f.arrayValue.values.map(function(v) { return v.stringValue || ''; }) : [];
-                    else data[key] = '';
-                });
-                var parts = doc.name.split('/');
-                return { firebaseId: parts[parts.length - 1], ...data };
-            });
-        }
+        // Lectura de datos: firestoreGetREST viene de supabase.js (Supabase)
 
         function cargarCacheLocal() {
             try {
@@ -307,19 +246,6 @@ service cloud.firestore {
                 localStorage.setItem('dashboard_registros', JSON.stringify(data));
                 localStorage.setItem('dashboard_lastSync', String(Date.now()));
             } catch(e) {}
-        }
-
-        function toFirestoreFields(data) {
-            var fields = {};
-            Object.keys(data).forEach(function(key) {
-                var v = data[key];
-                if (v === undefined || v === null) return;
-                if (typeof v === 'string') fields[key] = { stringValue: v };
-                else if (typeof v === 'number') fields[key] = Number.isInteger(v) ? { integerValue: v } : { doubleValue: v };
-                else if (typeof v === 'boolean') fields[key] = { booleanValue: v };
-                else fields[key] = { stringValue: String(v) };
-            });
-            return fields;
         }
 
         function formatearSede(sedeId) {
@@ -355,15 +281,14 @@ service cloud.firestore {
                 registros = datos;
                 registros.sort(function(a, b) { return (b.fecha || '').localeCompare(a.fecha || ''); });
                 guardarCacheLocal(registros);
-                document.getElementById('permAlert').classList.remove('visible');
                 document.getElementById('rateLimitAlert').style.display = 'none';
             } catch (err) {
-                console.warn('Dashboard: Firestore no disponible:', err.message);
-                document.getElementById('rateLimitAlert').style.display = '';
+                console.warn('Dashboard: Supabase no disponible:', err.message);
+                document.getElementById('rateLimitAlert').style.display = 'block';
                 if (registros.length > 0) {
                     toast('Usando datos del cache local.', 'warning');
                 } else {
-                    toast('Sin datos. Firestore bloqueado. Espera al reinicio diario.', 'warning');
+                    toast('Sin datos. Sin conexión con la base de datos.', 'warning');
                 }
             }
             procesarDatos();
@@ -602,9 +527,9 @@ service cloud.firestore {
                 cerrarModal();
                 toast('✅ Cambio guardado localmente');
 
-                // 2. Intentar guardar en Firebase
+                // 2. Intentar guardar en Supabase
                 await firebaseReady;
-                await fetchWithTimeout('https://firestore.googleapis.com/v1/projects/' + firebaseConfig.projectId + '/databases/(default)/documents/registros/' + registroEditando.firebaseId + '?key=' + firebaseConfig.apiKey, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: toFirestoreFields(datosActualizados) }) }, 15000);
+                await firestoreUpdateDoc('registros', registroEditando.firebaseId, datosActualizados);
             } catch (err) {
                 console.error(err);
                 toast('⚠️ Guardado localmente, pero error al sincronizar: ' + err.message, 'warning');
@@ -622,10 +547,10 @@ service cloud.firestore {
                 }
                 procesarDatos();
                 toast('🗑️ Registro eliminado');
-                // 2. Intentar eliminar de Firebase
+                // 2. Intentar eliminar de Supabase
                 try {
                     await firebaseReady;
-                    await fetchWithTimeout('https://firestore.googleapis.com/v1/projects/' + firebaseConfig.projectId + '/databases/(default)/documents/registros/' + firebaseId + '?key=' + firebaseConfig.apiKey, { method: 'DELETE' }, 15000);
+                    await firestoreDeleteDoc('registros', firebaseId);
                 } catch (err) {
                     console.error(err);
                     toast('⚠️ Eliminado localmente, pero error al sincronizar: ' + err.message, 'warning');
@@ -655,12 +580,6 @@ service cloud.firestore {
             t.innerText = msg;
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 4000);
-        }
-
-        function copiarReglas() {
-            navigator.clipboard.writeText(document.getElementById('rulesText').innerText).then(() => {
-                toast('📋 Reglas copiadas. Pégalas en Firebase Console → Reglas → Publicar');
-            });
         }
 
         function cerrarSesion() {

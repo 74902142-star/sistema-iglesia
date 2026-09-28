@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Importar Maestros KIDS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js?v=3"></script>
+    <script src="supabase.js?v=1"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f0f4ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
@@ -92,8 +90,7 @@
             btn.textContent = '⏳ Importando...';
             let importados = 0, duplicados = 0;
 
-            const db = firebase.firestore();
-            const col = db.collection('kids_maestros');
+            const col = sb.collection('kids_maestros');
 
             for (const m of maestros) {
                 try {
@@ -122,8 +119,7 @@
         }
 
         async function limpiar() {
-            const db = firebase.firestore();
-            const snap = await db.collection('kids_maestros').get();
+            const snap = await sb.collection('kids_maestros').get();
             let count = 0;
             for (const doc of snap.docs) {
                 await doc.ref.delete();
