@@ -570,6 +570,7 @@ service cloud.firestore {
                     <div class="form-group"><label>👨 VARONES</label><input type="number" id="editVarones" class="form-control" value="${reg.totalVarones}" min="0"></div>
                     <div class="form-group"><label>👩 MUJERES</label><input type="number" id="editMujeres" class="form-control" value="${reg.totalMujeres}" min="0"></div>
                 </div>
+                <div class="form-group"><label>👤 REGISTRADO POR (no se modifica)</label><input type="text" class="form-control" value="${reg.registradoPor || '-'}" readonly style="background:#f0f0f0;cursor:not-allowed;"></div>
                 <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="guardarEdicion()">💾 Guardar cambios</button>
             `;
             document.getElementById('editModalBody').innerHTML = html;
