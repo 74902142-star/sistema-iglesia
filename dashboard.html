@@ -613,13 +613,21 @@ service cloud.firestore {
         async function eliminarRegistro(firebaseId) {
             if (!esAdmin) return;
             if (confirm('¿Eliminar este registro permanentemente?')) {
+                // 1. Eliminar localmente de inmediato
+                let idx = registros.findIndex(r => r.firebaseId === firebaseId);
+                if (idx !== -1) {
+                    registros.splice(idx, 1);
+                    guardarCacheLocal(registros);
+                }
+                procesarDatos();
+                toast('🗑️ Registro eliminado');
+                // 2. Intentar eliminar de Firebase
                 try {
                     await firebaseReady;
                     await fetchWithTimeout('https://firestore.googleapis.com/v1/projects/' + firebaseConfig.projectId + '/databases/(default)/documents/registros/' + firebaseId + '?key=' + firebaseConfig.apiKey, { method: 'DELETE' }, 15000);
-                    toast('🗑️ Registro eliminado');
-                    cargarDatos();
                 } catch (err) {
-                    toast('❌ Error al eliminar: ' + err.message, 'error');
+                    console.error(err);
+                    toast('⚠️ Eliminado localmente, pero error al sincronizar: ' + err.message, 'warning');
                 }
             }
         }
