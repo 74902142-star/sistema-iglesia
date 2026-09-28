@@ -1,4 +1,4 @@
-// Sesión local (admin / invitado) — no modifica firebase-config.js
+// Sesión local (admin / invitado) en localStorage — sin backend de autenticación
 const Auth = {
     getUsuario() {
         try {

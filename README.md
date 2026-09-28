@@ -14,14 +14,14 @@ Aplicación web para la gestión de registros ministeriales, control de asistenc
 ## Tecnologías
 
 - HTML5 + CSS3 + Vanilla JS
-- Firebase Firestore (SDK v10 compat)
-- Firebase Auth (manejo de sesión local)
+- Supabase (PostgREST, API REST sin SDK) — `supabase.js`
+- Sesión local con localStorage (`auth.js`)
 - SheetJS (exportación a Excel)
 
 ## Requisitos
 
 - Navegador web moderno
-- Conexión a internet (Firebase)
+- Conexión a internet (Supabase)
 
 ## Desarrollo local
 
@@ -33,14 +33,25 @@ python3 -m http.server 8080
 ## Estructura
 
 ```
-├── index.html          — Login + entrada invitado
-├── dashboard.html      — Admin dashboard
-├── ingreso.html        — Registro de asistencia
-├── edl.html            — Escuela de Liderazgo (admin + invitado)
-├── predicadores.html   — Gestión predicadores/anfitriones
-├── creativos.html      — Gestión equipo creativo
-├── guest.html          — Landing para invitados
-├── auth.js             — Manejo de sesión
-├── firebase-config.js  — Configuración Firebase
-└── firebase-auth.js    — Lógica de autenticación
+├── index.html            — Login + entrada invitado
+├── dashboard.html        — Admin dashboard
+├── ingreso.html          — Registro de asistencia
+├── edl.html              — Escuela de Liderazgo (admin + invitado)
+├── kids.html             — Ministerio KIDS
+├── lideres.html          — Ministerio Líderes
+├── predicadores.html     — Gestión predicadores/anfitriones
+├── creativos.html        — Gestión equipo creativo
+├── aula-virtual.html     — Aula virtual (solo localStorage)
+├── guest.html            — Landing para invitados
+├── auth.js               — Manejo de sesión (localStorage)
+├── supabase.js           — Capa de datos (REST + shim compatible Firestore)
+├── supabase-schema.sql   — Esquema de las 9 tablas en Supabase
+└── apps-script-edl.js    — Script de Google Apps Script (EDL)
 ```
+
+## Base de datos
+
+Supabase (proyecto `bhuxtunecrqybnlmdspy`). El esquema está en
+`supabase-schema.sql`; se ejecuta en el SQL Editor de Supabase.
+RLS con acceso público para lectura/escritura (el sistema no usa
+auth de Supabase, la sesión es local en `auth.js`).
