@@ -149,6 +149,9 @@
             qs.push('order=' + encodeURIComponent(params.order.field) + '.' +
                 (params.order.dir === 'desc' ? 'desc' : 'asc'));
         }
+        if (params.columns && params.columns.length) {
+            qs.push('select=' + params.columns.join(','));
+        }
         qs.push('limit=' + (params.limit || PAGE_SIZE));
         if (params.offset) qs.push('offset=' + params.offset);
         return await request('/rest/v1/' + encodeURIComponent(table) + (qs.length ? '?' + qs.join('&') : ''));
@@ -219,6 +222,22 @@
     async function firestoreGet(collection, docId) {
         if (docId) return await firestoreGetDoc(collection, docId);
         return await select(collection);
+    }
+
+    // Lista sin columnas pesadas (p. ej. pagoCaptura con fotos en base64).
+    // Si no se conoce la tabla o no hay exclusiones, trae todo.
+    async function firestoreGetList(collection, exclude) {
+        var cols = TABLE_COLUMNS[collection];
+        var params = {};
+        if (cols && exclude && exclude.length) {
+            params.columns = cols.filter(function (c) { return exclude.indexOf(c) === -1; });
+        }
+        var rows = await select(collection, params);
+        return rows.map(function (r) {
+            var row = Object.assign({}, r);
+            row.firebaseId = r.id;
+            return row;
+        });
     }
 
     async function firestoreGetDoc(collection, docId) {
@@ -344,6 +363,7 @@
     window.SB = {
         url: SB_URL,
         key: SB_KEY,
+        columns: TABLE_COLUMNS,
         newId: newId,
         select: select,
         insert: insert,
@@ -358,6 +378,7 @@
 
     window.firestoreGetREST = firestoreGetREST;
     window.firestoreGet = firestoreGet;
+    window.firestoreGetList = firestoreGetList;
     window.firestoreGetDoc = firestoreGetDoc;
     window.firestoreAdd = firestoreAdd;
     window.firestoreAddREST = firestoreAddREST;

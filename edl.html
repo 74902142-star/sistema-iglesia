@@ -841,7 +841,9 @@
                 return;
             }
             try {
-                var nuevas = await firestoreGet('inscripciones');
+                // Sin pagoCaptura: 214 filas pesan 37 MB con las fotos y agotan el tiempo de Supabase.
+                // La foto se trae con un clic (ver verCaptura()).
+                var nuevas = await firestoreGetList('inscripciones', ['pagoCaptura']);
                 console.log('EDL Supabase:', nuevas.length, 'documentos leidos');
                 if (nuevas.length > 0) {
                     inscripciones = nuevas;
@@ -917,7 +919,7 @@
                 const estadoCls = i.estadoPago === 'Canceló' ? 'estado-pagado' : 'estado-debe';
                 const metodo = i.metodoPago ? i.metodoPago.charAt(0).toUpperCase() + i.metodoPago.slice(1) : '-';
                 const initials = getInitials(i.nombres);
-                const capturaHtml = i.pagoCaptura ? `<img src="${i.pagoCaptura}" class="captura-thumb" title="Ver captura de pago">` : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
+                const capturaHtml = `<button type="button" class="captura-thumb captura-btn" data-id="${i.id}" title="Ver captura de pago">📷</button>`;
 
                 return `<tr>
                     <td>
@@ -1199,9 +1201,20 @@
 
         // Event delegation for captura thumbnails (avoids inline onclick with huge base64)
         document.getElementById('tablaInscripciones').addEventListener('click', function (e) {
-            const thumb = e.target.closest('.captura-thumb');
-            if (thumb) abrirCaptura(thumb.src);
+            const btn = e.target.closest('.captura-btn');
+            if (btn) verCaptura(btn.dataset.id);
         });
+
+        // La lista no trae pagoCaptura (37 MB); se pide solo la foto que se quiere ver.
+        async function verCaptura(id) {
+            try {
+                const row = await firestoreGetDoc('inscripciones', id);
+                if (row && row.pagoCaptura) abrirCaptura(row.pagoCaptura);
+                else toast('Esta inscripción no tiene captura de pago', 'warning');
+            } catch (e) {
+                toast('No se pudo cargar la captura', 'warning');
+            }
+        }
 
         function abrirCaptura(src) {
             const modal = document.getElementById('lightboxCaptura');

@@ -28,8 +28,14 @@ tr:nth-child(even) { background: #f9f9f9; }
 
 <script src="supabase.js?v=1"></script>
 <script>
-async function firestoreList(collection) {
-  var rows = await SB.select(collection);
+async function firestoreList(collection, exclude) {
+  // exclude: columnas pesadas (pagoCaptura = fotos en base64, 37 MB en total)
+  var cols = (SB.columns && SB.columns[collection]) || null;
+  var params = {};
+  if (cols && exclude && exclude.length) {
+    params.columns = cols.filter(function(c) { return exclude.indexOf(c) === -1; });
+  }
+  var rows = await SB.select(collection, params);
   return rows.map(function(r) {
     var data = Object.assign({}, r);
     data._id = r.id;
@@ -69,7 +75,7 @@ async function leerInscripciones() {
   var div = document.getElementById('resultado');
   div.innerHTML = '<div class="info">Leyendo inscripciones...</div>';
   try {
-    var data = await firestoreList('inscripciones');
+    var data = await firestoreList('inscripciones', ['pagoCaptura']);
     data.sort((a,b) => (b.timestamp||'').localeCompare(a.timestamp||''));
     div.innerHTML = '<div class="ok">Leidos ' + data.length + ' inscripciones</div>' + renderTabla(data, 'Inscripciones EDL');
   } catch(e) {
@@ -83,7 +89,7 @@ async function leerTodos() {
   try {
     var registros = await firestoreList('registros');
     registros.sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
-    var inscripciones = await firestoreList('inscripciones');
+    var inscripciones = await firestoreList('inscripciones', ['pagoCaptura']);
     inscripciones.sort((a,b) => (b.timestamp||'').localeCompare(a.timestamp||''));
     div.innerHTML = '<div class="ok">Registros: ' + registros.length + ' | Inscripciones: ' + inscripciones.length + '</div>'
       + renderTabla(registros, 'Registros Dashboard')
