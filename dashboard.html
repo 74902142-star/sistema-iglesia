@@ -261,12 +261,15 @@
         }
 
         function obtenerSemana(fecha) {
-            let d = new Date(fecha);
-            let year = d.getFullYear();
-            let start = new Date(year, 0, 1);
-            let days = Math.floor((d - start) / (24 * 60 * 60 * 1000));
-            let week = Math.ceil((days + start.getDay() + 1) / 7);
-            return `${year}-W${week.toString().padStart(2, '0')}`;
+            if (!fecha) return '';
+            const p = String(fecha).slice(0, 10).split('-');
+            const anio = Number(p[0]);
+            if (!anio || p.length < 3) return '';
+            const inicio = Date.UTC(anio, 0, 1);
+            const dia = Date.UTC(anio, Number(p[1]) - 1, Number(p[2]));
+            const days = Math.round((dia - inicio) / 86400000);
+            const week = Math.ceil((days + 1) / 7);
+            return `${anio}-W${week.toString().padStart(2, '0')}`;
         }
 
         async function cargarDatos() {
@@ -402,7 +405,7 @@
             `;
             document.getElementById('whatsappBtn').onclick = () => {
                 let semana = document.getElementById('filtroSemana').value || 'General';
-                let fecha = new Date().toLocaleDateString();
+                let fecha = hoyPeru();
                 let msg = `*AGUA VIVA HUANCAYO*\n*REPORTE ${semana}\n${fecha}*\n\n*NEXT:* ${nextT}\nHombres: ${nextH} | Mujeres: ${nextM}\n\n*DOMINGO:* ${domT}\nHombres: ${domH} | Mujeres: ${domM}\n\n*KIDS:* ${kidsT}\nNiños: ${kidsH} | Niñas: ${kidsM}`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             };
@@ -571,7 +574,7 @@
             let ws = XLSX.utils.json_to_sheet(datos);
             let wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-            XLSX.writeFile(wb, `iglesia_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `iglesia_${hoyPeru()}.xlsx`);
             toast('📎 Excel exportado');
         }
 
@@ -618,8 +621,7 @@
             for (let s of sedes) { let opt = document.createElement('option'); opt.value = s; opt.textContent = formatearSede(s); selectSede.appendChild(opt); }
             let selectMes = document.getElementById('filtroMes');
             for (let i = 1; i <= 12; i++) { let opt = document.createElement('option'); opt.value = `2026-${String(i).padStart(2, '0')}`; opt.textContent = `Mes ${i}`; selectMes.appendChild(opt); }
-            let hoy = new Date(); let semana = `${hoy.getFullYear()}-W${Math.ceil(((hoy - new Date(hoy.getFullYear(), 0, 1)) / 86400000 + 1) / 7)}`;
-            document.getElementById('filtroSemana').value = semana;
+            document.getElementById('filtroSemana').value = obtenerSemana(hoyPeru());
         }
 
         function cargarUsuario() {

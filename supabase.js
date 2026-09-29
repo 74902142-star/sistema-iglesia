@@ -360,6 +360,18 @@
 
     /* ---------- Exports globales ---------- */
 
+    // Fecha del día en PERÚ (America/Lima, UTC-5, sin horario de verano).
+    // Usar SIEMPRE para fechas de registro/filtros: new Date().toISOString()
+    // da la fecha en UTC y a partir de las 7 PM en Perú ya es el día siguiente.
+    window.hoyPeru = function () {
+        return new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 10);
+    };
+
+    // Hora del día en Perú (HH:MM:SS)
+    window.horaPeru = function () {
+        return new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(11, 19);
+    };
+
     window.SB = {
         url: SB_URL,
         key: SB_KEY,

@@ -557,9 +557,10 @@
             }
         }
 
-        // Auto-disable password gate until Sunday July 5 2026
-        var fechaReactivar = new Date('2026-07-05T00:00:00');
-        if (esInvitado && new Date() < fechaReactivar) {
+        // Contraseña desactivada para invitados hasta el 18 de octubre de 2026, 11:55 PM hora Perú.
+        // Fecha calculada en UTC: Perú es UTC-5 → 18 oct 23:55 PM = 19 oct 04:55 UTC.
+        var fechaReactivar = Date.UTC(2026, 9, 19, 4, 55, 0);
+        if (esInvitado && Date.now() < fechaReactivar) {
             document.getElementById('edlPasswordGate').style.display = 'none';
             document.getElementById('edlGuestContent').style.display = 'block';
         }
@@ -1149,7 +1150,7 @@
 
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Inscripciones EDL');
-            XLSX.writeFile(wb, `edl_inscripciones_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `edl_inscripciones_${hoyPeru()}.xlsx`);
             toast('📎 Excel exportado');
         }
 

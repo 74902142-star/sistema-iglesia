@@ -1345,7 +1345,7 @@
 
         function actualizarStats() {
             document.getElementById('statTotal').innerText = maestros.length;
-            const hoy = new Date().toISOString().split('T')[0];
+            const hoy = hoyPeru();
             dbAsistencia.where('fecha', '==', hoy).get().then(snap => {
                 const uniqueIds = new Set();
                 snap.forEach(doc => {
@@ -1453,8 +1453,8 @@
             const now = new Date();
             await dbAsistencia.add({
                 maestroId: maestroActual.id,
-                fecha: now.toISOString().split('T')[0],
-                hora: now.toTimeString().split(' ')[0],
+                fecha: hoyPeru(),
+                hora: horaPeru(),
                 timestamp: now.toISOString()
             });
             toast('✅ Asistencia registrada para ' + maestroActual.nombres);
@@ -1513,8 +1513,8 @@
             const now = new Date();
             await dbAsistencia.add({
                 maestroId: m.id,
-                fecha: now.toISOString().split('T')[0],
-                hora: now.toTimeString().split(' ')[0],
+                fecha: hoyPeru(),
+                hora: horaPeru(),
                 timestamp: now.toISOString(),
                 origen: 'invitado'
             });
@@ -1537,8 +1537,8 @@
             const now = new Date();
             await dbAsistencia.add({
                 maestroId: maestroActual.id,
-                fecha: now.toISOString().split('T')[0],
-                hora: now.toTimeString().split(' ')[0],
+                fecha: hoyPeru(),
+                hora: horaPeru(),
                 timestamp: now.toISOString(),
                 origen: 'invitado'
             });
@@ -1706,7 +1706,7 @@
             const ws = XLSX.utils.json_to_sheet(datos);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Maestros KIDS');
-            XLSX.writeFile(wb, `kids_maestros_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `kids_maestros_${hoyPeru()}.xlsx`);
             toast('📎 Excel exportado');
         }
 
@@ -1773,7 +1773,7 @@
 
         // ── Today's attendance ──
         async function cargarHoy() {
-            const hoy = new Date().toISOString().split('T')[0];
+            const hoy = hoyPeru();
             document.getElementById('todayDate').innerText = hoy;
             const snap = await dbAsistencia.where('fecha', '==', hoy).orderBy('timestamp', 'desc').get();
             const tbody = document.getElementById('tablaHoy');
@@ -1803,53 +1803,49 @@
         let allAsistencia = [];
 
         function getWeekDates(offset) {
-            const now = new Date();
-            const monday = new Date(now);
-            monday.setDate(now.getDate() - now.getDay() + 1 + (offset * 7));
+            const p = hoyPeru().split('-').map(Number);
+            const lunes = new Date(Date.UTC(p[0], p[1] - 1, p[2]));
+            lunes.setUTCDate(lunes.getUTCDate() - ((lunes.getUTCDay() + 6) % 7) + (offset * 7));
             const dates = [];
             for (let i = 0; i < 7; i++) {
-                const d = new Date(monday);
-                d.setDate(monday.getDate() + i);
-                dates.push(d.toISOString().split('T')[0]);
+                const d = new Date(lunes);
+                d.setUTCDate(lunes.getUTCDate() + i);
+                dates.push(d.toISOString().slice(0, 10));
             }
             return dates;
         }
 
         function getWeekStart(offset) {
-            const now = new Date();
-            const monday = new Date(now);
-            monday.setDate(now.getDate() - now.getDay() + 1 + (offset * 7));
-            return monday.toISOString().split('T')[0];
+            return getWeekDates(offset)[0];
         }
 
         function initWeekPicker() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const weekNum = getWeekNumber(now);
-            document.getElementById('weekPicker').value = `${year}-W${weekNum.toString().padStart(2, '0')}`;
+            const hoy = hoyPeru();
+            const weekNum = getWeekNumber(new Date(hoy + 'T00:00:00Z'));
+            document.getElementById('weekPicker').value = `${hoy.slice(0, 4)}-W${weekNum.toString().padStart(2, '0')}`;
         }
 
         function getWeekNumber(d) {
             const date = new Date(d);
-            date.setHours(0, 0, 0, 0);
-            date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-            const week1 = new Date(date.getFullYear(), 0, 4);
-            return 1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+            date.setUTCHours(0, 0, 0, 0);
+            date.setUTCDate(date.getUTCDate() + 3 - (date.getUTCDay() + 6) % 7);
+            const week1 = new Date(Date.UTC(date.getUTCFullYear(), 0, 4));
+            return 1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getUTCDay() + 6) % 7) / 7);
         }
 
         function seleccionarSemana() {
             const val = document.getElementById('weekPicker').value;
             if (!val) return;
             const [year, week] = val.split('-W');
-            const jan4 = new Date(parseInt(year), 0, 4);
-            const dayOfWeek = jan4.getDay() || 7;
+            const jan4 = new Date(Date.UTC(parseInt(year), 0, 4));
+            const dayOfWeek = jan4.getUTCDay() || 7;
             const monday = new Date(jan4);
-            monday.setDate(jan4.getDate() - dayOfWeek + 1 + (parseInt(week) - 1) * 7);
+            monday.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1 + (parseInt(week) - 1) * 7);
             const dates = [];
             for (let i = 0; i < 7; i++) {
                 const d = new Date(monday);
-                d.setDate(monday.getDate() + i);
-                dates.push(d.toISOString().split('T')[0]);
+                d.setUTCDate(monday.getUTCDate() + i);
+                dates.push(d.toISOString().slice(0, 10));
             }
             renderWeek(dates);
         }
@@ -1858,10 +1854,8 @@
             weekOffset += dir;
             if (weekOffset > 0) weekOffset = 0;
             const dates = getWeekDates(weekOffset);
-            const d = new Date(dates[0] + 'T12:00:00');
-            const year = d.getFullYear();
-            const weekNum = getWeekNumber(d);
-            document.getElementById('weekPicker').value = `${year}-W${weekNum.toString().padStart(2, '0')}`;
+            const weekNum = getWeekNumber(new Date(dates[0] + 'T00:00:00Z'));
+            document.getElementById('weekPicker').value = `${dates[0].slice(0, 4)}-W${weekNum.toString().padStart(2, '0')}`;
             renderWeek(dates);
         }
 

@@ -357,12 +357,14 @@
 
         function obtenerSemana(fecha) {
             if (!fecha) return '';
-            const d = new Date(fecha + 'T12:00:00');
-            const dayNum = d.getDay() || 7;
-            d.setDate(d.getDate() + 4 - dayNum);
-            const yearStart = new Date(d.getFullYear(), 0, 1);
-            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            return `${d.getFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
+            const p = String(fecha).slice(0, 10).split('-');
+            const anio = Number(p[0]);
+            if (!anio || p.length < 3) return '';
+            const inicio = Date.UTC(anio, 0, 1);
+            const dia = Date.UTC(anio, Number(p[1]) - 1, Number(p[2]));
+            const days = Math.round((dia - inicio) / 86400000);
+            const week = Math.ceil((days + 1) / 7);
+            return `${anio}-W${week.toString().padStart(2, '0')}`;
         }
 
         function toast(msg, tipo = 'success') {
@@ -429,7 +431,7 @@
                 toast('✅ Registro guardado exitosamente');
                 if (esInvitado) {
                     document.getElementById('registroForm').reset();
-                    document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+                    document.getElementById('fecha').value = hoyPeru();
                     cargarFormulario();
                     btn.disabled = false;
                     btn.innerHTML = '<i data-lucide="save" style="width: 16px; height: 16px;"></i> Guardar Registro';
@@ -473,7 +475,7 @@
             });
         }
 
-        document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+        document.getElementById('fecha').value = hoyPeru();
         cargarFormulario();
     </script>
 </body>

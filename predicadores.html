@@ -300,7 +300,7 @@
         let waTargetId = null;
 
         function esEnviado(p) { return p.enviado === true || p.recordatorioEnviado === true; }
-        function hoyStr() { return new Date().toISOString().split('T')[0]; }
+        function hoyStr() { return hoyPeru(); }
 
         function getDayName(fecha) {
             if (!fecha) return '';
@@ -736,13 +736,13 @@
             const now = new Date();
             if (now.getDay() !== 5 || now.getHours() < 22 || now.getHours() >= 23) return;
 
-            const day = now.getDay();
-            const monday = new Date(now);
-            monday.setDate(now.getDate() + (day === 0 ? -6 : 1 - day));
-            const sunday = new Date(monday);
-            sunday.setDate(monday.getDate() + 6);
-            const weekStart = monday.toISOString().split('T')[0];
-            const weekEnd = sunday.toISOString().split('T')[0];
+            const p = hoyPeru().split('-').map(Number);
+            const lunes = new Date(Date.UTC(p[0], p[1] - 1, p[2]));
+            lunes.setUTCDate(lunes.getUTCDate() - ((lunes.getUTCDay() + 6) % 7));
+            const domingo = new Date(lunes);
+            domingo.setUTCDate(lunes.getUTCDate() + 6);
+            const weekStart = lunes.toISOString().slice(0, 10);
+            const weekEnd = domingo.toISOString().slice(0, 10);
 
             try {
                 const snapshot = await dbPart.where('enviado', '==', false).get();
