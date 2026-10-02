@@ -188,7 +188,7 @@
                                 <label>📅 Ciclo</label>
                                 <select id="filtroCiclo" class="filter-select">
                                     <option value="">Todos los ciclos</option>
-                                    <option value="202620">202620 (Actual)</option>
+                                    <option value="202620" selected>202620 (Actual)</option>
                                     <option value="202610">202610 (Anterior)</option>
                                 </select>
                             </div>
@@ -565,18 +565,51 @@
             document.getElementById('edlGuestContent').style.display = 'block';
         }
 
-        const CURSOS = [
-            { id: 'disc1_next', nombre: 'Discipulado 1 NEXT', inicio: '27 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 30 },
-            { id: 'disc2_next', nombre: 'Discipulado 2 NEXT', inicio: '27 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 50 },
-            { id: 'disc1', nombre: 'Discipulado 1', inicio: '27 de junio', dia: 'Sábado', hora: '5:30 PM', monto: 30 },
-            { id: 'disc2', nombre: 'Discipulado 2', inicio: '23 de junio', dia: 'Martes', hora: '7:30 PM', monto: 50 },
-            { id: 'disc3', nombre: 'Discipulado 3', inicio: '25 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50 },
-            { id: 'lidere1', nombre: 'Lidere 1', inicio: '24 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
-            { id: 'lidere2', nombre: 'Lidere 2', inicio: '24 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
-            { id: 'lidere3', nombre: 'Lidere 3', inicio: '24 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
-            { id: 'sem_apologetica', nombre: 'Seminario: Apologética', inicio: '27 de junio', dia: 'Sábado', hora: '5:30 PM', monto: 50 },
-            { id: 'sem_dones', nombre: 'Seminario: Int. Dones del Espíritu Santo', inicio: '25 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50, requiereDisc3: true }
-        ];
+        // ── Catálogo de cursos por ciclo ──
+        const CICLO_ACTUAL = '202620';   // clases desde el 12 de octubre de 2026
+        const CICLO_ANTERIOR = '202610';
+
+        const CURSOS_POR_CICLO = {
+            '202610': [
+                { id: 'disc1_next', nombre: 'Discipulado 1 NEXT', inicio: '27 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 30 },
+                { id: 'disc2_next', nombre: 'Discipulado 2 NEXT', inicio: '27 de junio', dia: 'Sábado', hora: '3:30 PM', monto: 50 },
+                { id: 'disc1', nombre: 'Discipulado 1', inicio: '27 de junio', dia: 'Sábado', hora: '5:30 PM', monto: 30 },
+                { id: 'disc2', nombre: 'Discipulado 2', inicio: '23 de junio', dia: 'Martes', hora: '7:30 PM', monto: 50 },
+                { id: 'disc3', nombre: 'Discipulado 3', inicio: '25 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50 },
+                { id: 'lidere1', nombre: 'Lidere 1', inicio: '24 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
+                { id: 'lidere2', nombre: 'Lidere 2', inicio: '24 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
+                { id: 'lidere3', nombre: 'Lidere 3', inicio: '24 de junio', dia: 'Miércoles', hora: '7:30 PM', monto: 50 },
+                { id: 'sem_apologetica', nombre: 'Seminario: Apologética', inicio: '27 de junio', dia: 'Sábado', hora: '5:30 PM', monto: 50 },
+                { id: 'sem_dones', nombre: 'Seminario: Int. Dones del Espíritu Santo', inicio: '25 de junio', dia: 'Jueves', hora: '7:30 PM', monto: 50, requiereDisc3: true }
+            ],
+            // Ciclo 202620 — cursos y horarios nuevos (clases desde el 12 de octubre)
+            '202620': [
+                // Sábado
+                { id: 'disc1_next', nombre: 'Discipulado 1 NEXT', inicio: '17 de octubre', dia: 'Sábado', hora: '3:30 PM - 4:30 PM', monto: 30 },
+                { id: 'disc2_next', nombre: 'Discipulado 2 NEXT', inicio: '17 de octubre', dia: 'Sábado', hora: '3:30 PM - 4:30 PM', monto: 50 },
+                { id: 'disc3_next', nombre: 'Discipulado 3 NEXT', inicio: '17 de octubre', dia: 'Sábado', hora: '3:30 PM - 4:30 PM', monto: 50 },
+                { id: 'sem_consejeria', nombre: 'Seminario: Consejería', inicio: '17 de octubre', dia: 'Sábado', hora: '6:00 PM - 7:30 PM', monto: 50 },
+                // Martes 7:30 PM - 9:00 PM
+                { id: 'disc2', nombre: 'Discipulado 2', inicio: '13 de octubre', dia: 'Martes', hora: '7:30 PM - 9:00 PM', monto: 50 },
+                { id: 'disc3', nombre: 'Discipulado 3', inicio: '13 de octubre', dia: 'Martes', hora: '7:30 PM - 9:00 PM', monto: 50 },
+                // Miércoles 7:30 PM - 9:00 PM
+                { id: 'lidere1', nombre: 'Lidere 1', inicio: '14 de octubre', dia: 'Miércoles', hora: '7:30 PM - 9:00 PM', monto: 50 },
+                { id: 'lidere2', nombre: 'Lidere 2', inicio: '14 de octubre', dia: 'Miércoles', hora: '7:30 PM - 9:00 PM', monto: 50 },
+                { id: 'lidere3', nombre: 'Lidere 3', inicio: '14 de octubre', dia: 'Miércoles', hora: '7:30 PM - 9:00 PM', monto: 50 },
+                { id: 'sem_padres', nombre: 'Seminario: Escuela para Padres', inicio: '14 de octubre', dia: 'Miércoles', hora: '7:30 PM - 9:00 PM', monto: 50 },
+                // Jueves 7:30 PM - 9:00 PM
+                { id: 'disc1', nombre: 'Discipulado 1', inicio: '15 de octubre', dia: 'Jueves', hora: '7:30 PM - 9:00 PM', monto: 30 },
+                { id: 'sem_sanidad', nombre: 'Seminario: Sanidad Interior', inicio: '15 de octubre', dia: 'Jueves', hora: '7:30 PM - 9:00 PM', monto: 50 }
+            ]
+        };
+
+        function cursosDe(ciclo) {
+            return CURSOS_POR_CICLO[ciclo] || CURSOS_POR_CICLO[CICLO_ACTUAL];
+        }
+
+        function todosLosCursos() {
+            return Object.keys(CURSOS_POR_CICLO).reduce(function (acc, k) { return acc.concat(CURSOS_POR_CICLO[k]); }, []);
+        }
 
         const dbIns = db.collection('inscripciones');
         let inscripciones = [];
@@ -585,13 +618,30 @@
 
         function initCursosSelect() {
             const selModal = document.getElementById('insCurso');
-            const selFiltro = document.getElementById('filtroCurso');
             const selGuest = document.getElementById('guestCurso');
-            CURSOS.forEach(c => {
-                selModal.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
-                selFiltro.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
-                if (selGuest) selGuest.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
+            cursosDe(CICLO_ACTUAL).forEach(c => {
+                const opt = `<option value="${c.id}">${c.nombre}</option>`;
+                if (selModal) selModal.innerHTML += opt;
+                if (selGuest) selGuest.innerHTML += opt;
             });
+            actualizarFiltroCursos();
+        }
+
+        // Los cursos del filtro dependen del ciclo seleccionado
+        function actualizarFiltroCursos() {
+            const sel = document.getElementById('filtroCurso');
+            const previo = sel.value;
+            const ciclo = document.getElementById('filtroCiclo').value;
+            const lista = ciclo ? cursosDe(ciclo) : todosLosCursos();
+            const vistos = {};
+            let html = '<option value="">Todos los cursos</option>';
+            lista.forEach(c => {
+                if (vistos[c.id]) return;
+                vistos[c.id] = true;
+                html += `<option value="${c.id}">${c.nombre}</option>`;
+            });
+            sel.innerHTML = html;
+            if (previo && vistos[previo]) sel.value = previo;
         }
 
         function fileToBase64(file) {
@@ -653,12 +703,19 @@
             });
         }
 
-        function getCurso(id) { return CURSOS.find(c => c.id === id); }
+        function getCurso(id, ciclo) {
+            if (!id) return null;
+            if (ciclo && CURSOS_POR_CICLO[ciclo]) {
+                const enCiclo = CURSOS_POR_CICLO[ciclo].find(c => c.id === id);
+                if (enCiclo) return enCiclo;
+            }
+            return todosLosCursos().find(c => c.id === id) || null;
+        }
 
         function formatMonto(n) { return 'S/ ' + n.toFixed(2); }
 
         document.getElementById('insCurso').addEventListener('change', function () {
-            const curso = getCurso(this.value);
+            const curso = getCurso(this.value, CICLO_ACTUAL);
             const info = document.getElementById('cursoInfo');
             if (!curso) { info.style.display = 'none'; return; }
             info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}<br><strong>💰 Costo:</strong> ${formatMonto(curso.monto)}`;
@@ -710,7 +767,7 @@
         const guestCurso = document.getElementById('guestCurso');
         if (guestCurso) {
             guestCurso.addEventListener('change', function () {
-                const curso = getCurso(this.value);
+                const curso = getCurso(this.value, CICLO_ACTUAL);
                 const info = document.getElementById('guestCursoInfo');
                 if (!curso) { info.style.display = 'none'; return; }
                 info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}<br><strong>💰 Costo:</strong> ${formatMonto(curso.monto)}`;
@@ -731,7 +788,7 @@
 
                 try {
                     const cursoId = document.getElementById('guestCurso').value;
-                    const curso = getCurso(cursoId);
+                    const curso = getCurso(cursoId, CICLO_ACTUAL);
                     if (!curso) { throw new Error('Selecciona un curso'); }
 
                     const docTipo = document.getElementById('guestDocTipo').value;
@@ -774,7 +831,7 @@
                         estadoPago: 'Debe',
                         metodoPago: metodoPago,
                         pagoCaptura: pagoCaptura || '',
-                        ciclo: '202620',
+                        ciclo: CICLO_ACTUAL,
                         origen: 'invitado',
                         creadoPor: usuarioActual ? usuarioActual.nombre : 'Invitado',
                         timestamp: new Date().toISOString()
@@ -873,7 +930,7 @@
             inscripcionesFiltradas = inscripciones.filter(i => {
                 if (curso && i.cursoId !== curso) return false;
                 if (ciclo) {
-                    const iCiclo = i.ciclo || '202610';
+                    const iCiclo = i.ciclo || CICLO_ANTERIOR;
                     if (iCiclo !== ciclo) return false;
                 }
                 if (busqueda) {
@@ -911,11 +968,15 @@
         function renderTabla() {
             const tbody = document.getElementById('tablaInscripciones');
             if (inscripcionesFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:48px;color:var(--text-muted);">No hay inscripciones</td></tr>';
+                const cicloSel = document.getElementById('filtroCiclo').value;
+                const vacio = cicloSel
+                    ? `No hay inscripciones en el ciclo ${cicloSel} todavía. Cambia el filtro de ciclo para ver los demás.`
+                    : 'No hay inscripciones';
+                tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:48px;color:var(--text-muted);">${vacio}</td></tr>`;
                 return;
             }
             tbody.innerHTML = inscripcionesFiltradas.map(i => {
-                const curso = getCurso(i.cursoId);
+                const curso = getCurso(i.cursoId, i.ciclo);
                 const horario = curso ? `${curso.dia} ${curso.hora}` : (i.fechaHorario || '-');
                 const estadoCls = i.estadoPago === 'Canceló' ? 'estado-pagado' : 'estado-debe';
                 const metodo = i.metodoPago ? i.metodoPago.charAt(0).toUpperCase() + i.metodoPago.slice(1) : '-';
@@ -960,7 +1021,10 @@
         }
 
         async function verificarDuplicado(dni, cursoId) {
-            var found = inscripciones.find(function(i) { return i.dni === dni && i.cursoId === cursoId; });
+            // Solo avisa si ya está en el MISMO curso de ESTE ciclo
+            var found = inscripciones.find(function(i) {
+                return i.dni === dni && i.cursoId === cursoId && (i.ciclo || CICLO_ANTERIOR) === CICLO_ACTUAL;
+            });
             return found || null;
         }
 
@@ -972,7 +1036,7 @@
 
             try {
                 const cursoId = document.getElementById('insCurso').value;
-                const curso = getCurso(cursoId);
+                const curso = getCurso(cursoId, CICLO_ACTUAL);
                 if (!curso) { btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
 
                 const docTipo = document.getElementById('insDocTipo').value;
@@ -1010,7 +1074,7 @@
                     estadoPago: document.getElementById('insEstado').value,
                     metodoPago: document.getElementById('insMetodoPago').value || '',
                     pagoCaptura: pagoCaptura,
-                    ciclo: '202620',
+                    ciclo: CICLO_ACTUAL,
                     creadoPor: usuarioActual ? usuarioActual.nombre : 'Admin',
                     timestamp: new Date().toISOString()
                 };
@@ -1073,8 +1137,16 @@
             document.getElementById('insCorreo').value = i.correo;
             document.getElementById('insLider').value = i.lider;
             document.getElementById('insSede').value = i.sede || '';
-            document.getElementById('insCurso').value = i.cursoId;
-            document.getElementById('insCurso').dispatchEvent(new Event('change'));
+            const selIns = document.getElementById('insCurso');
+            selIns.value = i.cursoId;
+            if (selIns.value !== i.cursoId) {
+                const cCurso = getCurso(i.cursoId, i.ciclo);
+                if (cCurso) {
+                    selIns.innerHTML += `<option value="${cCurso.id}">${cCurso.nombre}</option>`;
+                    selIns.value = cCurso.id;
+                }
+            }
+            selIns.dispatchEvent(new Event('change'));
             document.getElementById('insEstado').value = i.estadoPago;
             document.getElementById('insMetodoPago').value = i.metodoPago || '';
             const isDigital = ['yape', 'plin', 'transferencia'].includes(i.metodoPago || '');
@@ -1116,7 +1188,7 @@
 
         function exportarExcel() {
             const datos = inscripcionesFiltradas.map(i => {
-                const curso = getCurso(i.cursoId);
+                const curso = getCurso(i.cursoId, i.ciclo);
                 return {
                     Nombres: i.nombres, DNI: i.dni, Celular: i.celular, Correo: i.correo,
                     Lider: i.lider, Sede: i.sede || '-', Curso: i.cursoNombre || curso?.nombre,
@@ -1193,7 +1265,10 @@
         }
         document.getElementById('filtroBusqueda').addEventListener('input', aplicarFiltros);
         document.getElementById('filtroCurso').addEventListener('change', aplicarFiltros);
-        document.getElementById('filtroCiclo').addEventListener('change', aplicarFiltros);
+        document.getElementById('filtroCiclo').addEventListener('change', function () {
+            actualizarFiltroCursos();
+            aplicarFiltros();
+        });
 
         initCursosSelect();
         initDocTipo();
