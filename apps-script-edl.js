@@ -90,8 +90,30 @@ function prepararHojaAnterior_(ss) {
     }
     hoja = ss.getSheetByName(HOJA_ANTERIOR) || hoja;
   }
+  repararTitulo_(hoja);
   bloquearHoja_(hoja);
   return hoja;
+}
+
+// Si la versión anterior del script dejó "Sin datos de inscripciones"
+// en A1 (falló la consulta a Supabase), restaura el título real.
+function repararTitulo_(hoja) {
+  try {
+    const titulo = String(hoja.getRange(1, 1).getValue() || '').trim();
+    if (titulo.indexOf('INSCRIPCIONES') === 0) return;
+    const ultima = hoja.getLastRow();
+    if (titulo === '' && ultima < 4) return;
+    let filas = 0;
+    if (ultima >= 4) {
+      filas = hoja.getRange(4, 2, ultima - 3, 1).getValues()
+        .filter(f => String((f && f[0]) || '').trim() !== '').length;
+    }
+    desbloquearHoja_(hoja);
+    hoja.getRange(1, 1).setValue('INSCRIPCIONES EDL 2026 - Total: ' + filas);
+    Logger.log('Título restaurado en ' + hoja.getName() + ': ' + filas + ' filas.');
+  } catch (e) {
+    Logger.log('repararTitulo_: ' + e);
+  }
 }
 
 function obtenerHojaActual_(ss) {
