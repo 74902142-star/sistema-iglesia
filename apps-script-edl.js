@@ -1,141 +1,132 @@
 // ══════════════════════════════════════════════════════════
 // INSCRIPCIONES EDL - Google Apps Script
 // Pegar en: Extensiones > Apps Script del Google Sheet
+// Libro: https://docs.google.com/spreadsheets/d/11Lov2GO5Avj-vyI0K_WixOHW5fzECj2RtXFh17qKwc0/
+//
+// HOJAS DEL LIBRO
+//   • CICLO 202610 → ciclo anterior. Solo se RENOMBRA y se BLOQUEA
+//                    (contraseña 74902142). Su contenido no se toca.
+//   • CICLO 202620 → ciclo actual. Se crea si no existe y se actualiza
+//                    con cada nueva inscripción.
+//
+// ACTUALIZACIÓN AUTOMÁTICA
+//   • Al abrir el libro (onOpen) se refresca CICLO 202620.
+//   • Para refrescar cada 5 minutos sin abrir el libro: ejecutar UNA vez
+//     crearTrigger() desde el editor de Apps Script.
+//
+// FUNCIONES
+//   actualizarCiclo202620() → refresca la hoja del ciclo actual (+ bloqueo)
+//   actualizarCiclo202610() → regenera la hoja del ciclo anterior (manual:
+//                             solo si se recuperan sus datos)
+//   crearTrigger()          → actualización automática cada 5 minutos
+//   quitarTrigger()         → elimina ese disparador
 // ══════════════════════════════════════════════════════════
 
 const SUPABASE_URL = 'https://bhuxtunecrqybnlmdspy.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_O2I6gdmeKFfxE5J6KO5kcA_2-sADXLy';
-const SHEET_NAME = 'Inscripciones EDL';
 
-function actualizarSheet() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME)
-    || SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+const HOJA_ANTERIOR = 'CICLO 202610';
+const HOJA_ACTUAL = 'CICLO 202620';
+const CICLO_ANTERIOR = '202610';
+const CICLO_ACTUAL = '202620';
+const CLAVE_BLOQUEO = '74902142';
 
-  // 1. Leer inscripciones de Supabase
-  const inscripciones = obtenerInscripciones();
-  if (inscripciones.length === 0) {
-    sheet.getRange('A1').setValue('Sin datos de inscripciones');
-    return;
+const COLUMNAS = ['Nro', 'Nombres', 'DNI', 'Celular', 'Correo', 'Lider', 'Sede', 'Curso'];
+const COLOR_TITULO = '#00334F';
+const COLOR_HEADER = '#1C6390';
+const COLOR_PAR = '#FFFFFF';
+const COLOR_IMPAR = '#F1F5F9';
+const ANCHOS_PX = [45, 246, 80, 88, 220, 158, 141, 176];
+
+// ══════════════ DISPARADORES ══════════════
+
+function onOpen() {
+  try {
+    SpreadsheetApp.getUi()
+      .createMenu('🔄 Actualizar')
+      .addItem('Actualizar inscripciones ' + CICLO_ACTUAL, 'actualizarCiclo202620')
+      .addToUi();
+  } catch (e) {
+    Logger.log('onOpen menú: ' + e);
   }
-
-  // 2. Ordenar por Curso, luego por Sede
-  inscripciones.sort((a, b) => {
-    if (a.curso < b.curso) return -1;
-    if (a.curso > b.curso) return 1;
-    if (a.sede < b.sede) return -1;
-    if (a.sede > b.sede) return 1;
-    return 0;
-  });
-
-  // 3. Preparar datos
-  const headers = ['Nombres', 'DNI', 'Celular', 'Correo', 'Líder', 'Sede', 'Curso', 'Fecha/Horario', 'Estado', 'Monto'];
-  const data = inscripciones.map(i => [
-    i.nombres || '-',
-    i.dni || '-',
-    i.celular || '-',
-    i.correo || '-',
-    i.lider || '-',
-    i.sede || '-',
-    i.curso || '-',
-    i.fechaHorario || '-',
-    i.estadoPago || '-',
-    i.monto ? 'S/ ' + i.monto : '-'
-  ]);
-
-  // 4. Limpiar hoja
-  sheet.clear();
-
-  // 5. Título
-  const lastCol = headers.length;
-  sheet.getRange(1, 1, 1, lastCol).merge();
-  const titleRange = sheet.getRange(1, 1);
-  titleRange.setValue('INSCRIPCIONES ESCUELA DE LIDERAZGO 2026');
-  titleRange.setFontFamily('Arial');
-  titleRange.setFontSize(14);
-  titleRange.setFontWeight('bold');
-  titleRange.setFontColor('#FFFFFF');
-  titleRange.setBackground('#00334F');
-  titleRange.setHorizontalAlignment('center');
-  titleRange.setVerticalAlignment('middle');
-  sheet.setRowHeight(1, 40);
-
-  // 6. Subtítulo
-  sheet.getRange(2, 1, 1, lastCol).merge();
-  const subRange = sheet.getRange(2, 1);
-  subRange.setValue('Total: ' + inscripciones.length + ' inscripciones | Actualizado: ' + new Date().toLocaleString('es-PE'));
-  subRange.setFontFamily('Arial');
-  subRange.setFontSize(10);
-  subRange.setFontColor('#64748B');
-  subRange.setBackground('#F1F5F9');
-  subRange.setHorizontalAlignment('center');
-  sheet.setRowHeight(2, 25);
-
-  // 7. Headers
-  const headerRange = sheet.getRange(3, 1, 1, lastCol);
-  headerRange.setValues([headers]);
-  headerRange.setFontFamily('Arial');
-  headerRange.setFontSize(10);
-  headerRange.setFontWeight('bold');
-  headerRange.setFontColor('#FFFFFF');
-  headerRange.setBackground('#1C6390');
-  headerRange.setHorizontalAlignment('center');
-  headerRange.setBorder(true, true, true, true, true, true);
-  sheet.setRowHeight(3, 28);
-
-  // 8. Datos
-  if (data.length > 0) {
-    const dataRange = sheet.getRange(4, 1, data.length, lastCol);
-    dataRange.setValues(data);
-    dataRange.setFontFamily('Arial');
-    dataRange.setFontSize(10);
-    dataRange.setBorder(true, true, true, true, true, true);
-
-    // Colores alternados por fila
-    for (let i = 0; i < data.length; i++) {
-      const rowRange = sheet.getRange(i + 4, 1, 1, lastCol);
-      rowRange.setBackground(i % 2 === 0 ? '#FFFFFF' : '#F8FAFC');
-      rowRange.setVerticalAlignment('middle');
-    }
-
-    // Colores por estado de pago
-    for (let i = 0; i < data.length; i++) {
-      const estado = data[i][8]; // columna Estado
-      const estadoCell = sheet.getRange(i + 4, 9);
-      if (estado === 'Canceló') {
-        estadoCell.setBackground('#DCFCE7');
-        estadoCell.setFontColor('#16A34A');
-      } else {
-        estadoCell.setBackground('#FEF2F2');
-        estadoCell.setFontColor('#DC2626');
-      }
-    }
-
-    // Filtros automáticos
-    sheet.getRange(3, 1, data.length + 1, lastCol).createFilter();
+  try {
+    actualizarCiclo202620();
+  } catch (e) {
+    Logger.log('onOpen actualización: ' + e);
   }
-
-  // 9. Anchos de columna
-  sheet.setColumnWidth(1, 280);  // Nombres
-  sheet.setColumnWidth(2, 90);   // DNI
-  sheet.setColumnWidth(3, 100);  // Celular
-  sheet.setColumnWidth(4, 260);  // Correo
-  sheet.setColumnWidth(5, 200);  // Líder
-  sheet.setColumnWidth(6, 180);  // Sede
-  sheet.setColumnWidth(7, 220);  // Curso
-  sheet.setColumnWidth(8, 280);  // Fecha/Horario
-  sheet.setColumnWidth(9, 90);   // Estado
-  sheet.setColumnWidth(10, 80);  // Monto
-
-  // 10. Fijar filas superiores
-  sheet.setFrozenRows(3);
-
-  SpreadsheetApp.flush();
-  Logger.log('✅ Sheet actualizado: ' + inscripciones.length + ' inscripciones');
 }
 
-function obtenerInscripciones() {
-  const url = SUPABASE_URL + '/rest/v1/inscripciones?select=*&order=timestamp.desc&limit=1000';
-  const options = {
+function crearTrigger() {
+  const existe = ScriptApp.getProjectTriggers()
+    .some(t => t.getHandlerFunction() === 'actualizarCiclo202620');
+  if (existe) {
+    Logger.log('El disparador de 5 minutos ya existe.');
+    return;
+  }
+  ScriptApp.newTrigger('actualizarCiclo202620').timeBased().everyMinutes(5).create();
+  Logger.log('Disparador creado: cada 5 minutos.');
+}
+
+function quitarTrigger() {
+  ScriptApp.getProjectTriggers()
+    .filter(t => t.getHandlerFunction() === 'actualizarCiclo202620')
+    .forEach(t => ScriptApp.deleteTrigger(t));
+  Logger.log('Disparador eliminado.');
+}
+
+// ══════════════ HOJAS ══════════════
+
+// Primera pestaña = ciclo anterior: solo renombrar (si hace falta) y bloquear.
+function prepararHojaAnterior_(ss) {
+  let hoja = ss.getSheetByName(HOJA_ANTERIOR);
+  if (!hoja) {
+    hoja = ss.getSheets()[0];
+    if (hoja.getName() !== HOJA_ACTUAL) {
+      try {
+        hoja.setName(HOJA_ANTERIOR);
+      } catch (e) {
+        Logger.log('No se pudo renombrar la hoja: ' + e);
+      }
+    }
+    hoja = ss.getSheetByName(HOJA_ANTERIOR) || hoja;
+  }
+  bloquearHoja_(hoja);
+  return hoja;
+}
+
+function obtenerHojaActual_(ss) {
+  let hoja = ss.getSheetByName(HOJA_ACTUAL);
+  if (!hoja) hoja = ss.insertSheet(HOJA_ACTUAL, 1);
+  return hoja;
+}
+
+function bloquearHoja_(hoja) {
+  try {
+    const protecciones = hoja.getProtections(SpreadsheetApp.SheetProtectionType.SHEET);
+    if (protecciones.length > 0) return false;
+    const proteccion = hoja.protect();
+    proteccion.setWarningOnly(false);
+    proteccion.setDescription('Ciclo ' + CICLO_ANTERIOR + ' finalizado. Editar solo con contraseña.');
+    proteccion.setPassword(CLAVE_BLOQUEO);
+    const editores = proteccion.getEditors();
+    if (editores.length) proteccion.removeEditors(editores);
+    return true;
+  } catch (e) {
+    Logger.log('bloquearHoja_: ' + e);
+    return false;
+  }
+}
+
+function desbloquearHoja_(hoja) {
+  hoja.getProtections(SpreadsheetApp.SheetProtectionType.SHEET)
+    .forEach(p => p.remove());
+}
+
+// ══════════════ DATOS (Supabase) ══════════════
+
+function obtenerInscripciones_(ciclo) {
+  const columnas = 'nombres,dni,celular,correo,lider,sede,cursoNombre,timestamp';
+  const opciones = {
     method: 'get',
     headers: {
       'apikey': SUPABASE_KEY,
@@ -143,51 +134,133 @@ function obtenerInscripciones() {
     },
     muteHttpExceptions: true
   };
+  let datos = [];
+  let offset = 0;
+  for (let pagina = 0; pagina < 20; pagina++) {
+    const url = SUPABASE_URL + '/rest/v1/inscripciones?select=' + columnas +
+      '&ciclo=eq.' + encodeURIComponent(ciclo) +
+      '&order=timestamp.asc&limit=1000&offset=' + offset;
+    const respuesta = UrlFetchApp.fetch(url, opciones);
+    if (respuesta.getResponseCode() !== 200) {
+      Logger.log('Error Supabase (' + respuesta.getResponseCode() + '): ' +
+        respuesta.getContentText().slice(0, 300));
+      break;
+    }
+    const fila = JSON.parse(respuesta.getContentText());
+    if (!Array.isArray(fila)) {
+      Logger.log('Respuesta inesperada: ' + respuesta.getContentText().slice(0, 300));
+      break;
+    }
+    datos = datos.concat(fila);
+    if (fila.length < 1000) break;
+    offset += 1000;
+  }
+  // Omite registros vacíos (sin nombre): no son inscripciones.
+  return datos.filter(r => (r.nombres || '').trim() !== '');
+}
 
-  const response = UrlFetchApp.fetch(url, options);
-  const rows = JSON.parse(response.getContentText());
-  if (!Array.isArray(rows)) {
-    Logger.log('Error Supabase: ' + response.getContentText());
-    return [];
+function ordenar_(datos) {
+  return datos.sort((a, b) => {
+    const cursoA = (a.cursoNombre || '').toLowerCase();
+    const cursoB = (b.cursoNombre || '').toLowerCase();
+    if (cursoA !== cursoB) return cursoA < cursoB ? -1 : 1;
+    const fechaA = a.timestamp || '';
+    const fechaB = b.timestamp || '';
+    if (fechaA !== fechaB) return fechaA < fechaB ? -1 : 1;
+    return 0;
+  });
+}
+
+// ══════════════ ESCRITURA (mismo diseño que la hoja del ciclo 202610) ══════════════
+
+function texto_(valor) {
+  if (valor === null || valor === undefined) return '-';
+  const t = String(valor).trim();
+  return t === '' ? '-' : t;
+}
+
+function escribirHoja_(hoja, titulo, datos, hojaOrigen) {
+  try {
+    if (hoja.getLastRow() > 0) hoja.getDataRange().breakApart();
+  } catch (e) { /* sin celdas combinadas */ }
+  hoja.clear();
+
+  // Título (fila 1, combinada A1:H1)
+  hoja.getRange(1, 1, 1, COLUMNAS.length).merge();
+  hoja.getRange(1, 1)
+    .setValue(titulo)
+    .setFontFamily('Arial')
+    .setFontSize(14)
+    .setFontWeight('bold')
+    .setFontColor('#FFFFFF')
+    .setBackground(COLOR_TITULO)
+    .setHorizontalAlignment('center')
+    .setVerticalAlignment('middle');
+
+  // Fila 2: separadora en blanco. Encabezados en la fila 3.
+  hoja.getRange(3, 1, 1, COLUMNAS.length)
+    .setValues([COLUMNAS])
+    .setFontFamily('Arial')
+    .setFontSize(10)
+    .setFontColor('#FFFFFF')
+    .setBackground(COLOR_HEADER)
+    .setHorizontalAlignment('center')
+    .setVerticalAlignment('middle');
+
+  // Datos desde la fila 4, con filas alternadas.
+  const filas = datos.map((d, i) => [
+    i + 1,
+    texto_(d.nombres),
+    texto_(d.dni),
+    texto_(d.celular),
+    texto_(d.correo),
+    texto_(d.lider),
+    texto_(d.sede),
+    texto_(d.cursoNombre)
+  ]);
+  if (filas.length > 0) {
+    hoja.getRange(4, 1, filas.length, COLUMNAS.length)
+      .setValues(filas)
+      .setFontFamily('Arial')
+      .setFontSize(10)
+      .setVerticalAlignment('middle');
+    for (let i = 0; i < filas.length; i++) {
+      hoja.getRange(4 + i, 1, 1, COLUMNAS.length)
+        .setBackground(i % 2 === 0 ? COLOR_PAR : COLOR_IMPAR);
+    }
   }
 
-  return rows.map(r => ({
-    nombres:      r.nombres || '',
-    dni:          r.dni || '',
-    celular:      r.celular || '',
-    correo:       r.correo || '',
-    lider:        r.lider || '',
-    sede:         r.sede || '',
-    curso:        r.cursoNombre || '',
-    fechaHorario: r.fechaHorario || '',
-    estadoPago:   r.estadoPago || '',
-    monto:        r.monto || ''
-  }));
+  // Anchos de columna (los mismos del ciclo anterior cuando existen).
+  for (let c = 1; c <= COLUMNAS.length; c++) {
+    let ancho = ANCHOS_PX[c - 1];
+    if (hojaOrigen) {
+      try { ancho = hojaOrigen.getColumnWidth(c); } catch (e) { /* usa el ancho base */ }
+    }
+    hoja.setColumnWidth(c, ancho);
+  }
+
+  hoja.setFrozenRows(3);
 }
 
-// ══════════════════════════════════════════════════════════
-// TRIGGER: Se ejecuta cada vez que alguien abre el sheet
-// ══════════════════════════════════════════════════════════
-function onOpen() {
-  SpreadsheetApp.getUi()
-    .createMenu('🔄 Actualizar')
-    .addItem('Actualizar desde Supabase', 'actualizarSheet')
-    .addToUi();
+// ══════════════ ACTUALIZACIÓN ══════════════
 
-  // Auto-actualizar al abrir
-  actualizarSheet();
+function actualizarCiclo202620() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hojaAnterior = prepararHojaAnterior_(ss);
+  const hojaActual = obtenerHojaActual_(ss);
+  const datos = ordenar_(obtenerInscripciones_(CICLO_ACTUAL));
+  escribirHoja_(hojaActual, 'INSCRIPCIONES EDL 2026 - Total: ' + datos.length, datos, hojaAnterior);
+  Logger.log('Hoja ' + HOJA_ACTUAL + ' actualizada: ' + datos.length + ' inscripciones.');
 }
 
-// ══════════════════════════════════════════════════════════
-// TRIGGER TEMPORAL: Actualiza cada 5 minutos (opcional)
-// Para activar: Uncomment la función de abajo y crear un
-// time-driven trigger desde el editor de Apps Script
-// ══════════════════════════════════════════════════════════
-/*
-function crearTrigger() {
-  ScriptApp.newTrigger('actualizarSheet')
-    .timeBased()
-    .everyMinutes(5)
-    .create();
+// Manual: regenera la hoja del ciclo anterior desde Supabase.
+// (La hoja queda bloqueada de nuevo al terminar.)
+function actualizarCiclo202610() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hojaAnterior = prepararHojaAnterior_(ss);
+  desbloquearHoja_(hojaAnterior);
+  const datos = ordenar_(obtenerInscripciones_(CICLO_ANTERIOR));
+  escribirHoja_(hojaAnterior, 'INSCRIPCIONES EDL 2026 - Total: ' + datos.length, datos, null);
+  bloquearHoja_(hojaAnterior);
+  Logger.log('Hoja ' + HOJA_ANTERIOR + ' regenerada: ' + datos.length + ' inscripciones.');
 }
-*/
