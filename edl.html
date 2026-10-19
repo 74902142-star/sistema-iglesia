@@ -557,10 +557,8 @@
             }
         }
 
-        // Contraseña desactivada para invitados hasta el 18 de octubre de 2026, 11:55 PM hora Perú.
-        // Fecha calculada en UTC: Perú es UTC-5 → 18 oct 23:55 PM = 19 oct 04:55 UTC.
-        var fechaReactivar = Date.UTC(2026, 9, 19, 4, 55, 0);
-        if (esInvitado && Date.now() < fechaReactivar) {
+        // Contraseña quitada: el invitado se inscribe directo mientras el curso esté abierto.
+        if (esInvitado) {
             document.getElementById('edlPasswordGate').style.display = 'none';
             document.getElementById('edlGuestContent').style.display = 'block';
         }
@@ -611,6 +609,45 @@
             return Object.keys(CURSOS_POR_CICLO).reduce(function (acc, k) { return acc.concat(CURSOS_POR_CICLO[k]); }, []);
         }
 
+        // ── Cierre de inscripciones: al terminar la 2ª clase (inicio + 7 días,
+        //    a la hora final de la clase, hora Perú UTC-5) ──
+        const MESES_CAT = {
+            enero: 0, febrero: 1, marzo: 2, abril: 3, mayo: 4, junio: 5, julio: 6,
+            agosto: 7, septiembre: 8, setiembre: 8, octubre: 9, noviembre: 10, diciembre: 11
+        };
+        const NOMBRES_MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        const DIAS_SEMANA = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+
+        function cierreCurso(curso) {
+            if (!curso) return null;
+            const m = String(curso.inicio || '').match(/(\d{1,2})\s+de\s+([a-záéíóúñ]+)/i);
+            const mes = m ? MESES_CAT[m[2].toLowerCase()] : undefined;
+            if (!m || mes === undefined) return null;
+            const partes = String(curso.hora || '').split('-');
+            const h = partes[partes.length - 1].match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+            if (!h) return null;
+            let hora = parseInt(h[1], 10) % 12;
+            if (h[3].toUpperCase() === 'PM') hora += 12;
+            const anio = parseInt(CICLO_ACTUAL.slice(0, 4), 10);
+            return Date.UTC(anio, mes, parseInt(m[1], 10) + 7, hora + 5, parseInt(h[2], 10));
+        }
+
+        function cursoCerrado(curso) {
+            const cierre = cierreCurso(curso);
+            return cierre !== null && Date.now() >= cierre;
+        }
+
+        function fechaCierreTexto(curso) {
+            const cierre = cierreCurso(curso);
+            if (cierre === null) return '';
+            const d = new Date(cierre - 5 * 3600 * 1000);
+            const hh = d.getUTCHours();
+            const mm = String(d.getUTCMinutes()).padStart(2, '0');
+            return DIAS_SEMANA[d.getUTCDay()] + ' ' + d.getUTCDate() + ' de ' +
+                NOMBRES_MESES[d.getUTCMonth()] + ', ' + ((hh % 12) || 12) + ':' + mm + ' ' +
+                (hh >= 12 ? 'PM' : 'AM');
+        }
+
         const dbIns = db.collection('inscripciones');
         let inscripciones = [];
         let inscripcionesFiltradas = [];
@@ -619,11 +656,19 @@
         function initCursosSelect() {
             const selModal = document.getElementById('insCurso');
             const selGuest = document.getElementById('guestCurso');
+            let abiertos = 0;
             cursosDe(CICLO_ACTUAL).forEach(c => {
+                if (cursoCerrado(c)) return;   // cerró al terminar su 2ª clase: ya no se lista
+                abiertos++;
                 const opt = `<option value="${c.id}">${c.nombre}</option>`;
                 if (selModal) selModal.innerHTML += opt;
                 if (selGuest) selGuest.innerHTML += opt;
             });
+            if (abiertos === 0) {
+                const vacio = '<option value="" disabled selected>No hay cursos abiertos</option>';
+                if (selModal) selModal.innerHTML = vacio;
+                if (selGuest) selGuest.innerHTML = vacio;
+            }
             actualizarFiltroCursos();
         }
 
@@ -718,7 +763,7 @@
             const curso = getCurso(this.value, CICLO_ACTUAL);
             const info = document.getElementById('cursoInfo');
             if (!curso) { info.style.display = 'none'; return; }
-            info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}<br><strong>💰 Costo:</strong> ${formatMonto(curso.monto)}`;
+            info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}<br><strong>🔒 Inscripciones hasta:</strong> ${fechaCierreTexto(curso)}<br><strong>💰 Costo:</strong> ${formatMonto(curso.monto)}`;
             info.style.display = 'block';
             document.getElementById('insMonto').value = formatMonto(curso.monto);
             if (curso.requiereDisc3) {
@@ -770,7 +815,7 @@
                 const curso = getCurso(this.value, CICLO_ACTUAL);
                 const info = document.getElementById('guestCursoInfo');
                 if (!curso) { info.style.display = 'none'; return; }
-                info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}<br><strong>💰 Costo:</strong> ${formatMonto(curso.monto)}`;
+                info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}<br><strong>🔒 Inscripciones hasta:</strong> ${fechaCierreTexto(curso)}<br><strong>💰 Costo:</strong> ${formatMonto(curso.monto)}`;
                 info.style.display = 'block';
                 if (curso.requiereDisc3) {
                     toast('El alumno debe haber aprobado Discipulado 3. Verifique que cumpla el requisito.', 'warning');
@@ -790,6 +835,7 @@
                     const cursoId = document.getElementById('guestCurso').value;
                     const curso = getCurso(cursoId, CICLO_ACTUAL);
                     if (!curso) { throw new Error('Selecciona un curso'); }
+                    if (cursoCerrado(curso)) { throw new Error('Las inscripciones de ' + curso.nombre + ' ya cerraron (terminó su 2ª clase)'); }
 
                     const docTipo = document.getElementById('guestDocTipo').value;
                     const docNum = document.getElementById('guestDocNum').value.trim();
