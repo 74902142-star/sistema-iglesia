@@ -10,55 +10,71 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=13">
     <style>
-        .ng-hero { text-align: center; margin-bottom: 24px; }
-        .ng-hero-icon { width: 92px; height: 92px; background: linear-gradient(135deg, #00334f, #1c6390); border-radius: 26px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; box-shadow: 0 10px 30px rgba(0, 51, 79, 0.28); }
-        .ng-hero h1 { font-size: 27px; font-weight: 800; color: #00334f; margin-bottom: 6px; letter-spacing: -0.5px; }
-        .ng-hero p { color: #64748b; font-size: 14.5px; font-weight: 500; }
+        .ng-hero { background: linear-gradient(135deg, #00334f 0%, #1c6390 100%); border-radius: 22px; padding: 24px 28px; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; box-shadow: 0 14px 36px rgba(0, 51, 79, 0.28); position: relative; overflow: hidden; }
+        .ng-hero::after { content: ''; position: absolute; right: -50px; top: -60px; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.06); border-radius: 50%; pointer-events: none; }
+        .ng-hero-icon { width: 72px; height: 72px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.25); border-radius: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; backdrop-filter: blur(6px); }
+        .ng-hero h1 { color: #fff; font-size: 24px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.4px; }
+        .ng-hero p { color: rgba(255, 255, 255, 0.75); font-size: 14px; font-weight: 500; margin: 0; }
 
         .ng-gate-card { background: #fff; border-radius: 24px; padding: 40px 32px; width: 100%; max-width: 420px; margin: 40px auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18); text-align: center; animation: ngUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes ngUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .ng-gate-card h2 { font-size: 22px; font-weight: 700; color: #1e293b; margin: 0 0 6px; }
-        .ng-gate-card p { color: #64748b; font-size: 14px; margin: 0 0 24px; }
-        .ng-pass-input { width: 100%; padding: 14px 18px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 16px; text-align: center; letter-spacing: 6px; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+        .ng-gate-card img { width: 68px; height: 68px; object-fit: contain; border-radius: 16px; margin-bottom: 12px; }
+        .ng-gate-card h2 { font-size: 21px; font-weight: 700; color: #1e293b; margin: 0 0 6px; }
+        .ng-gate-card p { color: #64748b; font-size: 14px; margin: 0 0 22px; }
+        .ng-pass-input { width: 100%; padding: 14px 18px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 16px; text-align: center; letter-spacing: 6px; outline: none; transition: border-color 0.2s; box-sizing: border-box; font-family: inherit; }
         .ng-pass-input:focus { border-color: #00334f; box-shadow: 0 0 0 3px rgba(0, 51, 79, 0.1); }
-        .ng-pass-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #00334f, #1c6390); color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 16px; transition: transform 0.2s, box-shadow 0.2s; }
+        .ng-pass-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #00334f, #1c6390); color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 16px; transition: transform 0.2s, box-shadow 0.2s; font-family: inherit; }
         .ng-pass-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 51, 79, 0.3); }
         .ng-pass-error { color: #dc2626; font-size: 13px; font-weight: 600; margin-top: 12px; display: none; }
 
-        .ng-controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; background: #fff; border-radius: 18px; padding: 16px 20px; box-shadow: 0 6px 24px rgba(0, 51, 79, 0.07); margin-bottom: 16px; }
+        .ng-controls { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; background: #fff; border: 1px solid #e8eef5; border-radius: 18px; padding: 16px 20px; box-shadow: 0 4px 18px rgba(0, 51, 79, 0.05); margin-bottom: 14px; }
         .ng-field { display: flex; flex-direction: column; gap: 6px; }
-        .ng-field label { font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-        .ng-field select, .ng-field input { padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; outline: none; background: #fff; font-family: inherit; }
-        .ng-field select:focus, .ng-field input:focus { border-color: #1c6390; }
-        .ng-actions { display: flex; gap: 10px; margin-left: auto; flex-wrap: wrap; }
-        .ng-btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 16px; border: none; border-radius: 12px; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.15s, box-shadow 0.15s; }
-        .ng-btn:hover { transform: translateY(-1px); }
-        .ng-btn-primary { background: linear-gradient(135deg, #00334f, #1c6390); color: #fff; box-shadow: 0 4px 14px rgba(0, 51, 79, 0.25); }
+        .ng-field label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; }
+        .ng-field select, .ng-field input { padding: 11px 13px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; outline: none; background: #fff; font-family: inherit; transition: border-color 0.15s; }
+        .ng-field select:focus, .ng-field input:focus { border-color: #1c6390; box-shadow: 0 0 0 3px rgba(28, 99, 144, 0.1); }
+        .ng-badge { display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 700; white-space: nowrap; align-self: flex-end; }
+        .ng-badge.ok { background: #dcfce7; color: #166534; }
+        .ng-badge.warn { background: #fef9c3; color: #854d0e; }
+        .ng-badge.info { background: #e0f2fe; color: #075985; }
+        .ng-actions { display: flex; gap: 9px; margin-left: auto; flex-wrap: wrap; align-items: flex-end; }
+        .ng-btn { display: inline-flex; align-items: center; gap: 7px; padding: 11px 16px; border: none; border-radius: 12px; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.15s, box-shadow 0.15s, filter 0.15s; white-space: nowrap; }
+        .ng-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        .ng-btn:active { transform: translateY(0); }
+        .ng-btn-primary { background: linear-gradient(135deg, #00334f, #1c6390); color: #fff; box-shadow: 0 4px 14px rgba(0, 51, 79, 0.28); }
         .ng-btn-soft { background: #e8f4ff; color: #1c6390; }
         .ng-btn-green { background: #dcfce7; color: #166534; }
-        .ng-sync { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 700; }
-        .ng-sync.ok { background: #dcfce7; color: #166534; }
-        .ng-sync.warn { background: #fef9c3; color: #854d0e; }
 
-        .ng-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 12px; margin-bottom: 16px; }
-        .ng-chip { background: #fff; border-radius: 16px; padding: 14px 16px; box-shadow: 0 6px 24px rgba(0, 51, 79, 0.07); }
-        .ng-chip .k { font-size: 12px; color: #64748b; font-weight: 600; }
-        .ng-chip .v { font-size: 23px; font-weight: 800; color: #00334f; margin-top: 4px; }
+        .ng-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 14px; }
+        .ng-chip { background: #fff; border: 1px solid #e8eef5; border-left: 5px solid var(--ac, #1c6390); border-radius: 14px; padding: 13px 16px; box-shadow: 0 4px 18px rgba(0, 51, 79, 0.05); }
+        .ng-chip .k { font-size: 11.5px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+        .ng-chip .v { font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 3px; line-height: 1.15; }
+        .chip-blue { --ac: #1c6390; }
+        .chip-teal { --ac: #0e7490; }
+        .chip-navy { --ac: #00334f; }
+        .chip-green { --ac: #16a34a; }
 
-        .ng-table-wrap { background: #fff; border-radius: 18px; box-shadow: 0 6px 24px rgba(0, 51, 79, 0.07); overflow: hidden; margin-bottom: 16px; }
-        .ng-table-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 20px 10px; }
-        .ng-table-head h3 { font-size: 16.5px; font-weight: 700; color: #1e293b; margin: 0; }
-        .ng-table-wrap .table-container { padding: 0 12px 14px; border: none; border-radius: 0; box-shadow: none; }
+        .ng-table-wrap { background: #fff; border: 1px solid #e8eef5; border-radius: 18px; box-shadow: 0 4px 18px rgba(0, 51, 79, 0.05); overflow: hidden; margin-bottom: 14px; }
+        .ng-table-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 15px 20px 10px; }
+        .ng-table-head h3 { font-size: 16px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .ng-table-head span { font-size: 12.5px; color: #94a3b8; }
+        .ng-table-head b { color: #1c6390; }
+        .ng-table-wrap .table-container { padding: 0 10px 12px; border: none; border-radius: 0; box-shadow: none; }
         #tablaNotas { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; }
         #tablaNotas th { font-size: 12px; padding: 8px 6px; text-align: center; white-space: nowrap; }
         #tablaNotas thead tr:first-child th { border-bottom: none; }
-        .th-grp { text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px !important; color: #fff !important; }
-        .th-asist { background: #1c6390; }
-        .th-crec { background: #0e7490; }
-        .th-fin { background: #00334f; }
-        .th-calc { background: #475569; }
-        #tablaNotas thead .c-alumno { background: #00334f; color: #fff; position: sticky; left: 0; z-index: 3; font-size: 12px; vertical-align: middle; min-width: 230px; }
-        #tablaNotas tbody .c-alumno { position: sticky; left: 0; background: #fff; z-index: 1; text-align: left; padding: 7px 12px; min-width: 230px; border-right: 2px solid #eef2f7; }
+        #tablaNotas thead tr:nth-child(2) th { background: #f8fafc; color: #334155; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
+        .th-grp { text-transform: uppercase; letter-spacing: 0.6px; font-size: 10.5px !important; color: #fff !important; font-weight: 800 !important; background: #64748b !important; padding: 7px 6px !important; border-bottom: none !important; }
+        .th-asist { background: #1c6390 !important; }
+        .th-crec { background: #0e7490 !important; }
+        .th-fin { background: #00334f !important; }
+        .th-calc { background: #334155 !important; }
+        #tablaNotas thead .c-alumno { background: #00334f !important; color: #fff; position: sticky; left: 0; z-index: 3; font-size: 12px; vertical-align: middle; min-width: 230px; border-bottom: none; }
+        #tablaNotas tbody .c-alumno { position: sticky; left: 0; background: #fff; z-index: 1; text-align: left; padding: 8px 12px; min-width: 230px; border-right: 2px solid #eef2f7; }
+        #tablaNotas tbody td { border-bottom: 1px solid #f1f5f9; padding: 5px 4px; vertical-align: middle; background: #fff; }
+        #tablaNotas tbody tr:nth-child(even) td { background: #f8fafc; }
+        #tablaNotas tbody tr:hover td { background: #eaf4ff; }
+        .c-alumno strong { display: block; font-size: 13.5px; color: #0f172a; font-weight: 700; line-height: 1.25; }
+        .c-alumno .sub { display: block; font-size: 11px; color: #94a3b8; font-weight: 500; margin-top: 1px; }
         .th-ses, .td-ses { min-width: 64px; width: 64px; }
         .th-num, .td-num { min-width: 80px; }
         th[data-calc="crec"], td.calc[data-calc="crec"] { min-width: 78px; }
@@ -66,35 +82,31 @@
         th[data-calc="faltas"], td.calc[data-calc="faltas"] { min-width: 74px; }
         th[data-calc="prom"], td.calc[data-calc="prom"] { min-width: 94px; }
         th[data-calc="cond"], .td-cond { min-width: 124px; }
-        #tablaNotas tbody tr:hover .c-alumno { background: #f8fafc; }
-        #tablaNotas tbody td { border-bottom: 1px solid #f1f5f9; padding: 5px 4px; vertical-align: middle; }
-        .c-alumno strong { display: block; font-size: 13.5px; color: #1e293b; font-weight: 600; }
-        .c-alumno .sub { display: block; font-size: 11px; color: #94a3b8; font-weight: 500; }
 
-        .asist-sel { width: 54px; padding: 6px 3px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 800; text-align: center; outline: none; background: #fff; cursor: pointer; font-family: inherit; appearance: auto; }
-        .asist-sel:focus { border-color: #1c6390; }
+        .asist-sel { width: 54px; padding: 6px 3px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 800; text-align: center; outline: none; background: #fff; cursor: pointer; font-family: inherit; appearance: auto; transition: box-shadow 0.15s; }
+        .asist-sel:focus { border-color: #1c6390; box-shadow: 0 0 0 3px rgba(28, 99, 144, 0.12); }
         .asist-sel.a { background: #dcfce7; border-color: #86efac; color: #166534; }
         .asist-sel.t { background: #fef9c3; border-color: #fde047; color: #854d0e; }
         .asist-sel.f { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
-        .ng-num { width: 70px; padding: 7px 4px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; text-align: center; outline: none; font-family: inherit; }
-        .ng-num:focus { border-color: #1c6390; background: #f8fbff; }
+        .ng-num { width: 70px; padding: 7px 4px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; text-align: center; outline: none; font-family: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
+        .ng-num:focus { border-color: #1c6390; box-shadow: 0 0 0 3px rgba(28, 99, 144, 0.12); background: #fff; }
 
         .calc { text-align: center; font-weight: 700; color: #00334f; white-space: nowrap; font-size: 13.5px; padding: 6px 8px !important; }
-        .calc.strong { font-size: 16px; font-weight: 800; }
-        .cond { display: inline-block; padding: 3px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
-        .cond-ok { background: #dcfce7; color: #166534; }
-        .cond-no { background: #fee2e2; color: #991b1b; }
+        .calc.strong { font-size: 16.5px; font-weight: 800; }
+        .cond { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; letter-spacing: 0.2px; }
+        .cond-ok { background: #dcfce7; color: #166534; box-shadow: inset 0 0 0 1px #bbf7d0; }
+        .cond-no { background: #fee2e2; color: #991b1b; box-shadow: inset 0 0 0 1px #fecaca; }
         .cond-ne { background: #f1f5f9; color: #64748b; }
 
-        .ng-empty { text-align: center; padding: 34px 16px; color: #94a3b8; font-size: 14.5px; white-space: normal !important; }
+        .ng-empty { text-align: center; padding: 36px 16px; color: #94a3b8; font-size: 14.5px; white-space: normal !important; }
 
-        .ng-manual { display: none; gap: 10px; flex-wrap: wrap; align-items: flex-end; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; }
+        .ng-manual { display: none; gap: 10px; flex-wrap: wrap; align-items: flex-end; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
         .ng-manual.show { display: flex; }
 
-        .ng-legend { background: #fff; border-radius: 18px; padding: 18px 22px; box-shadow: 0 6px 24px rgba(0, 51, 79, 0.07); font-size: 13.5px; color: #475569; line-height: 1.75; }
-        .ng-legend h4 { margin: 0 0 8px; font-size: 15px; color: #00334f; font-weight: 800; }
+        .ng-legend { background: #fff; border: 1px solid #e8eef5; border-left: 5px solid #1c6390; border-radius: 16px; padding: 18px 22px; box-shadow: 0 4px 18px rgba(0, 51, 79, 0.05); font-size: 13.5px; color: #475569; line-height: 1.8; }
+        .ng-legend h4 { margin: 0 0 8px; font-size: 15px; color: #00334f; font-weight: 800; display: flex; align-items: center; gap: 8px; }
         .ng-legend b { color: #1e293b; }
-        .ng-legend .tag { display: inline-block; padding: 1px 8px; border-radius: 6px; font-weight: 800; font-size: 12.5px; margin-right: 3px; }
+        .ng-legend .tag { display: inline-block; padding: 1px 9px; border-radius: 6px; font-weight: 800; font-size: 12.5px; margin-right: 3px; }
         .tag-a { background: #dcfce7; color: #166534; }
         .tag-t { background: #fef9c3; color: #854d0e; }
         .tag-f { background: #fee2e2; color: #991b1b; }
@@ -164,8 +176,8 @@
             <div class="container">
                 <div id="notasGate" style="display:none;">
                     <div class="ng-gate-card">
-                        <div style="font-size:40px;margin-bottom:12px;">🔒</div>
-                        <h2>Registro de Notas</h2>
+                        <img src="logo.png" alt="Agua Viva">
+                        <h2>🔒 Registro de Notas</h2>
                         <p>Ingresa la contraseña del módulo para continuar</p>
                         <input type="password" id="notasPasswordInput" class="ng-pass-input" placeholder="••••••••"
                             onkeydown="if(event.key==='Enter')verificarPasswordNotas()">
@@ -176,22 +188,22 @@
 
                 <div id="notasApp" style="display:none;">
                     <div class="ng-hero">
-                        <div class="ng-hero-icon"><i data-lucide="clipboard-check" style="width:44px;height:44px;color:#fff;"></i></div>
-                        <h1>Registro de Notas</h1>
-                        <p>Asistencia, crecimiento espiritual, trabajo final y examen final — ciclo 202620</p>
+                        <div class="ng-hero-icon"><i data-lucide="clipboard-check" style="width:38px;height:38px;color:#fff;"></i></div>
+                        <div>
+                            <h1>Registro de Notas</h1>
+                            <p>Asistencia (9 sesiones) · Crecimiento espiritual · Trabajo final · Examen final — ciclo 202620</p>
+                        </div>
                     </div>
 
                     <div class="ng-controls">
                         <div class="ng-field">
                             <label for="selCurso">Curso</label>
-                            <select id="selCurso" style="min-width:260px"></select>
+                            <select id="selCurso" style="min-width:310px"></select>
                         </div>
-                        <div class="ng-field">
-                            <label for="selSesiones">N° de sesiones</label>
-                            <select id="selSesiones"></select>
-                        </div>
+                        <span id="cicloBadge" class="ng-badge info">👥 Cargando lista del ciclo…</span>
                         <div class="ng-actions">
-                            <span id="syncBadge" class="ng-sync ok">✓ Sincronizado</span>
+                            <span id="syncBadge" class="ng-badge ok">✓ Sincronizado</span>
+                            <button class="ng-btn ng-btn-soft" onclick="actualizarLista()" title="Volver a bajar la lista de inscritos y las notas"><i data-lucide="refresh-cw" style="width:15px;height:15px;"></i> Actualizar</button>
                             <button class="ng-btn ng-btn-soft" onclick="alternarManual()"><i data-lucide="user-plus" style="width:15px;height:15px;"></i> Agregar alumno</button>
                             <button class="ng-btn ng-btn-soft" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width:15px;height:15px;"></i> Excel</button>
                             <button class="ng-btn ng-btn-primary" onclick="guardarTodo()"><i data-lucide="save" style="width:15px;height:15px;"></i> Guardar todo</button>
@@ -211,16 +223,16 @@
                     </div>
 
                     <div class="ng-chips">
-                        <div class="ng-chip"><div class="k">Alumnos</div><div class="v" id="chipAlumnos">0</div></div>
-                        <div class="ng-chip"><div class="k">Con notas cargadas</div><div class="v" id="chipNotas">0</div></div>
-                        <div class="ng-chip"><div class="k">Promedio del curso</div><div class="v" id="chipProm">—</div></div>
-                        <div class="ng-chip"><div class="k">Aprobados / Desaprobados</div><div class="v" id="chipCond">0 / 0</div></div>
+                        <div class="ng-chip chip-blue"><div class="k">Alumnos del curso</div><div class="v" id="chipAlumnos">0</div></div>
+                        <div class="ng-chip chip-teal"><div class="k">Con notas cargadas</div><div class="v" id="chipNotas">0</div></div>
+                        <div class="ng-chip chip-navy"><div class="k">Promedio del curso</div><div class="v" id="chipProm">—</div></div>
+                        <div class="ng-chip chip-green"><div class="k">Aprobados / Desaprobados</div><div class="v" id="chipCond">0 / 0</div></div>
                     </div>
 
                     <div class="ng-table-wrap">
                         <div class="ng-table-head">
-                            <h3><i data-lucide="table-2" style="width:17px;height:17px;vertical-align:-3px;"></i> Hoja de notas</h3>
-                            <span style="font-size:12.5px;color:#94a3b8;">Los cambios se guardan solos · <b>*</b> = promedio parcial</span>
+                            <h3><i data-lucide="table-2" style="width:17px;height:17px;"></i> Hoja de notas</h3>
+                            <span>Autoguardado al escribir · <b>*</b> = promedio parcial · 9 casillas de asistencia por alumno</span>
                         </div>
                         <div class="table-container">
                             <table id="tablaNotas">
@@ -235,19 +247,20 @@
                     </div>
 
                     <div class="ng-legend">
-                        <h4>¿Cómo se calcula la nota?</h4>
-                        <b>Asistencia por sesión:</b>
+                        <h4>📘 ¿Cómo se calcula la nota?</h4>
+                        <b>Asistencia (9 sesiones):</b>
                         <span class="tag tag-a">A = Asistió (20)</span>
                         <span class="tag tag-t">T = Llegó Tarde (15)</span>
                         <span class="tag tag-f">F = Faltó (0)</span>
                         &nbsp;·&nbsp; <b>3 tardías = 1 falta</b>.<br>
                         <b>Componentes y pesos:</b> Crecimiento Espiritual <b>40%</b> (promedio de Devocionales,
                         Asistencia a su servicio, Montaña de oración y Versículo memorizado) · Examen Final
-                        <b>25%</b> · Trabajo Final <b>20%</b> · Asistencia <b>15%</b>. Los campos vacíos no se
-                        cuentan (promedio parcial).<br>
+                        <b>25%</b> · Trabajo Final <b>20%</b> · Asistencia <b>15%</b>. Las notas van de <b>0 a 20</b>
+                        (no hay más) y los campos vacíos no se cuentan (promedio parcial).<br>
                         <b>Reglas de faltas:</b> con <b>3 faltas</b> la nota final queda fija en <b>11.0</b>; con
                         <b>más de 3 faltas</b> el alumno queda <b>Desaprobado</b> sin importar sus notas.<br>
-                        <b>Mínima aprobatoria: 11.0</b> (escala 0 – 20).
+                        <b>Mínima aprobatoria: 11.0.</b> Los alumnos se cargan automáticamente desde las
+                        inscripciones del ciclo 202620 (botón <b>Actualizar</b> para refrescar).
                     </div>
                 </div>
             </div>
@@ -267,6 +280,7 @@
 
         const PASS_MODULO = 'AguaViva2026';
         const CICLO = '202620';
+        const SESIONES = 9;
         const MIN_APROB = 11;
         const VAL_ASIST = { A: 20, T: 15, F: 0 };
         const PESO = { crec: 0.40, examen: 0.25, trabajo: 0.20, asistencia: 0.15 };
@@ -287,8 +301,9 @@
         ];
 
         let cursoActual = null;
-        let sesiones = 10;
         let filas = [];
+        let inscripcionesCiclo = [];
+        let cicloOk = true;
         let syncOk = true;
         let initHecha = false;
         const timersGuardar = {};
@@ -324,40 +339,69 @@
             }
         }
 
-        function iniciarModulo() {
+        async function iniciarModulo() {
             if (initHecha) return;
             initHecha = true;
             document.getElementById('notasApp').style.display = 'block';
             poblarControles();
-            const sel = document.getElementById('selCurso');
-            sel.value = CURSOS[0].id;
-            cargarCurso();
             if (typeof lucide !== 'undefined') lucide.createIcons();
+            await cargarCiclo();
+            document.getElementById('selCurso').value = CURSOS[0].id;
+            await cargarCurso();
         }
 
-        function cfgKey() { return 'notas_sesiones_' + cursoActual; }
         function cacheKeyFor(curso) { return 'notas_cache_' + curso; }
-        function cacheKey() { return cacheKeyFor(cursoActual); }
-        function rosterKey() { return 'notas_roster_' + cursoActual; }
+        function cicloCacheKey() { return 'notas_ciclo_' + CICLO; }
 
         function poblarControles() {
             const sel = document.getElementById('selCurso');
             sel.innerHTML = CURSOS.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + '</option>'; }).join('');
             sel.onchange = cargarCurso;
-            const selS = document.getElementById('selSesiones');
-            let opts = '';
-            for (let i = 1; i <= 20; i++) opts += '<option value="' + i + '">' + i + '</option>';
-            selS.innerHTML = opts;
-            selS.onchange = function () {
-                sesiones = parseInt(selS.value, 10) || 10;
-                localStorage.setItem(cfgKey(), sesiones);
-                filas.forEach(function (f) {
-                    f.asistencia = f.asistencia || [];
-                    while (f.asistencia.length < sesiones) f.asistencia.push('');
+        }
+
+        function inscritosDe(cursoId) {
+            return inscripcionesCiclo.filter(function (r) {
+                return r.cursoId === cursoId && (r.nombres || '').trim();
+            });
+        }
+
+        async function cargarCiclo() {
+            try {
+                inscripcionesCiclo = await SB.select('inscripciones', {
+                    filters: [{ field: 'ciclo', op: '==', value: CICLO }],
+                    columns: ['id', 'nombres', 'dni', 'cursoId'],
+                    order: { field: 'nombres', dir: 'asc' }
                 });
-                renderTabla();
-                filas.forEach(programarGuardado);
-            };
+                cicloOk = true;
+                localStorage.setItem(cicloCacheKey(), JSON.stringify(inscripcionesCiclo));
+            } catch (e) {
+                cicloOk = false;
+                try { inscripcionesCiclo = JSON.parse(localStorage.getItem(cicloCacheKey()) || '[]'); } catch (e2) { inscripcionesCiclo = []; }
+            }
+            pintarCiclo();
+        }
+
+        function pintarCiclo() {
+            const total = inscripcionesCiclo.filter(function (r) { return r.cursoId && (r.nombres || '').trim(); }).length;
+            const el = document.getElementById('cicloBadge');
+            el.className = 'ng-badge ' + (cicloOk ? 'info' : 'warn');
+            el.innerHTML = cicloOk ? '👥 ' + total + ' alumnos en el ciclo ' + CICLO : '⚠ Lista local (' + total + ')';
+            el.title = cicloOk
+                ? 'Lista tomada de las inscripciones EDL del ciclo ' + CICLO + '. Pulsa Actualizar para refrescar.'
+                : 'Sin conexión con Supabase: se muestra la última lista guardada en este equipo.';
+            const sel = document.getElementById('selCurso');
+            const actual = sel.value;
+            sel.innerHTML = CURSOS.map(function (c) {
+                const n = inscritosDe(c.id).length;
+                return '<option value="' + c.id + '">' + esc(c.nombre) + (n ? '  ·  ' + n + ' alumnos' : '') + '</option>';
+            }).join('');
+            sel.value = actual && CURSOS.some(function (c) { return c.id === actual; }) ? actual : CURSOS[0].id;
+        }
+
+        async function actualizarLista() {
+            await cargarCiclo();
+            if (cursoActual) await cargarCurso();
+            toast('🔄 Lista actualizada: ' + inscritosDe(cursoActual).length + ' alumnos en este curso');
         }
 
         async function cargarCurso() {
@@ -365,48 +409,22 @@
             const id = document.getElementById('selCurso').value;
             cursoActual = id;
             if (!id) { filas = []; renderTabla(); return; }
-            sesiones = parseInt(localStorage.getItem(cfgKey()) || '10', 10);
-            document.getElementById('selSesiones').value = sesiones;
             filas = [];
-            renderTabla('Cargando alumnos del curso...');
+            renderTabla('Cargando notas del curso…');
 
             let guardadas = [];
             try {
                 guardadas = await SB.select('notas', { filters: [{ field: 'cursoId', op: '==', value: id }] });
                 syncOk = true;
-                localStorage.setItem(cacheKey(), JSON.stringify(guardadas));
+                localStorage.setItem(cacheKeyFor(id), JSON.stringify(guardadas));
             } catch (e) {
                 syncOk = false;
-                try { guardadas = JSON.parse(localStorage.getItem(cacheKey()) || '[]'); } catch (e2) { guardadas = []; }
+                try { guardadas = JSON.parse(localStorage.getItem(cacheKeyFor(id)) || '[]'); } catch (e2) { guardadas = []; }
             }
             if (cursoActual !== id) return;
-
-            let ins = [];
-            try {
-                ins = await SB.select('inscripciones', {
-                    filters: [{ field: 'cursoId', op: '==', value: id }, { field: 'ciclo', op: '==', value: CICLO }],
-                    columns: ['id', 'nombres', 'dni', 'celular', 'lider', 'cursoId', 'ciclo', 'sede', 'estadoPago'],
-                    order: { field: 'nombres', dir: 'asc' }
-                });
-                localStorage.setItem(rosterKey(), JSON.stringify(ins));
-            } catch (e) {
-                try { ins = JSON.parse(localStorage.getItem(rosterKey()) || '[]'); } catch (e2) { ins = []; }
-            }
-            if (cursoActual !== id) return;
-
-            const sesMax = guardadas.reduce(function (m, r) {
-                const s = parseInt(r.sesiones || 0, 10) || 0;
-                return s > m ? s : m;
-            }, 0);
-            if (sesMax > sesiones) {
-                sesiones = sesMax;
-                document.getElementById('selSesiones').value = sesiones;
-                localStorage.setItem(cfgKey(), sesiones);
-            }
 
             const map = new Map();
-            ins.forEach(function (r) {
-                if (!(r.nombres || '').trim()) return;
+            inscritosDe(id).forEach(function (r) {
                 const dni = (r.dni || '').toString().trim();
                 const key = id + '|' + (dni || ('ref' + r.id));
                 const base = { key: key, curso: id, dni: dni, nombres: r.nombres, refId: r.id, asistencia: [] };
@@ -437,8 +455,8 @@
             if (Array.isArray(v)) a = v;
             else if (typeof v === 'string' && v) { try { a = JSON.parse(v); } catch (e) { a = []; } }
             if (!Array.isArray(a)) a = [];
-            const out = a.map(function (x) { return (x === 'A' || x === 'T' || x === 'F') ? x : ''; });
-            while (out.length < sesiones) out.push('');
+            const out = a.slice(0, SESIONES).map(function (x) { return (x === 'A' || x === 'T' || x === 'F') ? x : ''; });
+            while (out.length < SESIONES) out.push('');
             return out;
         }
 
@@ -450,7 +468,7 @@
         }
 
         function calcular(f) {
-            const a = (f.asistencia || []).slice(0, sesiones);
+            const a = (f.asistencia || []).slice(0, SESIONES);
             const valAsist = [];
             a.forEach(function (m) { if (VAL_ASIST[m] !== undefined) valAsist.push(VAL_ASIST[m]); });
             const asistencia = valAsist.length ? valAsist.reduce(function (s, v) { return s + v; }, 0) / valAsist.length : null;
@@ -498,16 +516,16 @@
             const tbody = document.getElementById('tbodyNotas');
             if (mensaje) {
                 head.innerHTML = '';
-                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (sesiones + 12) + '">' + esc(mensaje) + '</td></tr>';
+                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (SESIONES + 12) + '">' + esc(mensaje) + '</td></tr>';
                 return;
             }
             let r1 = '<tr><th rowspan="2" class="c-alumno">Alumno</th>' +
-                '<th colspan="' + sesiones + '" class="th-grp th-asist">Asistencia por sesión (A · T · F)</th>' +
+                '<th colspan="' + SESIONES + '" class="th-grp th-asist">Asistencia · 9 sesiones (A · T · F)</th>' +
                 '<th colspan="4" class="th-grp th-crec">Crecimiento Espiritual (0-20)</th>' +
                 '<th colspan="2" class="th-grp th-fin">Finales (0-20)</th>' +
                 '<th colspan="5" class="th-grp th-calc">Cálculo automático</th></tr>';
             let r2 = '<tr>';
-            for (let i = 1; i <= sesiones; i++) r2 += '<th class="th-ses" title="Sesión ' + i + '">S' + i + '</th>';
+            for (let i = 1; i <= SESIONES; i++) r2 += '<th class="th-ses" title="Sesión ' + i + '">S' + i + '</th>';
             r2 += '<th class="th-num" title="Devocionales">Devoc.</th>' +
                 '<th class="th-num" title="Asistencia a su servicio">Servicio</th>' +
                 '<th class="th-num" title="Montaña de oración">Montaña</th>' +
@@ -519,8 +537,9 @@
             head.innerHTML = r1 + r2;
 
             if (!filas.length) {
-                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (sesiones + 12) + '">' +
-                    'Aún no hay alumnos en este curso.<br>Se cargarán automáticamente desde las inscripciones EDL, o agrégalos con el botón <b>Agregar alumno</b>.</td></tr>';
+                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (SESIONES + 12) + '">' +
+                    '📭 Aún no hay alumnos en este curso.<br>Se cargan automáticamente desde las inscripciones del ciclo ' + CICLO +
+                    ' — pulsa <b>Actualizar</b> — o agrégalos con <b>Agregar alumno</b>.</td></tr>';
                 actualizarChips();
                 return;
             }
@@ -534,7 +553,7 @@
                 '<td class="c-alumno"><strong>' + esc(f.nombres || '—') + '</strong>' +
                 '<span class="sub">' + (f.dni ? 'DNI ' + esc(f.dni) : 'Sin DNI') + '</span></td>';
             const a = f.asistencia || [];
-            for (let i = 0; i < sesiones; i++) {
+            for (let i = 0; i < SESIONES; i++) {
                 const v = a[i] || '';
                 h += '<td class="td-ses" style="text-align:center"><select class="asist-sel' + (v ? ' ' + v.toLowerCase() : '') +
                     '" data-idx="' + i + '"><option value=""' + (v === '' ? ' selected' : '') + '>—</option>' +
@@ -565,8 +584,12 @@
             const r = calcular(f);
             tr.querySelector('[data-calc="crec"]').textContent = r.crec === null ? '—' : r.crec.toFixed(1);
             tr.querySelector('[data-calc="asist"]').textContent = r.asistencia === null ? '—' : r.asistencia.toFixed(1);
-            tr.querySelector('[data-calc="faltas"]').textContent = r.faltas + (r.faltas > 3 ? ' ⛔' : '');
-            tr.querySelector('[data-calc="prom"]').textContent = r.nota === null ? '—' : r.nota.toFixed(1);
+            const faltasEl = tr.querySelector('[data-calc="faltas"]');
+            faltasEl.textContent = r.faltas + (r.faltas > 3 ? ' ⛔' : '');
+            faltasEl.style.color = r.faltas > 0 ? '#dc2626' : '';
+            const promEl = tr.querySelector('[data-calc="prom"]');
+            promEl.textContent = r.nota === null ? '—' : r.nota.toFixed(1);
+            promEl.style.color = r.nota === null ? '' : (r.nota >= MIN_APROB ? '#15803d' : '#dc2626');
             const cond = tr.querySelector('[data-calc="cond"]');
             const parcial = r.parcial && r.condicion !== '—';
             cond.textContent = r.condicion + (parcial ? '*' : '');
@@ -588,13 +611,13 @@
         function actualizarSync() {
             const el = document.getElementById('syncBadge');
             if (syncOk) {
-                el.className = 'ng-sync ok';
+                el.className = 'ng-badge ok';
                 el.innerHTML = '✓ Sincronizado';
                 el.title = 'Las notas se guardan en Supabase y se ven desde cualquier equipo.';
             } else {
-                el.className = 'ng-sync warn';
+                el.className = 'ng-badge warn';
                 el.innerHTML = '⚠ Solo en este equipo';
-                el.title = 'La tabla "notas" no está disponible: ejecuta el SQL en Supabase (supabase-schema.sql) para sincronizar.';
+                el.title = 'No se pudo contactar con Supabase: las notas quedan guardadas en este equipo y se sincronizarán al volver la conexión.';
             }
         }
 
@@ -630,7 +653,7 @@
         function aplicarCambio(t, f) {
             if (t.classList.contains('asist-sel')) {
                 f.asistencia = f.asistencia || [];
-                while (f.asistencia.length < sesiones) f.asistencia.push('');
+                while (f.asistencia.length < SESIONES) f.asistencia.push('');
                 f.asistencia[+t.dataset.idx] = t.value;
                 t.className = 'asist-sel' + (t.value ? ' ' + t.value.toLowerCase() : '');
             } else if (t.classList.contains('ng-num')) {
@@ -651,8 +674,8 @@
                 ciclo: CICLO,
                 dni: f.dni || '',
                 nombres: f.nombres || '',
-                sesiones: sesiones,
-                asistencia: (f.asistencia || []).slice(0, sesiones),
+                sesiones: SESIONES,
+                asistencia: (f.asistencia || []).slice(0, SESIONES),
                 devocionales: f.devocionales,
                 servicio: f.servicio,
                 montana: f.montana,
@@ -671,7 +694,7 @@
             try { cache = JSON.parse(localStorage.getItem(cacheKeyFor(r.cursoId)) || '[]'); } catch (e) { cache = []; }
             const i = cache.findIndex(function (x) { return x.id === r.id; });
             if (i >= 0) cache[i] = r; else cache.push(r);
-            localStorage.setItem(cacheKey(), JSON.stringify(cache));
+            localStorage.setItem(cacheKeyFor(r.cursoId), JSON.stringify(cache));
         }
 
         async function guardarFila(f) {
@@ -689,8 +712,7 @@
         async function guardarTodo() {
             filas.forEach(function (f) { clearTimeout(timersGuardar[f.key]); });
             await Promise.all(filas.map(guardarFila));
-            toast(syncOk ? '💾 Notas guardadas y sincronizadas'
-                : '💾 Guardado en este equipo (ejecuta el SQL de la tabla notas)', syncOk ? 'success' : 'warning');
+            toast(syncOk ? '💾 Notas guardadas y sincronizadas' : '💾 Guardado en este equipo (revisa la conexión)', syncOk ? 'success' : 'warning');
         }
 
         function alternarManual() {
@@ -708,7 +730,7 @@
             if (filas.some(function (f) { return f.key === key; })) { toast('Ese alumno ya está en la lista', 'warning'); return; }
             const f = { key: key, curso: cursoActual, dni: dni, nombres: nom, refId: '', asistencia: [] };
             CAMPOS_NUM.forEach(function (k) { f[k] = null; });
-            while (f.asistencia.length < sesiones) f.asistencia.push('');
+            while (f.asistencia.length < SESIONES) f.asistencia.push('');
             filas.push(f);
             filas.sort(function (a, b) { return (a.nombres || '').localeCompare(b.nombres || '', 'es'); });
             renderTabla();
@@ -724,20 +746,20 @@
             if (!cursoActual || !filas.length) { toast('No hay alumnos para exportar', 'warning'); return; }
             const curso = CURSOS.find(function (c) { return c.id === cursoActual; });
             const head = ['Alumno', 'DNI'];
-            for (let i = 1; i <= sesiones; i++) head.push('S' + i);
+            for (let i = 1; i <= SESIONES; i++) head.push('S' + i);
             head.push('Devocionales', 'Servicio', 'Montaña', 'Versículo', 'Trabajo Final', 'Examen Final',
                 'Crec. Esp.', 'Asistencia', 'Faltas', 'Promedio', 'Condición');
             const rows = [
                 ['REGISTRO DE NOTAS — ' + (curso ? curso.nombre : cursoActual)],
-                ['Ciclo ' + CICLO + ' · ' + hoyPeru()],
+                ['Ciclo ' + CICLO + ' · ' + SESIONES + ' sesiones · ' + hoyPeru()],
                 [],
                 head
             ];
             filas.forEach(function (f) {
                 const r = calcular(f);
-                const a = (f.asistencia || []).slice(0, sesiones);
+                const a = (f.asistencia || []).slice(0, SESIONES);
                 const row = [f.nombres, f.dni];
-                for (let i = 0; i < sesiones; i++) row.push(a[i] || '');
+                for (let i = 0; i < SESIONES; i++) row.push(a[i] || '');
                 CAMPOS_NUM.forEach(function (k) { row.push(f[k] === null || f[k] === undefined ? '' : f[k]); });
                 row.push(r.crec === null ? '' : Math.round(r.crec * 10) / 10);
                 row.push(r.asistencia === null ? '' : Math.round(r.asistencia * 10) / 10);
@@ -753,7 +775,7 @@
             const ws = XLSX.utils.aoa_to_sheet(rows);
             ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: head.length - 1 } }];
             const anchos = [{ wch: 40 }, { wch: 12 }];
-            for (let i = 0; i < sesiones; i++) anchos.push({ wch: 6 });
+            for (let i = 0; i < SESIONES; i++) anchos.push({ wch: 6 });
             [{ wch: 13 }, { wch: 11 }, { wch: 11 }, { wch: 12 }, { wch: 14 }, { wch: 13 },
             { wch: 11 }, { wch: 11 }, { wch: 8 }, { wch: 11 }, { wch: 14 }].forEach(function (c) { anchos.push(c); });
             ws['!cols'] = anchos;
