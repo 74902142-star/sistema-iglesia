@@ -48,16 +48,32 @@ const Auth = {
     }
 };
 
-// Invitados: solo ven Registro de Notas en el menú (sin Aula, EDL, Kids, etc.)
+// Invitados: en el menú lateral solo ven el módulo al que entraron
+// (Notas, Ingreso/Conteo o EDL). No ven Aula, Kids, etc.
 document.addEventListener('DOMContentLoaded', function () {
     try {
         var u = Auth.getUsuario();
         if (u && u.rol === 'invitado') {
-            ['nav-aula', 'opt-aula', 'nav-edl', 'opt-edl', 'nav-kids', 'opt-kids',
-             'nav-lideres', 'opt-lideres', 'nav-dashboard', 'opt-dashboard',
-             'nav-registro', 'opt-registro', 'opt-ingreso'].forEach(function (id) {
+            var path = (location.pathname || '').split('/').pop() || 'guest.html';
+            // Ocultar siempre: Aula, Kids, Lideres, Dashboard, Registro principal
+            ['nav-aula', 'nav-kids', 'nav-lideres', 'nav-dashboard', 'nav-registro'].forEach(function (id) {
                 var el = document.getElementById(id);
                 if (el) el.style.display = 'none';
+            });
+            // En guest.html las tarjetas las controla guest.html
+            if (path === 'guest.html') return;
+            // Solo queda visible el módulo actual; ocultar los otros dos
+            var mapa = {
+                'notas.html': 'nav-notas',
+                'ingreso.html': 'nav-ingreso',
+                'edl.html': 'nav-edl'
+            };
+            var actual = mapa[path];
+            ['nav-notas', 'nav-ingreso', 'nav-edl'].forEach(function (id) {
+                if (id !== actual) {
+                    var el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                }
             });
         }
     } catch (e) { }

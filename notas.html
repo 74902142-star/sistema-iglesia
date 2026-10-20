@@ -534,6 +534,7 @@
         }
 
         function cerrarSesion() {
+            localStorage.removeItem('tutorValidado');
             if (typeof Auth !== 'undefined') Auth.cerrarSesion();
             else { localStorage.removeItem('usuarioActual'); window.location.href = 'index.html'; }
         }
@@ -566,6 +567,7 @@
                 nombreTutor = nom;
                 usuarioActual.nombre = nom;
                 localStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+                localStorage.setItem('tutorValidado', '1');
                 document.getElementById('userName').innerText = nom;
             } else {
                 nombreTutor = usuarioActual.nombre || 'Admin';

@@ -245,39 +245,20 @@
         }
         document.getElementById('userName').textContent = user.nombre || 'Invitado';
 
-        // Solo tutores de Notas (nombres/alias de notas.html) ven la tarjeta de Notas;
-        // el resto de invitados ven EDL/asistencia pero NO Notas.
-        const TUTORES_GUEST = [
-            'Iriela', 'Cristina', 'Marlit', 'Marlith', 'Kazumi', 'Patsy',
-            'Roger', 'Stefany', 'Stephany', 'Sthefany', 'Stefani', 'Thefa',
-            'Jhon', 'John', 'Paul', 'Evelyn', 'Milagros', 'Nataly', 'Nathaly', 'Arni'
-        ];
-        function norm(s) {
-            return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
-        }
-        const nombreInv = norm(user.nombre);
-        const esTutor = nombreInv && nombreInv !== 'invitado' && TUTORES_GUEST.some(function (t) {
-            const nt = norm(t);
-            return nombreInv === nt || nombreInv.split(' ')[0] === nt || nombreInv.startsWith(nt);
+        // Invitado siempre ve: Conteo (asistencia) + Inscribirse (EDL)
+        // Registrar (Notas) solo aparece después de validar como tutor en notas.html
+        ['opt-kids', 'opt-lideres', 'opt-aula'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.style.display = 'none';
         });
-
-        if (esTutor) {
-            // Tutor: solo Registro de Notas
-            ['opt-ingreso', 'opt-edl', 'opt-kids', 'opt-lideres', 'opt-aula'].forEach(function (id) {
-                var el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-        } else {
-            // No es tutor: sin Notas
-            var n = document.getElementById('opt-notas');
-            if (n) n.style.display = 'none';
-            if (user.nombre !== 'Agua Viva Hyo') {
-                document.getElementById('opt-kids').style.display = 'none';
-                document.getElementById('opt-lideres').style.display = 'none';
-            }
+        if (localStorage.getItem('tutorValidado') !== '1') {
+            document.getElementById('opt-notas').style.display = 'none';
         }
 
-        function cerrarSesion() { Auth.cerrarSesion(); }
+        function cerrarSesion() {
+            localStorage.removeItem('tutorValidado');
+            Auth.cerrarSesion();
+        }
     </script>
 </body>
 
