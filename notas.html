@@ -244,10 +244,14 @@
                     <div class="ng-gate-card">
                         <img src="logo.png" alt="Agua Viva">
                         <h2>🔒 Registro de Notas</h2>
-                        <p id="gateHint">Ingresa la contraseña del módulo para continuar</p>
+                        <p id="gateHint">Escribe tu nombre y un apellido</p>
                         <div id="gateTutorBox" style="display:none; margin-bottom:14px;">
-                            <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;text-align:left;">Tu nombre (tutor)</label>
-                            <input type="text" id="notasTutorInput" class="ng-pass-input" style="letter-spacing:0;text-align:left;" placeholder="Ej: Jesus, Stefany, Thefa…">
+                            <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;text-align:left;">Tu nombre y un apellido</label>
+                            <input type="text" id="notasTutorInput" class="ng-pass-input" style="letter-spacing:0;text-align:left;" placeholder="Ej: Stefany Quispe" autocomplete="off">
+                        </div>
+                        <div id="gateCursoBox" style="display:none; margin-bottom:14px;">
+                            <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;text-align:left;">¿A qué curso quieres entrar?</label>
+                            <div id="gateCursosBtns" style="display:flex;flex-direction:column;gap:8px;"></div>
                         </div>
                         <input type="password" id="notasPasswordInput" class="ng-pass-input" placeholder="••••••••"
                             onkeydown="if(event.key==='Enter')verificarPasswordNotas()">
@@ -540,6 +544,7 @@
         }
 
         let nombreTutor = '';
+        let cursoPreseleccionado = '';
 
         function verificarPasswordNotas() {
             const input = document.getElementById('notasPasswordInput').value.trim();
@@ -553,7 +558,7 @@
                 const nom = document.getElementById('notasTutorInput').value.trim();
                 if (!nom) {
                     document.getElementById('notasPasswordError').style.display = 'block';
-                    document.getElementById('notasPasswordError').textContent = '❌ Escribe tu nombre de tutor';
+                    document.getElementById('notasPasswordError').textContent = '❌ Escribe tu nombre y un apellido';
                     document.getElementById('notasTutorInput').focus();
                     return;
                 }
@@ -564,17 +569,53 @@
                     document.getElementById('notasTutorInput').focus();
                     return;
                 }
+                if (cursos.length > 1 && !cursoPreseleccionado) {
+                    mostrarSelectorCursos(cursos, nom);
+                    return;
+                }
                 nombreTutor = nom;
                 usuarioActual.nombre = nom;
                 localStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
                 localStorage.setItem('tutorValidado', '1');
                 document.getElementById('userName').innerText = nom;
+                if (cursoPreseleccionado) {
+                    cursoActual = cursoPreseleccionado;
+                }
             } else {
                 nombreTutor = usuarioActual.nombre || 'Admin';
             }
             document.getElementById('notasPasswordError').style.display = 'none';
+            document.getElementById('gateCursoBox').style.display = 'none';
             document.getElementById('notasGate').style.display = 'none';
             iniciarModulo();
+        }
+
+        function mostrarSelectorCursos(cursos, nom) {
+            const err = document.getElementById('notasPasswordError');
+            err.style.display = 'none';
+            document.getElementById('gateCursoBox').style.display = 'block';
+            const box = document.getElementById('gateCursosBtns');
+            box.innerHTML = '';
+            cursos.forEach(function (c) {
+                const b = document.createElement('button');
+                b.className = 'ng-pass-btn';
+                b.style.marginTop = '0';
+                b.style.fontSize = '14px';
+                b.textContent = c.nombre;
+                b.onclick = function () {
+                    cursoPreseleccionado = c.id;
+                    nombreTutor = nom;
+                    usuarioActual.nombre = nom;
+                    localStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+                    localStorage.setItem('tutorValidado', '1');
+                    document.getElementById('userName').innerText = nom;
+                    document.getElementById('notasPasswordError').style.display = 'none';
+                    document.getElementById('notasGate').style.display = 'none';
+                    iniciarModulo();
+                };
+                box.appendChild(b);
+            });
+            document.getElementById('notasPasswordInput').focus();
         }
 
         async function iniciarModulo() {
@@ -615,7 +656,14 @@
         function poblarControles() {
             const sel = document.getElementById('selCurso');
             const campo = document.getElementById('campoCurso');
-            const lista = listaCursosTutor();
+            let lista = listaCursosTutor();
+            // Tutor invitado con curso preseleccionado: solo ese
+            if (cursoPreseleccionado && !esAdmin) {
+                lista = lista.filter(function (c) { return c.id === cursoPreseleccionado; });
+                if (lista.length) {
+                    cursoActual = lista[0].id;
+                }
+            }
             if (lista.length === 1) {
                 campo.style.display = 'none';
                 cursoActual = lista[0].id;
@@ -624,6 +672,10 @@
                 campo.style.display = '';
                 sel.innerHTML = lista.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + '</option>'; }).join('');
                 if (!lista.length) sel.innerHTML = '<option value="">(sin cursos asignados)</option>';
+                else if (cursoPreseleccionado && lista.some(function (c) { return c.id === cursoPreseleccionado; })) {
+                    sel.value = cursoPreseleccionado;
+                    cursoActual = cursoPreseleccionado;
+                }
                 sel.onchange = cargarCurso;
             }
         }
@@ -638,12 +690,15 @@
             }
             const lista = listaCursosTutor();
             const nom = nombreTutor || usuarioActual.nombre || '';
-            if (lista.length === 1) {
-                el.innerHTML = '📘 ' + esc(lista[0].nombre) + ' · 👤 ' + esc(nom);
+            const visibles = (cursoPreseleccionado && !esAdmin)
+                ? lista.filter(function (c) { return c.id === cursoPreseleccionado; })
+                : lista;
+            if (visibles.length === 1) {
+                el.innerHTML = '📘 ' + esc(visibles[0].nombre) + ' · 👤 ' + esc(nom);
                 el.className = 'ng-badge info';
                 el.title = 'Solo puedes editar este curso.';
-            } else if (lista.length > 1) {
-                el.innerHTML = '👤 ' + esc(nom) + ' · ' + lista.length + ' cursos';
+            } else if (visibles.length > 1) {
+                el.innerHTML = '👤 ' + esc(nom) + ' · ' + visibles.length + ' cursos';
                 el.className = 'ng-badge info';
             } else {
                 el.innerHTML = '🔒 Sin cursos asignados';
@@ -683,7 +738,12 @@
                 : 'Sin conexión con Supabase: se muestra la última lista guardada en este equipo.';
             const sel = document.getElementById('selCurso');
             const actual = sel.value;
-            const lista = listaCursosTutor();
+            let lista = listaCursosTutor();
+            // Invitado con curso preseleccionado: solo ese
+            if (cursoPreseleccionado && !esAdmin) {
+                lista = lista.filter(function (c) { return c.id === cursoPreseleccionado; });
+                if (lista.length) cursoActual = lista[0].id;
+            }
             const campo = document.getElementById('campoCurso');
             if (lista.length === 1) {
                 campo.style.display = 'none';
@@ -1290,11 +1350,10 @@
             iniciarModulo();
         } else {
             document.getElementById('gateTutorBox').style.display = 'block';
-            document.getElementById('gateHint').textContent = 'Escribe tu nombre de tutor y la contraseña del módulo';
-            const ti = document.getElementById('notasTutorInput');
-            if (usuarioActual.nombre && usuarioActual.nombre !== 'Invitado') ti.value = usuarioActual.nombre;
+            document.getElementById('gateHint').textContent = 'Escribe tu nombre y un apellido';
+            document.getElementById('notasTutorInput').value = '';
             document.getElementById('notasGate').style.display = 'block';
-            ti.focus();
+            document.getElementById('notasTutorInput').focus();
         }
         if (typeof lucide !== 'undefined') lucide.createIcons();
     </script>
