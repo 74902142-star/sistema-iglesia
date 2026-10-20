@@ -95,6 +95,11 @@
         .ng-crec-btn:hover { border-color: #1c6390; background: #f0f9ff; }
         .ng-crec-btn.full { background: #e0f2fe; border-color: #7dd3fc; }
         .ng-crec-btn.empty { color: #94a3b8; font-weight: 500; }
+        .sesion-cerrada .asist-sel,
+        .sesion-cerrada .ng-crec-btn,
+        .sesion-cerrada .ng-num { opacity: 0.72; pointer-events: none; cursor: default; }
+        .sesion-cerrada .asist-sel.f { opacity: 0.85; }
+        .sesion-futura { display: none !important; }
 
         .ng-crec-modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
         .ng-crec-modal.show { display: flex; }
@@ -221,12 +226,13 @@
                             <select id="selCurso" style="min-width:310px"></select>
                         </div>
                         <span id="cicloBadge" class="ng-badge info">👥 Cargando lista del ciclo…</span>
+                        <span id="semanaBadge" class="ng-badge warn">📅 Semana —</span>
                         <div class="ng-actions">
                             <span id="syncBadge" class="ng-badge ok">✓ Sincronizado</span>
-                            <button class="ng-btn ng-btn-soft" onclick="actualizarLista()" title="Volver a bajar la lista de inscritos y las notas"><i data-lucide="refresh-cw" style="width:15px;height:15px;"></i> Actualizar</button>
-                            <button class="ng-btn ng-btn-soft" onclick="alternarManual()"><i data-lucide="user-plus" style="width:15px;height:15px;"></i> Agregar alumno</button>
-                            <button class="ng-btn ng-btn-soft" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width:15px;height:15px;"></i> Excel</button>
-                            <button class="ng-btn ng-btn-primary" onclick="guardarTodo()"><i data-lucide="save" style="width:15px;height:15px;"></i> Guardar todo</button>
+                            <button class="ng-btn ng-btn-soft" id="btnActualizar" onclick="actualizarLista()" title="Volver a bajar la lista de inscritos y las notas"><i data-lucide="refresh-cw" style="width:15px;height:15px;"></i> Actualizar</button>
+                            <button class="ng-btn ng-btn-soft" id="btnAgregar" onclick="alternarManual()"><i data-lucide="user-plus" style="width:15px;height:15px;"></i> Agregar alumno</button>
+                            <button class="ng-btn ng-btn-soft" id="btnExcel" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width:15px;height:15px;"></i> Excel</button>
+                            <button class="ng-btn ng-btn-primary" id="btnGuardarTodo" onclick="guardarTodo()"><i data-lucide="save" style="width:15px;height:15px;"></i> Guardar todo</button>
                         </div>
                     </div>
 
@@ -252,7 +258,7 @@
                     <div class="ng-table-wrap">
                         <div class="ng-table-head">
                             <h3><i data-lucide="table-2" style="width:17px;height:17px;"></i> Hoja de notas</h3>
-                            <span>Autoguardado al escribir · <b>*</b> = promedio parcial · 9 casillas de asistencia y 9 de crecimiento por alumno</span>
+                            <span>Autoguardado al escribir · <b>*</b> = promedio parcial · Solo la semana actual se puede editar</span>
                         </div>
                         <div class="table-container">
                             <table id="tablaNotas">
@@ -276,9 +282,12 @@
                         <b>Crecimiento Espiritual:</b> cada sesión se califican los <b>4 items</b>
                         (Devocionales · Servicio · Montaña de oración · Versículo), de ahí sale
                         <b>1 nota semanal</b>; el promedio de las 9 semanas vale <b>40%</b>.<br>
+                        <b>Semana a semana:</b> solo se abre la semana actual (lunes a domingo). Al cerrar la semana,
+                        lo que quede en blanco se toma como <b>F</b> (asistencia) o <b>0</b> (crecimiento) y ya no se
+                        puede editar; al lunes siguiente aparece la siguiente semana.<br>
                         <b>Componentes y pesos:</b> Crecimiento Espiritual (promedio semanal) <b>40%</b> ·
                         Examen Final <b>25%</b> · Trabajo Final <b>20%</b> · Asistencia <b>15%</b>.
-                        Las notas van de <b>0 a 20</b> (no hay más) y los campos vacíos no se cuentan (promedio parcial).<br>
+                        Las notas van de <b>0 a 20</b> (no hay más) y los campos vacíos de la semana abierta no se cuentan (promedio parcial).<br>
                         <b>Reglas de faltas:</b> con <b>3 faltas</b> la nota final queda fija en <b>11.0</b>; con
                         <b>más de 3 faltas</b> el alumno queda <b>Desaprobado</b> sin importar sus notas.<br>
                         <b>Mínima aprobatoria: 11.0.</b> Los alumnos se cargan automáticamente desde las
@@ -352,8 +361,21 @@
         let initHecha = false;
         let crecEdit = { key: null, idx: -1 };
         const timersGuardar = {};
+        const INICIO_CICLO = '2026-10-12';
 
         function verCalculo() { return esAdmin; }
+
+        function sesionActual() {
+            const hoy = (typeof hoyPeru === 'function' ? hoyPeru() : new Date().toISOString().slice(0, 10));
+            const h = hoy.split('-').map(Number);
+            const i = INICIO_CICLO.split('-').map(Number);
+            const diff = Math.floor((Date.UTC(h[0], h[1] - 1, h[2]) - Date.UTC(i[0], i[1] - 1, i[2])) / 86400000);
+            if (diff < 0) return 1;
+            return Math.min(SESIONES, Math.floor(diff / 7) + 1);
+        }
+
+        function sesionCerrada(idx) { return (idx + 1) < sesionActual(); }
+        function sesionFutura(idx) { return (idx + 1) > sesionActual(); }
 
         function esc(s) {
             return String(s === null || s === undefined ? '' : s)
@@ -394,7 +416,14 @@
             if (!verCalculo()) {
                 document.getElementById('chipBox').style.display = 'none';
                 document.getElementById('legendBox').style.display = 'none';
+                document.getElementById('btnAgregar').style.display = 'none';
+                document.getElementById('btnExcel').style.display = 'none';
+                document.getElementById('btnGuardarTodo').style.display = 'none';
             }
+            const sem = sesionActual();
+            const sb = document.getElementById('semanaBadge');
+            sb.textContent = '📅 Semana ' + sem + ' de ' + SESIONES;
+            sb.title = 'Solo se abre la semana actual. Al terminar el domingo, la semana se cierra (en blanco = falta o 0) y aparece la siguiente.';
             if (typeof lucide !== 'undefined') lucide.createIcons();
             await cargarCiclo();
             document.getElementById('selCurso').value = CURSOS[0].id;
@@ -550,19 +579,29 @@
         }
 
         function calcular(f) {
+            const sem = sesionActual();
             const a = (f.asistencia || []).slice(0, SESIONES);
             const valAsist = [];
-            a.forEach(function (m) { if (VAL_ASIST[m] !== undefined) valAsist.push(VAL_ASIST[m]); });
-            const asistencia = valAsist.length ? valAsist.reduce(function (s, v) { return s + v; }, 0) / valAsist.length : null;
             let nF = 0, nT = 0;
-            a.forEach(function (m) { if (m === 'F') nF++; else if (m === 'T') nT++; });
+            for (let i = 0; i < SESIONES; i++) {
+                if (i + 1 > sem) break;
+                let m = a[i] || '';
+                if (!m && i + 1 < sem) m = 'F';
+                if (VAL_ASIST[m] !== undefined) valAsist.push(VAL_ASIST[m]);
+                if (m === 'F') nF++;
+                else if (m === 'T') nT++;
+            }
+            const asistencia = valAsist.length ? valAsist.reduce(function (s, v) { return s + v; }, 0) / valAsist.length : null;
             const faltas = nF + Math.floor(nT / 3);
 
             const crecVals = [];
-            (f.crecimiento || []).slice(0, SESIONES).forEach(function (item) {
-                const n = notaSemanalCrec(item);
+            const cr = (f.crecimiento || []).slice(0, SESIONES);
+            for (let i = 0; i < SESIONES; i++) {
+                if (i + 1 > sem) break;
+                const n = notaSemanalCrec(cr[i]);
                 if (n !== null) crecVals.push(n);
-            });
+                else if (i + 1 < sem) crecVals.push(0);
+            }
             const crec = crecVals.length ? crecVals.reduce(function (s, v) { return s + v; }, 0) / crecVals.length : null;
 
             const comps = [];
@@ -597,21 +636,23 @@
             const head = document.getElementById('headNotas');
             const tbody = document.getElementById('tbodyNotas');
             const calc = verCalculo();
-            const nCols = calc ? (SESIONES * 2 + 8) : (SESIONES * 2 + 3);
+            const sem = sesionActual();
+            const nSes = sem;
+            const nCols = calc ? (nSes * 2 + 8) : (nSes * 2 + 3);
             if (mensaje) {
                 head.innerHTML = '';
                 tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + nCols + '">' + esc(mensaje) + '</td></tr>';
                 return;
             }
             let r1 = '<tr><th rowspan="2" class="c-alumno">Alumno</th>' +
-                '<th colspan="' + SESIONES + '" class="th-grp th-asist">Asistencia · 9 sesiones (A · T · F)</th>' +
-                '<th colspan="' + SESIONES + '" class="th-grp th-crec">Crec. Esp. · por sesión</th>' +
+                '<th colspan="' + nSes + '" class="th-grp th-asist">Asistencia · ' + nSes + ' sesiones (A · T · F)</th>' +
+                '<th colspan="' + nSes + '" class="th-grp th-crec">Crec. Esp. · por sesión</th>' +
                 '<th colspan="2" class="th-grp th-fin">Finales (0-20)</th>';
             if (calc) r1 += '<th colspan="5" class="th-grp th-calc">Cálculo automático</th>';
             r1 += '</tr>';
             let r2 = '<tr>';
-            for (let i = 1; i <= SESIONES; i++) r2 += '<th class="th-ses" title="Sesión ' + i + ' · asistencia">S' + i + '</th>';
-            for (let i = 1; i <= SESIONES; i++) r2 += '<th class="th-crec" title="Sesión ' + i + ' · crecimiento espiritual (4 items)">' + i + '</th>';
+            for (let i = 1; i <= nSes; i++) r2 += '<th class="th-ses" title="Sesión ' + i + ' · asistencia">S' + i + '</th>';
+            for (let i = 1; i <= nSes; i++) r2 += '<th class="th-crec" title="Sesión ' + i + ' · crecimiento espiritual (4 items)">' + i + '</th>';
             r2 += '<th class="th-num">Trabajo</th><th class="th-num">Examen</th>';
             if (calc) r2 += '<th data-calc="crec">Crec. Esp.</th><th data-calc="asist">Asist.</th>' +
                 '<th data-calc="faltas">Faltas</th><th data-calc="prom">Promedio</th>' +
@@ -622,7 +663,7 @@
             if (!filas.length) {
                 tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + nCols + '">' +
                     '📭 Aún no hay alumnos en este curso.<br>Se cargan automáticamente desde las inscripciones del ciclo ' + CICLO +
-                    ' — pulsa <b>Actualizar</b> — o agrégalos con <b>Agregar alumno</b>.</td></tr>';
+                    ' — pulsa <b>Actualizar</b>.</td></tr>';
                 if (calc) actualizarChips();
                 return;
             }
@@ -633,28 +674,32 @@
 
         function renderFila(f) {
             const calc = verCalculo();
+            const sem = sesionActual();
             let h = '<tr data-key="' + esc(f.key) + '">' +
                 '<td class="c-alumno"><strong>' + esc(f.nombres || '—') + '</strong>' +
                 '<span class="sub">' + (f.dni ? 'DNI ' + esc(f.dni) : 'Sin DNI') + '</span></td>';
             const a = f.asistencia || [];
             const cr = f.crecimiento || [];
-            for (let i = 0; i < SESIONES; i++) {
-                const v = a[i] || '';
-                h += '<td class="td-ses" style="text-align:center"><select class="asist-sel' + (v ? ' ' + v.toLowerCase() : '') +
-                    '" data-idx="' + i + '"><option value=""' + (v === '' ? ' selected' : '') + '>—</option>' +
+            for (let i = 0; i < sem; i++) {
+                let v = a[i] || '';
+                const cerrada = i + 1 < sem;
+                if (!v && cerrada) v = 'F';
+                h += '<td class="td-ses' + (cerrada ? ' sesion-cerrada' : '') + '" style="text-align:center"><select class="asist-sel' + (v ? ' ' + v.toLowerCase() : '') +
+                    '" data-idx="' + i + '"' + (cerrada ? ' disabled' : '') + '><option value=""' + (v === '' ? ' selected' : '') + '>—</option>' +
                     '<option' + (v === 'A' ? ' selected' : '') + '>A</option>' +
                     '<option' + (v === 'T' ? ' selected' : '') + '>T</option>' +
                     '<option' + (v === 'F' ? ' selected' : '') + '>F</option></select></td>';
             }
-            for (let i = 0; i < SESIONES; i++) {
+            for (let i = 0; i < sem; i++) {
                 const item = cr[i];
+                const cerrada = i + 1 < sem;
                 const n = notaSemanalCrec(item);
-                const etiqueta = calc
-                    ? (n === null ? '·' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, ''))
-                    : (item ? '✓' : '·');
-                h += '<td class="td-crec" style="text-align:center"><button type="button" class="ng-crec-btn' +
-                    (item ? ' full' : ' empty') + '" data-crec-idx="' + i + '" ' +
-                    'title="Sesión ' + (i + 1) + ' · 4 items de crecimiento espiritual">' + etiqueta + '</button></td>';
+                let etiqueta;
+                if (cerrada) etiqueta = calc ? (n === null ? '0' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, '')) : (item ? '✓' : '0');
+                else etiqueta = calc ? (n === null ? '·' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, '')) : (item ? '✓' : '·');
+                h += '<td class="td-crec' + (cerrada ? ' sesion-cerrada' : '') + '" style="text-align:center"><button type="button" class="ng-crec-btn' +
+                    ((item || cerrada) ? ' full' : ' empty') + '" data-crec-idx="' + i + '"' + (cerrada ? ' disabled' : '') + ' ' +
+                    'title="Sesión ' + (i + 1) + (cerrada ? ' · cerrada' : ' · 4 items de crecimiento espiritual') + '">' + etiqueta + '</button></td>';
             }
             CAMPOS_NUM.forEach(function (k) {
                 const v = f[k];
@@ -725,10 +770,12 @@
 
         document.getElementById('tbodyNotas').addEventListener('click', function (e) {
             const btn = e.target.closest ? e.target.closest('button.ng-crec-btn') : null;
-            if (!btn) return;
+            if (!btn || btn.disabled) return;
             const f = filaDeEvento(e);
             if (!f) return;
-            abrirCrecModal(f, +btn.dataset.crecIdx);
+            const idx = +btn.dataset.crecIdx;
+            if (sesionCerrada(idx)) return;
+            abrirCrecModal(f, idx);
         });
 
         document.getElementById('tbodyNotas').addEventListener('input', function (e) {
@@ -921,14 +968,15 @@
             if (!cursoActual || !filas.length) { toast('No hay alumnos para exportar', 'warning'); return; }
             const curso = CURSOS.find(function (c) { return c.id === cursoActual; });
             const calc = verCalculo();
+            const sem = sesionActual();
             const head = ['Alumno', 'DNI'];
-            for (let i = 1; i <= SESIONES; i++) head.push('Asist S' + i);
-            for (let i = 1; i <= SESIONES; i++) head.push('Crec ' + i);
+            for (let i = 1; i <= sem; i++) head.push('Asist S' + i);
+            for (let i = 1; i <= sem; i++) head.push('Crec ' + i);
             head.push('Trabajo Final', 'Examen Final');
             if (calc) head.push('Crec. Esp.', 'Asistencia', 'Faltas', 'Promedio', 'Condición');
             const rows = [
                 ['REGISTRO DE NOTAS — ' + (curso ? curso.nombre : cursoActual)],
-                ['Ciclo ' + CICLO + ' · ' + SESIONES + ' sesiones · ' + hoyPeru()],
+                ['Ciclo ' + CICLO + ' · semana ' + sem + ' de ' + SESIONES + ' · ' + hoyPeru()],
                 [],
                 head
             ];
@@ -936,10 +984,16 @@
                 const a = (f.asistencia || []).slice(0, SESIONES);
                 const cr = (f.crecimiento || []).slice(0, SESIONES);
                 const row = [f.nombres, f.dni];
-                for (let i = 0; i < SESIONES; i++) row.push(a[i] || '');
-                for (let i = 0; i < SESIONES; i++) {
+                for (let i = 0; i < sem; i++) {
+                    let v = a[i] || '';
+                    if (!v && i + 1 < sem) v = 'F';
+                    row.push(v);
+                }
+                for (let i = 0; i < sem; i++) {
                     const n = notaSemanalCrec(cr[i]);
-                    row.push(n === null ? '' : Math.round(n * 10) / 10);
+                    if (n !== null) row.push(Math.round(n * 10) / 10);
+                    else if (i + 1 < sem) row.push(0);
+                    else row.push('');
                 }
                 CAMPOS_NUM.forEach(function (k) { row.push(f[k] === null || f[k] === undefined ? '' : f[k]); });
                 if (calc) {
@@ -962,7 +1016,7 @@
             const ws = XLSX.utils.aoa_to_sheet(rows);
             ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: head.length - 1 } }];
             const anchos = [{ wch: 40 }, { wch: 12 }];
-            for (let i = 0; i < SESIONES * 2; i++) anchos.push({ wch: 8 });
+            for (let i = 0; i < sem * 2; i++) anchos.push({ wch: 8 });
             if (calc) [{ wch: 14 }, { wch: 13 },
             { wch: 11 }, { wch: 11 }, { wch: 8 }, { wch: 11 }, { wch: 14 }].forEach(function (c) { anchos.push(c); });
             else [{ wch: 14 }, { wch: 13 }].forEach(function (c) { anchos.push(c); });
