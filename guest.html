@@ -245,24 +245,30 @@
         }
         document.getElementById('userName').textContent = user.nombre || 'Invitado';
 
-        // Forzar visibles: Conteo + Inscripción siempre
-        // Notas solo si el nombre de invitado es Tutor, tutor o EDL
+        // Tutor/tutor/EDL → solo Registro de Notas
+        // Otro nombre → Conteo + Inscripción (sin Notas)
         function esNombreTutorOEdl(n) {
             var s = String(n || '').toLowerCase().trim();
             return s === 'tutor' || s === 'edl';
         }
         function forzarTarjetas() {
-            ['opt-ingreso', 'opt-edl'].forEach(function (id) {
-                var el = document.getElementById(id);
-                if (el) el.style.display = 'flex';
-            });
+            var esTutor = esNombreTutorOEdl(user && user.nombre);
+            var elN = document.getElementById('opt-notas');
+            var elI = document.getElementById('opt-ingreso');
+            var elE = document.getElementById('opt-edl');
+            if (esTutor) {
+                elN.style.display = 'flex';
+                elI.style.display = 'none';
+                elE.style.display = 'none';
+            } else {
+                elN.style.display = 'none';
+                elI.style.display = 'flex';
+                elE.style.display = 'flex';
+            }
             ['opt-kids', 'opt-lideres', 'opt-aula'].forEach(function (id) {
                 var el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
-            var n = document.getElementById('opt-notas');
-            if (esNombreTutorOEdl(user && user.nombre)) n.style.display = 'flex';
-            else n.style.display = 'none';
         }
         forzarTarjetas();
         document.addEventListener('DOMContentLoaded', forzarTarjetas);
