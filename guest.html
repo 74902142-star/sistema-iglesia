@@ -219,7 +219,7 @@
             </div>
         </a>
 
-        <a href="notas.html" class="module-card" id="opt-notas" style="display:flex;">
+        <a href="notas.html" class="module-card" id="opt-notas" style="display:none;">
             <div class="module-icon" style="background:#1c6390;">
                 <i data-lucide="clipboard-check" style="width: 24px; height: 24px;"></i>
             </div>
@@ -245,10 +245,14 @@
         }
         document.getElementById('userName').textContent = user.nombre || 'Invitado';
 
-        // Forzar visibles: las 3 tarjetas (Conteo, Inscripción, Notas)
-        // La seguridad de Notas está en su gate (nombre + contraseña)
+        // Forzar visibles: Conteo + Inscripción siempre
+        // Notas solo si el nombre de invitado es Tutor, tutor o EDL
+        function esNombreTutorOEdl(n) {
+            var s = String(n || '').toLowerCase().trim();
+            return s === 'tutor' || s === 'edl';
+        }
         function forzarTarjetas() {
-            ['opt-ingreso', 'opt-edl', 'opt-notas'].forEach(function (id) {
+            ['opt-ingreso', 'opt-edl'].forEach(function (id) {
                 var el = document.getElementById(id);
                 if (el) el.style.display = 'flex';
             });
@@ -256,6 +260,9 @@
                 var el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
+            var n = document.getElementById('opt-notas');
+            if (esNombreTutorOEdl(user && user.nombre)) n.style.display = 'flex';
+            else n.style.display = 'none';
         }
         forzarTarjetas();
         document.addEventListener('DOMContentLoaded', forzarTarjetas);
