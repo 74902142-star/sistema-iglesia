@@ -785,9 +785,22 @@
 
             let guardadas = [];
             try {
-                guardadas = await SB.select('notas', { filters: [{ field: 'cursoId', op: '==', value: id }] });
+                guardadas = await SB.select('notas', {
+                    filters: [
+                        { field: 'cursoId', op: '==', value: id },
+                        { field: 'ciclo', op: '==', value: CICLO }
+                    ]
+                });
                 syncOk = true;
-                localStorage.setItem(cacheKeyFor(id), JSON.stringify(guardadas));
+                // No pisar el caché local con vacío si aún no hay nada en Supabase
+                let cache = [];
+                try { cache = JSON.parse(localStorage.getItem(cacheKeyFor(id)) || '[]'); } catch (e2) { cache = []; }
+                if (guardadas.length === 0 && cache.length > 0) {
+                    guardadas = cache;
+                    syncOk = false;
+                } else {
+                    localStorage.setItem(cacheKeyFor(id), JSON.stringify(guardadas));
+                }
             } catch (e) {
                 syncOk = false;
                 try { guardadas = JSON.parse(localStorage.getItem(cacheKeyFor(id)) || '[]'); } catch (e2) { guardadas = []; }
@@ -1217,9 +1230,14 @@
             const r = filaARegistro(f);
             guardarLocal(r);
             try {
-                await sb.collection('notas').doc(r.id).set(r);
+                await SB.request('/rest/v1/notas?on_conflict=id', {
+                    method: 'POST',
+                    headers: { 'Prefer': 'resolution=merge-duplicates' },
+                    body: JSON.stringify(r)
+                });
                 syncOk = true;
             } catch (e) {
+                console.error('guardarFila Supabase:', e && e.message || e);
                 syncOk = false;
             }
             actualizarSync();
@@ -1227,8 +1245,16 @@
 
         async function guardarTodo() {
             filas.forEach(function (f) { clearTimeout(timersGuardar[f.key]); });
-            await Promise.all(filas.map(guardarFila));
-            toast(syncOk ? '💾 Notas guardadas y sincronizadas' : '💾 Guardado en este equipo (revisa la conexión)', syncOk ? 'success' : 'warning');
+            let ok = 0, fail = 0;
+            for (const f of filas) {
+                try {
+                    await guardarFila(f);
+                    if (syncOk) ok++; else fail++;
+                } catch (e) { fail++; }
+            }
+            if (fail === 0) toast('💾 ' + ok + ' notas guardadas y sincronizadas', 'success');
+            else if (ok === 0) toast('⚠ No se pudo guardar en la nube. Quedan en este equipo.', 'warning');
+            else toast('💾 ' + ok + ' guardadas · ' + fail + ' solo en este equipo', 'warning');
         }
 
         function alternarManual() {
