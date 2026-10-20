@@ -1030,6 +1030,13 @@ function setData(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 function getObj(key) { return JSON.parse(localStorage.getItem(key) || '{}'); }
 function setObj(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 
+(function bloquearInvitadoSistema() {
+  try {
+    var u = JSON.parse(localStorage.getItem('usuarioActual'));
+    if (u && u.rol === 'invitado') window.location.href = 'guest.html';
+  } catch (e) { }
+})();
+
 // Init admin user if not exists
 (function initAdmin() {
   let users = getData('users');
@@ -1039,23 +1046,25 @@ function setObj(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
   setData('users', users);
   // Force reset courses if old version
   const courseVersion = localStorage.getItem('courseVersion');
-  if (courseVersion !== '2') {
+  if (courseVersion !== '3') {
     localStorage.removeItem('courses');
-    localStorage.setItem('courseVersion', '2');
+    localStorage.setItem('courseVersion', '3');
   }
-  // Init EDL courses if empty
+  // Init EDL courses if empty (Ciclo 202620 — clases desde el 12 de octubre)
   if (getData('courses').length === 0) {
     const samples = [
-      { id: 'disc1_next', name: 'Discipulado 1 NEXT', category: 'Discipulado', desc: 'Curso de discipulado nivel 1 en formato NEXT.', color: '2', status: 'active' },
-      { id: 'disc2_next', name: 'Discipulado 2 NEXT', category: 'Discipulado', desc: 'Curso de discipulado nivel 2 en formato NEXT.', color: '2', status: 'active' },
-      { id: 'disc1', name: 'Discipulado 1', category: 'Discipulado', desc: 'Curso de discipulado nivel 1.', color: '3', status: 'active' },
-      { id: 'disc2', name: 'Discipulado 2', category: 'Discipulado', desc: 'Curso de discipulado nivel 2.', color: '3', status: 'active' },
-      { id: 'disc3', name: 'Discipulado 3', category: 'Discipulado', desc: 'Curso de discipulado nivel 3.', color: '3', status: 'active' },
-      { id: 'lidere1', name: 'Lidere 1', category: 'Liderazgo', desc: 'Curso de liderazgo nivel 1.', color: '5', status: 'active' },
-      { id: 'lidere2', name: 'Lidere 2', category: 'Liderazgo', desc: 'Curso de liderazgo nivel 2.', color: '5', status: 'active' },
-      { id: 'lidere3', name: 'Lidere 3', category: 'Liderazgo', desc: 'Curso de liderazgo nivel 3.', color: '5', status: 'active' },
-      { id: 'sem_apologetica', name: 'Seminario: Apologética', category: 'Seminario', desc: 'Seminario de Apologética.', color: '4', status: 'active' },
-      { id: 'sem_dones', name: 'Seminario: Int. Dones del Espíritu Santo', category: 'Seminario', desc: 'Seminario de Introduccion a los Dones del Espiritu Santo. Requiere Discipulado 3.', color: '4', status: 'active' }
+      { id: 'disc1_next', name: 'Discipulado 1 NEXT', category: 'Discipulado', desc: 'Sábado 3:30 PM - 4:30 PM (desde el 17 de octubre). Ciclo 202620.', color: '2', status: 'active' },
+      { id: 'disc2_next', name: 'Discipulado 2 NEXT', category: 'Discipulado', desc: 'Sábado 3:30 PM - 4:30 PM (desde el 17 de octubre). Ciclo 202620.', color: '2', status: 'active' },
+      { id: 'disc3_next', name: 'Discipulado 3 NEXT', category: 'Discipulado', desc: 'Sábado 3:30 PM - 4:30 PM (desde el 17 de octubre). Ciclo 202620.', color: '2', status: 'active' },
+      { id: 'sem_consejeria', name: 'Seminario: Consejería', category: 'Seminario', desc: 'Sábado 6:00 PM - 7:30 PM (desde el 17 de octubre). Ciclo 202620.', color: '4', status: 'active' },
+      { id: 'disc2', name: 'Discipulado 2', category: 'Discipulado', desc: 'Martes 7:30 PM - 9:00 PM (desde el 13 de octubre). Ciclo 202620.', color: '3', status: 'active' },
+      { id: 'disc3', name: 'Discipulado 3', category: 'Discipulado', desc: 'Martes 7:30 PM - 9:00 PM (desde el 13 de octubre). Ciclo 202620.', color: '3', status: 'active' },
+      { id: 'lidere1', name: 'Lidere 1', category: 'Liderazgo', desc: 'Miércoles 7:30 PM - 9:00 PM (desde el 14 de octubre). Ciclo 202620.', color: '5', status: 'active' },
+      { id: 'lidere2', name: 'Lidere 2', category: 'Liderazgo', desc: 'Miércoles 7:30 PM - 9:00 PM (desde el 14 de octubre). Ciclo 202620.', color: '5', status: 'active' },
+      { id: 'lidere3', name: 'Lidere 3', category: 'Liderazgo', desc: 'Miércoles 7:30 PM - 9:00 PM (desde el 14 de octubre). Ciclo 202620.', color: '5', status: 'active' },
+      { id: 'sem_padres', name: 'Seminario: Escuela para Padres', category: 'Seminario', desc: 'Miércoles 7:30 PM - 9:00 PM (desde el 14 de octubre). Ciclo 202620.', color: '4', status: 'active' },
+      { id: 'disc1', name: 'Discipulado 1', category: 'Discipulado', desc: 'Jueves 7:30 PM - 9:00 PM (desde el 15 de octubre). Ciclo 202620.', color: '3', status: 'active' },
+      { id: 'sem_sanidad', name: 'Seminario: Sanidad Interior', category: 'Seminario', desc: 'Jueves 7:30 PM - 9:00 PM (desde el 15 de octubre). Ciclo 202620.', color: '4', status: 'active' }
     ];
     setData('courses', samples);
   }

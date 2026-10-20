@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Registro de Notas | Iglesia Agua Viva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=13">
+    <style>
+        .ng-hero { text-align: center; margin-bottom: 24px; }
+        .ng-hero-icon { width: 92px; height: 92px; background: linear-gradient(135deg, #00334f, #1c6390); border-radius: 26px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; box-shadow: 0 10px 30px rgba(0, 51, 79, 0.28); }
+        .ng-hero h1 { font-size: 27px; font-weight: 800; color: #00334f; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .ng-hero p { color: #64748b; font-size: 14.5px; font-weight: 500; }
+
+        .ng-gate-card { background: #fff; border-radius: 24px; padding: 40px 32px; width: 100%; max-width: 420px; margin: 40px auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18); text-align: center; animation: ngUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes ngUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .ng-gate-card h2 { font-size: 22px; font-weight: 700; color: #1e293b; margin: 0 0 6px; }
+        .ng-gate-card p { color: #64748b; font-size: 14px; margin: 0 0 24px; }
+        .ng-pass-input { width: 100%; padding: 14px 18px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 16px; text-align: center; letter-spacing: 6px; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+        .ng-pass-input:focus { border-color: #00334f; box-shadow: 0 0 0 3px rgba(0, 51, 79, 0.1); }
+        .ng-pass-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #00334f, #1c6390); color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 16px; transition: transform 0.2s, box-shadow 0.2s; }
+        .ng-pass-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 51, 79, 0.3); }
+        .ng-pass-error { color: #dc2626; font-size: 13px; font-weight: 600; margin-top: 12px; display: none; }
+
+        .ng-controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; background: #fff; border-radius: 18px; padding: 16px 20px; box-shadow: 0 6px 24px rgba(0, 51, 79, 0.07); margin-bottom: 16px; }
+        .ng-field { display: flex; flex-direction: column; gap: 6px; }
+        .ng-field label { font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ng-field select, .ng-field input { padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; outline: none; background: #fff; font-family: inherit; }
+        .ng-field select:focus, .ng-field input:focus { border-color: #1c6390; }
+        .ng-actions { display: flex; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+        .ng-btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 16px; border: none; border-radius: 12px; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.15s, box-shadow 0.15s; }
+        .ng-btn:hover { transform: translateY(-1px); }
+        .ng-btn-primary { background: linear-gradient(135deg, #00334f, #1c6390); color: #fff; box-shadow: 0 4px 14px rgba(0, 51, 79, 0.25); }
+        .ng-btn-soft { background: #e8f4ff; color: #1c6390; }
+        .ng-btn-green { background: #dcfce7; color: #166534; }
+        .ng-sync { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 700; }
+        .ng-sync.ok { background: #dcfce7; color: #166534; }
+        .ng-sync.warn { background: #fef9c3; color: #854d0e; }
+
+        .ng-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .ng-chip { background: #fff; border-radius: 16px; padding: 14px 16px; box-shadow: 0 6px 24px rgba(0, 51, 79, 0.07); }
+        .ng-chip .k { font-size: 12px; color: #64748b; font-weight: 600; }
+        .ng-chip .v { font-size: 23px; font-weight: 800; color: #00334f; margin-top: 4px; }
+
+        .ng-table-wrap { background: #fff; border-radius: 18px; box-shadow: 0 6px 24px rgba(0, 51, 79, 0.07); overflow: hidden; margin-bottom: 16px; }
+        .ng-table-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 20px 10px; }
+        .ng-table-head h3 { font-size: 16.5px; font-weight: 700; color: #1e293b; margin: 0; }
+        .ng-table-wrap .table-container { padding: 0 12px 14px; border: none; border-radius: 0; box-shadow: none; }
+        #tablaNotas { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; }
+        #tablaNotas th { font-size: 12px; padding: 8px 6px; text-align: center; white-space: nowrap; }
+        #tablaNotas thead tr:first-child th { border-bottom: none; }
+        .th-grp { text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px !important; color: #fff !important; }
+        .th-asist { background: #1c6390; }
+        .th-crec { background: #0e7490; }
+        .th-fin { background: #00334f; }
+        .th-calc { background: #475569; }
+        #tablaNotas thead .c-alumno { background: #00334f; color: #fff; position: sticky; left: 0; z-index: 3; font-size: 12px; vertical-align: middle; min-width: 230px; }
+        #tablaNotas tbody .c-alumno { position: sticky; left: 0; background: #fff; z-index: 1; text-align: left; padding: 7px 12px; min-width: 230px; border-right: 2px solid #eef2f7; }
+        .th-ses, .td-ses { min-width: 64px; width: 64px; }
+        .th-num, .td-num { min-width: 80px; }
+        th[data-calc="crec"], td.calc[data-calc="crec"] { min-width: 78px; }
+        th[data-calc="asist"], td.calc[data-calc="asist"] { min-width: 70px; }
+        th[data-calc="faltas"], td.calc[data-calc="faltas"] { min-width: 74px; }
+        th[data-calc="prom"], td.calc[data-calc="prom"] { min-width: 94px; }
+        th[data-calc="cond"], .td-cond { min-width: 124px; }
+        #tablaNotas tbody tr:hover .c-alumno { background: #f8fafc; }
+        #tablaNotas tbody td { border-bottom: 1px solid #f1f5f9; padding: 5px 4px; vertical-align: middle; }
+        .c-alumno strong { display: block; font-size: 13.5px; color: #1e293b; font-weight: 600; }
+        .c-alumno .sub { display: block; font-size: 11px; color: #94a3b8; font-weight: 500; }
+
+        .asist-sel { width: 54px; padding: 6px 3px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 800; text-align: center; outline: none; background: #fff; cursor: pointer; font-family: inherit; appearance: auto; }
+        .asist-sel:focus { border-color: #1c6390; }
+        .asist-sel.a { background: #dcfce7; border-color: #86efac; color: #166534; }
+        .asist-sel.t { background: #fef9c3; border-color: #fde047; color: #854d0e; }
+        .asist-sel.f { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+        .ng-num { width: 70px; padding: 7px 4px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; text-align: center; outline: none; font-family: inherit; }
+        .ng-num:focus { border-color: #1c6390; background: #f8fbff; }
+
+        .calc { text-align: center; font-weight: 700; color: #00334f; white-space: nowrap; font-size: 13.5px; padding: 6px 8px !important; }
+        .calc.strong { font-size: 16px; font-weight: 800; }
+        .cond { display: inline-block; padding: 3px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+        .cond-ok { background: #dcfce7; color: #166534; }
+        .cond-no { background: #fee2e2; color: #991b1b; }
+        .cond-ne { background: #f1f5f9; color: #64748b; }
+
+        .ng-empty { text-align: center; padding: 34px 16px; color: #94a3b8; font-size: 14.5px; white-space: normal !important; }
+
+        .ng-manual { display: none; gap: 10px; flex-wrap: wrap; align-items: flex-end; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; }
+        .ng-manual.show { display: flex; }
+
+        .ng-legend { background: #fff; border-radius: 18px; padding: 18px 22px; box-shadow: 0 6px 24px rgba(0, 51, 79, 0.07); font-size: 13.5px; color: #475569; line-height: 1.75; }
+        .ng-legend h4 { margin: 0 0 8px; font-size: 15px; color: #00334f; font-weight: 800; }
+        .ng-legend b { color: #1e293b; }
+        .ng-legend .tag { display: inline-block; padding: 1px 8px; border-radius: 6px; font-weight: 800; font-size: 12.5px; margin-right: 3px; }
+        .tag-a { background: #dcfce7; color: #166534; }
+        .tag-t { background: #fef9c3; color: #854d0e; }
+        .tag-f { background: #fee2e2; color: #991b1b; }
+    </style>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="supabase.js?v=1"></script>
+    <script src="auth.js"></script>
+</head>
+
+<body>
+    <button class="sidebar-mobile-toggle" id="sidebarMobileToggle">☰</button>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="logo.png" alt="Logo" class="sidebar-logo-img" />
+                    <div class="logo-text">
+                        <h2>Agua Viva</h2>
+                        <p>Administración</p>
+                    </div>
+                </div>
+                <button class="sidebar-close" id="sidebarClose">&times;</button>
+            </div>
+            <div class="nav-section-content">
+                <a href="dashboard.html" class="nav-link" id="nav-dashboard"><span class="nav-icon"><i
+                            data-lucide="layout-dashboard"></i></span><span>Dashboard</span></a>
+                <a href="ingreso.html" class="nav-link" id="nav-registro"><span class="nav-icon"><i
+                            data-lucide="clipboard-list"></i></span><span>Registro</span></a>
+                <a href="edl.html" class="nav-link" id="nav-edl"><span class="nav-icon"><i
+                            data-lucide="graduation-cap"></i></span><span>EDL</span></a>
+                <a href="kids.html" class="nav-link" id="nav-kids"><span class="nav-icon"><i
+                            data-lucide="heart"></i></span><span>KIDS</span></a>
+                <a href="lideres.html" class="nav-link" id="nav-lideres"><span class="nav-icon"><i data-lucide="users"></i></span><span>LIDERES</span></a>
+                <a href="aula-virtual.html" class="nav-link" id="nav-aula"><span class="nav-icon"><i data-lucide="graduation-cap"></i></span><span>Aula Virtual</span></a>
+                <a href="notas.html" class="nav-link active" id="nav-notas"><span class="nav-icon"><i
+                            data-lucide="clipboard-check"></i></span><span>Registro de Notas</span></a>
+            </div>
+            <div class="nav-section-content" style="margin-top: auto;">
+                <a href="#" class="nav-link"><span class="nav-icon"><i
+                            data-lucide="settings"></i></span><span>Configuración</span></a>
+                <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i
+                            data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <div class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <div class="header-title">Registro de Notas – Ciclo 202620</div>
+                </div>
+                <div class="header-right">
+                    <div class="user-area">
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Cargando...</div>
+                            <div class="user-role" id="userRole"></div>
+                        </div>
+                        <div class="user-avatar" id="userAvatar">A</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div id="notasGate" style="display:none;">
+                    <div class="ng-gate-card">
+                        <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+                        <h2>Registro de Notas</h2>
+                        <p>Ingresa la contraseña del módulo para continuar</p>
+                        <input type="password" id="notasPasswordInput" class="ng-pass-input" placeholder="••••••••"
+                            onkeydown="if(event.key==='Enter')verificarPasswordNotas()">
+                        <button class="ng-pass-btn" onclick="verificarPasswordNotas()">Ingresar</button>
+                        <p id="notasPasswordError" class="ng-pass-error">❌ Contraseña incorrecta</p>
+                    </div>
+                </div>
+
+                <div id="notasApp" style="display:none;">
+                    <div class="ng-hero">
+                        <div class="ng-hero-icon"><i data-lucide="clipboard-check" style="width:44px;height:44px;color:#fff;"></i></div>
+                        <h1>Registro de Notas</h1>
+                        <p>Asistencia, crecimiento espiritual, trabajo final y examen final — ciclo 202620</p>
+                    </div>
+
+                    <div class="ng-controls">
+                        <div class="ng-field">
+                            <label for="selCurso">Curso</label>
+                            <select id="selCurso" style="min-width:260px"></select>
+                        </div>
+                        <div class="ng-field">
+                            <label for="selSesiones">N° de sesiones</label>
+                            <select id="selSesiones"></select>
+                        </div>
+                        <div class="ng-actions">
+                            <span id="syncBadge" class="ng-sync ok">✓ Sincronizado</span>
+                            <button class="ng-btn ng-btn-soft" onclick="alternarManual()"><i data-lucide="user-plus" style="width:15px;height:15px;"></i> Agregar alumno</button>
+                            <button class="ng-btn ng-btn-soft" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width:15px;height:15px;"></i> Excel</button>
+                            <button class="ng-btn ng-btn-primary" onclick="guardarTodo()"><i data-lucide="save" style="width:15px;height:15px;"></i> Guardar todo</button>
+                        </div>
+                    </div>
+
+                    <div class="ng-manual" id="manualBox">
+                        <div class="ng-field">
+                            <label for="manualNombres">Nombres y apellidos</label>
+                            <input type="text" id="manualNombres" placeholder="Ej. María López" style="min-width:240px">
+                        </div>
+                        <div class="ng-field">
+                            <label for="manualDni">DNI (opcional)</label>
+                            <input type="text" id="manualDni" placeholder="12345678" maxlength="8" style="width:140px">
+                        </div>
+                        <button class="ng-btn ng-btn-green" onclick="agregarManual()">Agregar a la lista</button>
+                    </div>
+
+                    <div class="ng-chips">
+                        <div class="ng-chip"><div class="k">Alumnos</div><div class="v" id="chipAlumnos">0</div></div>
+                        <div class="ng-chip"><div class="k">Con notas cargadas</div><div class="v" id="chipNotas">0</div></div>
+                        <div class="ng-chip"><div class="k">Promedio del curso</div><div class="v" id="chipProm">—</div></div>
+                        <div class="ng-chip"><div class="k">Aprobados / Desaprobados</div><div class="v" id="chipCond">0 / 0</div></div>
+                    </div>
+
+                    <div class="ng-table-wrap">
+                        <div class="ng-table-head">
+                            <h3><i data-lucide="table-2" style="width:17px;height:17px;vertical-align:-3px;"></i> Hoja de notas</h3>
+                            <span style="font-size:12.5px;color:#94a3b8;">Los cambios se guardan solos · <b>*</b> = promedio parcial</span>
+                        </div>
+                        <div class="table-container">
+                            <table id="tablaNotas">
+                                <thead id="headNotas"></thead>
+                                <tbody id="tbodyNotas">
+                                    <tr>
+                                        <td class="ng-empty" colspan="13">Elige un curso para ver a sus alumnos</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="ng-legend">
+                        <h4>¿Cómo se calcula la nota?</h4>
+                        <b>Asistencia por sesión:</b>
+                        <span class="tag tag-a">A = Asistió (20)</span>
+                        <span class="tag tag-t">T = Llegó Tarde (15)</span>
+                        <span class="tag tag-f">F = Faltó (0)</span>
+                        &nbsp;·&nbsp; <b>3 tardías = 1 falta</b>.<br>
+                        <b>Componentes y pesos:</b> Crecimiento Espiritual <b>40%</b> (promedio de Devocionales,
+                        Asistencia a su servicio, Montaña de oración y Versículo memorizado) · Examen Final
+                        <b>25%</b> · Trabajo Final <b>20%</b> · Asistencia <b>15%</b>. Los campos vacíos no se
+                        cuentan (promedio parcial).<br>
+                        <b>Reglas de faltas:</b> con <b>3 faltas</b> la nota final queda fija en <b>11.0</b>; con
+                        <b>más de 3 faltas</b> el alumno queda <b>Desaprobado</b> sin importar sus notas.<br>
+                        <b>Mínima aprobatoria: 11.0</b> (escala 0 – 20).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual'));
+        if (!usuarioActual) { window.location.href = 'index.html'; }
+        const esAdmin = usuarioActual.rol === 'admin';
+        const esInvitado = usuarioActual.rol === 'invitado';
+        if (!esAdmin && !esInvitado) { window.location.href = 'index.html'; }
+
+        document.getElementById('userName').innerText = usuarioActual.nombre || '—';
+        document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : '👥 Invitado';
+        document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
+
+        const PASS_MODULO = 'AguaViva2026';
+        const CICLO = '202620';
+        const MIN_APROB = 11;
+        const VAL_ASIST = { A: 20, T: 15, F: 0 };
+        const PESO = { crec: 0.40, examen: 0.25, trabajo: 0.20, asistencia: 0.15 };
+        const CAMPOS_NUM = ['devocionales', 'servicio', 'montana', 'versiculo', 'trabajoFinal', 'examenFinal'];
+        const CURSOS = [
+            { id: 'disc1_next', nombre: 'Discipulado 1 NEXT' },
+            { id: 'disc2_next', nombre: 'Discipulado 2 NEXT' },
+            { id: 'disc3_next', nombre: 'Discipulado 3 NEXT' },
+            { id: 'sem_consejeria', nombre: 'Seminario: Consejería' },
+            { id: 'disc2', nombre: 'Discipulado 2' },
+            { id: 'disc3', nombre: 'Discipulado 3' },
+            { id: 'lidere1', nombre: 'Lidere 1' },
+            { id: 'lidere2', nombre: 'Lidere 2' },
+            { id: 'lidere3', nombre: 'Lidere 3' },
+            { id: 'sem_padres', nombre: 'Seminario: Escuela para Padres' },
+            { id: 'disc1', nombre: 'Discipulado 1' },
+            { id: 'sem_sanidad', nombre: 'Seminario: Sanidad Interior' }
+        ];
+
+        let cursoActual = null;
+        let sesiones = 10;
+        let filas = [];
+        let syncOk = true;
+        let initHecha = false;
+        const timersGuardar = {};
+
+        function esc(s) {
+            return String(s === null || s === undefined ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function toast(msg, tipo) {
+            tipo = tipo || 'success';
+            const t = document.createElement('div');
+            t.className = 'toast toast-' + tipo;
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(function () { t.style.opacity = '0'; setTimeout(function () { t.remove(); }, 500); }, tipo === 'warning' ? 5000 : 3000);
+        }
+
+        function cerrarSesion() {
+            if (typeof Auth !== 'undefined') Auth.cerrarSesion();
+            else { localStorage.removeItem('usuarioActual'); window.location.href = 'index.html'; }
+        }
+
+        function verificarPasswordNotas() {
+            const input = document.getElementById('notasPasswordInput').value.trim();
+            if (input === PASS_MODULO) {
+                document.getElementById('notasGate').style.display = 'none';
+                iniciarModulo();
+            } else {
+                document.getElementById('notasPasswordError').style.display = 'block';
+                document.getElementById('notasPasswordInput').value = '';
+                document.getElementById('notasPasswordInput').focus();
+            }
+        }
+
+        function iniciarModulo() {
+            if (initHecha) return;
+            initHecha = true;
+            document.getElementById('notasApp').style.display = 'block';
+            poblarControles();
+            const sel = document.getElementById('selCurso');
+            sel.value = CURSOS[0].id;
+            cargarCurso();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function cfgKey() { return 'notas_sesiones_' + cursoActual; }
+        function cacheKeyFor(curso) { return 'notas_cache_' + curso; }
+        function cacheKey() { return cacheKeyFor(cursoActual); }
+        function rosterKey() { return 'notas_roster_' + cursoActual; }
+
+        function poblarControles() {
+            const sel = document.getElementById('selCurso');
+            sel.innerHTML = CURSOS.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + '</option>'; }).join('');
+            sel.onchange = cargarCurso;
+            const selS = document.getElementById('selSesiones');
+            let opts = '';
+            for (let i = 1; i <= 20; i++) opts += '<option value="' + i + '">' + i + '</option>';
+            selS.innerHTML = opts;
+            selS.onchange = function () {
+                sesiones = parseInt(selS.value, 10) || 10;
+                localStorage.setItem(cfgKey(), sesiones);
+                filas.forEach(function (f) {
+                    f.asistencia = f.asistencia || [];
+                    while (f.asistencia.length < sesiones) f.asistencia.push('');
+                });
+                renderTabla();
+                filas.forEach(programarGuardado);
+            };
+        }
+
+        async function cargarCurso() {
+            Object.keys(timersGuardar).forEach(function (k) { clearTimeout(timersGuardar[k]); delete timersGuardar[k]; });
+            const id = document.getElementById('selCurso').value;
+            cursoActual = id;
+            if (!id) { filas = []; renderTabla(); return; }
+            sesiones = parseInt(localStorage.getItem(cfgKey()) || '10', 10);
+            document.getElementById('selSesiones').value = sesiones;
+            filas = [];
+            renderTabla('Cargando alumnos del curso...');
+
+            let guardadas = [];
+            try {
+                guardadas = await SB.select('notas', { filters: [{ field: 'cursoId', op: '==', value: id }] });
+                syncOk = true;
+                localStorage.setItem(cacheKey(), JSON.stringify(guardadas));
+            } catch (e) {
+                syncOk = false;
+                try { guardadas = JSON.parse(localStorage.getItem(cacheKey()) || '[]'); } catch (e2) { guardadas = []; }
+            }
+            if (cursoActual !== id) return;
+
+            let ins = [];
+            try {
+                ins = await SB.select('inscripciones', {
+                    filters: [{ field: 'cursoId', op: '==', value: id }, { field: 'ciclo', op: '==', value: CICLO }],
+                    columns: ['id', 'nombres', 'dni', 'celular', 'lider', 'cursoId', 'ciclo', 'sede', 'estadoPago'],
+                    order: { field: 'nombres', dir: 'asc' }
+                });
+                localStorage.setItem(rosterKey(), JSON.stringify(ins));
+            } catch (e) {
+                try { ins = JSON.parse(localStorage.getItem(rosterKey()) || '[]'); } catch (e2) { ins = []; }
+            }
+            if (cursoActual !== id) return;
+
+            const sesMax = guardadas.reduce(function (m, r) {
+                const s = parseInt(r.sesiones || 0, 10) || 0;
+                return s > m ? s : m;
+            }, 0);
+            if (sesMax > sesiones) {
+                sesiones = sesMax;
+                document.getElementById('selSesiones').value = sesiones;
+                localStorage.setItem(cfgKey(), sesiones);
+            }
+
+            const map = new Map();
+            ins.forEach(function (r) {
+                if (!(r.nombres || '').trim()) return;
+                const dni = (r.dni || '').toString().trim();
+                const key = id + '|' + (dni || ('ref' + r.id));
+                const base = { key: key, curso: id, dni: dni, nombres: r.nombres, refId: r.id, asistencia: [] };
+                CAMPOS_NUM.forEach(function (k) { base[k] = null; });
+                map.set(key, base);
+            });
+            guardadas.forEach(function (r) {
+                const dni = (r.dni || '').toString().trim();
+                const key = r.id || (id + '|' + dni);
+                const base = map.get(key) || { key: key, curso: id, dni: dni, nombres: r.nombres || '—', refId: r.refId || '', asistencia: [] };
+                base.asistencia = normAsis(r.asistencia);
+                CAMPOS_NUM.forEach(function (k) {
+                    const v = r[k];
+                    base[k] = (v === undefined || v === null || v === '') ? null : parseFloat(v);
+                    if (isNaN(base[k])) base[k] = null;
+                });
+                map.set(key, base);
+            });
+            filas = Array.from(map.values()).sort(function (a, b) {
+                return (a.nombres || '').localeCompare(b.nombres || '', 'es');
+            });
+            renderTabla();
+            actualizarSync();
+        }
+
+        function normAsis(v) {
+            let a = [];
+            if (Array.isArray(v)) a = v;
+            else if (typeof v === 'string' && v) { try { a = JSON.parse(v); } catch (e) { a = []; } }
+            if (!Array.isArray(a)) a = [];
+            const out = a.map(function (x) { return (x === 'A' || x === 'T' || x === 'F') ? x : ''; });
+            while (out.length < sesiones) out.push('');
+            return out;
+        }
+
+        function num(v) {
+            if (v === null || v === undefined || v === '') return null;
+            const n = parseFloat(v);
+            if (isNaN(n)) return null;
+            return Math.min(20, Math.max(0, n));
+        }
+
+        function calcular(f) {
+            const a = (f.asistencia || []).slice(0, sesiones);
+            const valAsist = [];
+            a.forEach(function (m) { if (VAL_ASIST[m] !== undefined) valAsist.push(VAL_ASIST[m]); });
+            const asistencia = valAsist.length ? valAsist.reduce(function (s, v) { return s + v; }, 0) / valAsist.length : null;
+            let nF = 0, nT = 0;
+            a.forEach(function (m) { if (m === 'F') nF++; else if (m === 'T') nT++; });
+            const faltas = nF + Math.floor(nT / 3);
+
+            const crecVals = [];
+            ['devocionales', 'servicio', 'montana', 'versiculo'].forEach(function (k) {
+                const v = num(f[k]);
+                if (v !== null) crecVals.push(v);
+            });
+            const crec = crecVals.length ? crecVals.reduce(function (s, v) { return s + v; }, 0) / crecVals.length : null;
+
+            const comps = [];
+            if (crec !== null) comps.push([crec, PESO.crec]);
+            const ex = num(f.examenFinal);
+            if (ex !== null) comps.push([ex, PESO.examen]);
+            const tr = num(f.trabajoFinal);
+            if (tr !== null) comps.push([tr, PESO.trabajo]);
+            if (asistencia !== null) comps.push([asistencia, PESO.asistencia]);
+
+            let prom = null, parcial = true;
+            if (comps.length) {
+                const w = comps.reduce(function (s, c) { return s + c[1]; }, 0);
+                prom = comps.reduce(function (s, c) { return s + c[0] * c[1]; }, 0) / w;
+                parcial = w < 0.999;
+            }
+
+            let nota = prom, condicion = '—';
+            if (faltas > 3) {
+                condicion = 'Desaprobado';
+            } else if (prom !== null) {
+                if (faltas === 3) nota = MIN_APROB;
+                condicion = nota >= MIN_APROB ? 'Aprobado' : 'Desaprobado';
+            }
+            return {
+                crec: crec, asistencia: asistencia, faltas: faltas,
+                prom: prom, nota: nota, condicion: condicion, parcial: parcial
+            };
+        }
+
+        function renderTabla(mensaje) {
+            const head = document.getElementById('headNotas');
+            const tbody = document.getElementById('tbodyNotas');
+            if (mensaje) {
+                head.innerHTML = '';
+                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (sesiones + 12) + '">' + esc(mensaje) + '</td></tr>';
+                return;
+            }
+            let r1 = '<tr><th rowspan="2" class="c-alumno">Alumno</th>' +
+                '<th colspan="' + sesiones + '" class="th-grp th-asist">Asistencia por sesión (A · T · F)</th>' +
+                '<th colspan="4" class="th-grp th-crec">Crecimiento Espiritual (0-20)</th>' +
+                '<th colspan="2" class="th-grp th-fin">Finales (0-20)</th>' +
+                '<th colspan="5" class="th-grp th-calc">Cálculo automático</th></tr>';
+            let r2 = '<tr>';
+            for (let i = 1; i <= sesiones; i++) r2 += '<th class="th-ses" title="Sesión ' + i + '">S' + i + '</th>';
+            r2 += '<th class="th-num" title="Devocionales">Devoc.</th>' +
+                '<th class="th-num" title="Asistencia a su servicio">Servicio</th>' +
+                '<th class="th-num" title="Montaña de oración">Montaña</th>' +
+                '<th class="th-num" title="Versículo memorizado">Versículo</th>' +
+                '<th class="th-num">Trabajo</th><th class="th-num">Examen</th>' +
+                '<th data-calc="crec">Crec. Esp.</th><th data-calc="asist">Asist.</th>' +
+                '<th data-calc="faltas">Faltas</th><th data-calc="prom">Promedio</th>' +
+                '<th data-calc="cond">Condición</th></tr>';
+            head.innerHTML = r1 + r2;
+
+            if (!filas.length) {
+                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (sesiones + 12) + '">' +
+                    'Aún no hay alumnos en este curso.<br>Se cargarán automáticamente desde las inscripciones EDL, o agrégalos con el botón <b>Agregar alumno</b>.</td></tr>';
+                actualizarChips();
+                return;
+            }
+            tbody.innerHTML = filas.map(renderFila).join('');
+            filas.forEach(actualizarFila);
+            actualizarChips();
+        }
+
+        function renderFila(f) {
+            let h = '<tr data-key="' + esc(f.key) + '">' +
+                '<td class="c-alumno"><strong>' + esc(f.nombres || '—') + '</strong>' +
+                '<span class="sub">' + (f.dni ? 'DNI ' + esc(f.dni) : 'Sin DNI') + '</span></td>';
+            const a = f.asistencia || [];
+            for (let i = 0; i < sesiones; i++) {
+                const v = a[i] || '';
+                h += '<td class="td-ses" style="text-align:center"><select class="asist-sel' + (v ? ' ' + v.toLowerCase() : '') +
+                    '" data-idx="' + i + '"><option value=""' + (v === '' ? ' selected' : '') + '>—</option>' +
+                    '<option' + (v === 'A' ? ' selected' : '') + '>A</option>' +
+                    '<option' + (v === 'T' ? ' selected' : '') + '>T</option>' +
+                    '<option' + (v === 'F' ? ' selected' : '') + '>F</option></select></td>';
+            }
+            CAMPOS_NUM.forEach(function (k) {
+                const v = f[k];
+                h += '<td class="td-num" style="text-align:center"><input type="number" class="ng-num" data-field="' + k +
+                    '" min="0" max="20" step="0.5" value="' + (v === null || v === undefined ? '' : v) + '"></td>';
+            });
+            h += '<td class="calc" data-calc="crec">—</td>' +
+                '<td class="calc" data-calc="asist">—</td>' +
+                '<td class="calc" data-calc="faltas">0</td>' +
+                '<td class="calc strong" data-calc="prom">—</td>' +
+                '<td class="td-cond" style="text-align:center"><span class="cond cond-ne" data-calc="cond">—</span></td></tr>';
+            return h;
+        }
+
+        function trDe(f) {
+            return document.querySelector('#tbodyNotas tr[data-key="' + (f.key || '').replace(/"/g, '\\"') + '"]');
+        }
+
+        function actualizarFila(f) {
+            const tr = trDe(f);
+            if (!tr) return;
+            const r = calcular(f);
+            tr.querySelector('[data-calc="crec"]').textContent = r.crec === null ? '—' : r.crec.toFixed(1);
+            tr.querySelector('[data-calc="asist"]').textContent = r.asistencia === null ? '—' : r.asistencia.toFixed(1);
+            tr.querySelector('[data-calc="faltas"]').textContent = r.faltas + (r.faltas > 3 ? ' ⛔' : '');
+            tr.querySelector('[data-calc="prom"]').textContent = r.nota === null ? '—' : r.nota.toFixed(1);
+            const cond = tr.querySelector('[data-calc="cond"]');
+            const parcial = r.parcial && r.condicion !== '—';
+            cond.textContent = r.condicion + (parcial ? '*' : '');
+            cond.className = 'cond ' + (r.condicion === 'Aprobado' ? 'cond-ok' : r.condicion === 'Desaprobado' ? 'cond-no' : 'cond-ne');
+        }
+
+        function actualizarChips() {
+            const rs = filas.map(function (f) { return calcular(f); });
+            const conNota = rs.filter(function (r) { return r.nota !== null; });
+            const prom = conNota.length ? conNota.reduce(function (s, r) { return s + r.nota; }, 0) / conNota.length : null;
+            const ok = rs.filter(function (r) { return r.condicion === 'Aprobado'; }).length;
+            const no = rs.filter(function (r) { return r.condicion === 'Desaprobado'; }).length;
+            document.getElementById('chipAlumnos').textContent = filas.length;
+            document.getElementById('chipNotas').textContent = conNota.length;
+            document.getElementById('chipProm').textContent = prom === null ? '—' : prom.toFixed(1);
+            document.getElementById('chipCond').textContent = ok + ' / ' + no;
+        }
+
+        function actualizarSync() {
+            const el = document.getElementById('syncBadge');
+            if (syncOk) {
+                el.className = 'ng-sync ok';
+                el.innerHTML = '✓ Sincronizado';
+                el.title = 'Las notas se guardan en Supabase y se ven desde cualquier equipo.';
+            } else {
+                el.className = 'ng-sync warn';
+                el.innerHTML = '⚠ Solo en este equipo';
+                el.title = 'La tabla "notas" no está disponible: ejecuta el SQL en Supabase (supabase-schema.sql) para sincronizar.';
+            }
+        }
+
+        document.getElementById('tbodyNotas').addEventListener('input', function (e) {
+            const f = filaDeEvento(e);
+            if (!f) return;
+            aplicarCambio(e.target, f);
+            actualizarFila(f);
+            actualizarChips();
+            programarGuardado(f);
+        });
+
+        document.getElementById('tbodyNotas').addEventListener('change', function (e) {
+            const f = filaDeEvento(e);
+            if (!f) return;
+            if (e.target.classList.contains('ng-num')) {
+                const v = num(e.target.value);
+                f[e.target.dataset.field] = v;
+                e.target.value = v === null ? '' : v;
+            }
+            actualizarFila(f);
+            actualizarChips();
+            programarGuardado(f);
+        });
+
+        function filaDeEvento(e) {
+            const tr = e.target.closest ? e.target.closest('tr[data-key]') : null;
+            if (!tr) return null;
+            for (let i = 0; i < filas.length; i++) if (filas[i].key === tr.dataset.key) return filas[i];
+            return null;
+        }
+
+        function aplicarCambio(t, f) {
+            if (t.classList.contains('asist-sel')) {
+                f.asistencia = f.asistencia || [];
+                while (f.asistencia.length < sesiones) f.asistencia.push('');
+                f.asistencia[+t.dataset.idx] = t.value;
+                t.className = 'asist-sel' + (t.value ? ' ' + t.value.toLowerCase() : '');
+            } else if (t.classList.contains('ng-num')) {
+                const n = parseFloat(t.value);
+                f[t.dataset.field] = t.value === '' || isNaN(n) ? null : Math.min(20, Math.max(0, n));
+            }
+        }
+
+        function programarGuardado(f) {
+            clearTimeout(timersGuardar[f.key]);
+            timersGuardar[f.key] = setTimeout(function () { guardarFila(f); }, 700);
+        }
+
+        function filaARegistro(f) {
+            const r = {
+                id: f.key,
+                cursoId: f.curso || cursoActual,
+                ciclo: CICLO,
+                dni: f.dni || '',
+                nombres: f.nombres || '',
+                sesiones: sesiones,
+                asistencia: (f.asistencia || []).slice(0, sesiones),
+                devocionales: f.devocionales,
+                servicio: f.servicio,
+                montana: f.montana,
+                versiculo: f.versiculo,
+                trabajoFinal: f.trabajoFinal,
+                examenFinal: f.examenFinal,
+                actualizado: hoyPeru() + ' ' + horaPeru(),
+                registradoPor: usuarioActual.nombre || ''
+            };
+            CAMPOS_NUM.forEach(function (k) { if (r[k] === undefined) r[k] = null; });
+            return r;
+        }
+
+        function guardarLocal(r) {
+            let cache = [];
+            try { cache = JSON.parse(localStorage.getItem(cacheKeyFor(r.cursoId)) || '[]'); } catch (e) { cache = []; }
+            const i = cache.findIndex(function (x) { return x.id === r.id; });
+            if (i >= 0) cache[i] = r; else cache.push(r);
+            localStorage.setItem(cacheKey(), JSON.stringify(cache));
+        }
+
+        async function guardarFila(f) {
+            const r = filaARegistro(f);
+            guardarLocal(r);
+            try {
+                await sb.collection('notas').doc(r.id).set(r);
+                syncOk = true;
+            } catch (e) {
+                syncOk = false;
+            }
+            actualizarSync();
+        }
+
+        async function guardarTodo() {
+            filas.forEach(function (f) { clearTimeout(timersGuardar[f.key]); });
+            await Promise.all(filas.map(guardarFila));
+            toast(syncOk ? '💾 Notas guardadas y sincronizadas'
+                : '💾 Guardado en este equipo (ejecuta el SQL de la tabla notas)', syncOk ? 'success' : 'warning');
+        }
+
+        function alternarManual() {
+            const box = document.getElementById('manualBox');
+            box.classList.toggle('show');
+            if (box.classList.contains('show')) document.getElementById('manualNombres').focus();
+        }
+
+        function agregarManual() {
+            const nom = document.getElementById('manualNombres').value.trim();
+            const dni = document.getElementById('manualDni').value.trim();
+            if (!cursoActual) { toast('Elige un curso primero', 'error'); return; }
+            if (!nom) { toast('Escribe los nombres del alumno', 'error'); return; }
+            const key = cursoActual + '|' + (dni || ('refman' + Date.now()));
+            if (filas.some(function (f) { return f.key === key; })) { toast('Ese alumno ya está en la lista', 'warning'); return; }
+            const f = { key: key, curso: cursoActual, dni: dni, nombres: nom, refId: '', asistencia: [] };
+            CAMPOS_NUM.forEach(function (k) { f[k] = null; });
+            while (f.asistencia.length < sesiones) f.asistencia.push('');
+            filas.push(f);
+            filas.sort(function (a, b) { return (a.nombres || '').localeCompare(b.nombres || '', 'es'); });
+            renderTabla();
+            guardarFila(f);
+            document.getElementById('manualNombres').value = '';
+            document.getElementById('manualDni').value = '';
+            document.getElementById('manualBox').classList.remove('show');
+            toast('Alumno agregado a la hoja de notas');
+        }
+
+        function exportarExcel() {
+            if (typeof XLSX === 'undefined') { toast('No se pudo cargar el exportador de Excel', 'error'); return; }
+            if (!cursoActual || !filas.length) { toast('No hay alumnos para exportar', 'warning'); return; }
+            const curso = CURSOS.find(function (c) { return c.id === cursoActual; });
+            const head = ['Alumno', 'DNI'];
+            for (let i = 1; i <= sesiones; i++) head.push('S' + i);
+            head.push('Devocionales', 'Servicio', 'Montaña', 'Versículo', 'Trabajo Final', 'Examen Final',
+                'Crec. Esp.', 'Asistencia', 'Faltas', 'Promedio', 'Condición');
+            const rows = [
+                ['REGISTRO DE NOTAS — ' + (curso ? curso.nombre : cursoActual)],
+                ['Ciclo ' + CICLO + ' · ' + hoyPeru()],
+                [],
+                head
+            ];
+            filas.forEach(function (f) {
+                const r = calcular(f);
+                const a = (f.asistencia || []).slice(0, sesiones);
+                const row = [f.nombres, f.dni];
+                for (let i = 0; i < sesiones; i++) row.push(a[i] || '');
+                CAMPOS_NUM.forEach(function (k) { row.push(f[k] === null || f[k] === undefined ? '' : f[k]); });
+                row.push(r.crec === null ? '' : Math.round(r.crec * 10) / 10);
+                row.push(r.asistencia === null ? '' : Math.round(r.asistencia * 10) / 10);
+                row.push(r.faltas);
+                row.push(r.nota === null ? '' : Math.round(r.nota * 10) / 10);
+                row.push(r.condicion);
+                rows.push(row);
+            });
+            rows.push([]);
+            rows.push(['A = Asistió (20) · T = Llegó Tarde (15) · F = Faltó (0) · 3 tardías = 1 falta']);
+            rows.push(['Pesos: Crecimiento Espiritual 40% · Examen Final 25% · Trabajo Final 20% · Asistencia 15%']);
+            rows.push(['Con 3 faltas la nota queda en 11.0 · Con más de 3 faltas: Desaprobado · Mínima aprobatoria: 11.0']);
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: head.length - 1 } }];
+            const anchos = [{ wch: 40 }, { wch: 12 }];
+            for (let i = 0; i < sesiones; i++) anchos.push({ wch: 6 });
+            [{ wch: 13 }, { wch: 11 }, { wch: 11 }, { wch: 12 }, { wch: 14 }, { wch: 13 },
+            { wch: 11 }, { wch: 11 }, { wch: 8 }, { wch: 11 }, { wch: 14 }].forEach(function (c) { anchos.push(c); });
+            ws['!cols'] = anchos;
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Notas');
+            XLSX.writeFile(wb, 'notas_' + cursoActual + '_' + hoyPeru() + '.xlsx');
+            toast('📎 Excel exportado');
+        }
+
+        const sidebarMobileToggle = document.getElementById('sidebarMobileToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarClose = document.getElementById('sidebarClose');
+        if (sidebarMobileToggle) {
+            sidebarMobileToggle.addEventListener('click', function () {
+                sidebar.classList.add('active');
+                if (sidebarOverlay) sidebarOverlay.style.display = 'block';
+            });
+        }
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', function () {
+                sidebar.classList.remove('active');
+                if (sidebarOverlay) sidebarOverlay.style.display = 'none';
+            });
+        }
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function () {
+                sidebar.classList.remove('active');
+                sidebarOverlay.style.display = 'none';
+            });
+        }
+
+        if (esAdmin) {
+            iniciarModulo();
+        } else {
+            document.getElementById('notasGate').style.display = 'block';
+        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    </script>
+</body>
+
+</html>

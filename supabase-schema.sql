@@ -120,6 +120,24 @@ create table if not exists personas (
   "createdAt" text
 );
 
+create table if not exists notas (
+  "id" text primary key,
+  "cursoId" text not null,
+  "ciclo" text,
+  "dni" text,
+  "nombres" text,
+  "sesiones" integer default 10,
+  "asistencia" jsonb,
+  "devocionales" numeric,
+  "servicio" numeric,
+  "montana" numeric,
+  "versiculo" numeric,
+  "trabajoFinal" numeric,
+  "examenFinal" numeric,
+  "actualizado" text,
+  "registradoPor" text
+);
+
 -- ============================================================
 -- RLS: acceso público (equivalente a Firestore "allow read, write: if true")
 -- ============================================================
@@ -128,7 +146,7 @@ declare t text;
 begin
   foreach t in array array[
     'registros','inscripciones','kids_maestros','kids_asistencia',
-    'lideres_maestros','lideres_asistencia','participantes','creativos','personas'
+    'lideres_maestros','lideres_asistencia','participantes','creativos','personas','notas'
   ]
   loop
     execute format('alter table %I enable row level security', t);

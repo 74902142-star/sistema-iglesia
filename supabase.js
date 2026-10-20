@@ -122,7 +122,8 @@
         lideres_asistencia: ['id', 'fecha', 'timestamp', 'hora', 'maestroId', 'origen'],
         participantes: ['id', 'nombre', 'telefono', 'sede', 'rol', 'fecha', 'tipoServicio', 'hora', 'enviado', 'recordatorioEnviado', 'foto'],
         creativos: ['id', 'nombre', 'telefono', 'rol', 'servicio', 'fecha', 'hora', 'timestamp'],
-        personas: ['id', 'nombre', 'telefono', 'nombres', 'dni', 'celular', 'correo', 'origen', 'createdAt']
+        personas: ['id', 'nombre', 'telefono', 'nombres', 'dni', 'celular', 'correo', 'origen', 'createdAt'],
+        notas: ['id', 'cursoId', 'ciclo', 'dni', 'nombres', 'sesiones', 'asistencia', 'devocionales', 'servicio', 'montana', 'versiculo', 'trabajoFinal', 'examenFinal', 'actualizado', 'registradoPor']
     };
 
     function onlyKnownColumns(table, row) {

@@ -47,3 +47,16 @@ const Auth = {
         window.location.href = 'index.html';
     }
 };
+
+// Invitados: se oculta la entrada al Aula Virtual (por ahora solo ven Registro de Notas)
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        var u = Auth.getUsuario();
+        if (u && u.rol === 'invitado') {
+            ['nav-aula', 'opt-aula'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+        }
+    } catch (e) { }
+});
