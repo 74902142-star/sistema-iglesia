@@ -48,12 +48,14 @@ const Auth = {
     }
 };
 
-// Invitados: se oculta la entrada al Aula Virtual (por ahora solo ven Registro de Notas)
+// Invitados: solo ven Registro de Notas en el menú (sin Aula, EDL, Kids, etc.)
 document.addEventListener('DOMContentLoaded', function () {
     try {
         var u = Auth.getUsuario();
         if (u && u.rol === 'invitado') {
-            ['nav-aula', 'opt-aula'].forEach(function (id) {
+            ['nav-aula', 'opt-aula', 'nav-edl', 'opt-edl', 'nav-kids', 'opt-kids',
+             'nav-lideres', 'opt-lideres', 'nav-dashboard', 'opt-dashboard',
+             'nav-registro', 'opt-registro', 'opt-ingreso'].forEach(function (id) {
                 var el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });

@@ -169,7 +169,7 @@
             <p>Bienvenido, <span class="user-name" id="userName">Invitado</span></p>
         </div>
 
-        <a href="ingreso.html" class="module-card">
+        <a href="ingreso.html" class="module-card" id="opt-ingreso">
             <div class="module-icon">
                 <i data-lucide="clipboard-list" style="width: 24px; height: 24px;"></i>
             </div>
@@ -179,7 +179,7 @@
             </div>
         </a>
 
-        <a href="edl.html" class="module-card">
+        <a href="edl.html" class="module-card" id="opt-edl">
             <div class="module-icon">
                 <i data-lucide="graduation-cap" style="width: 24px; height: 24px;"></i>
             </div>
@@ -245,10 +245,36 @@
         }
         document.getElementById('userName').textContent = user.nombre || 'Invitado';
 
-        // KIDS & LIDERES only visible if name is "Agua Viva Hyo"
-        if (user.nombre !== 'Agua Viva Hyo') {
-            document.getElementById('opt-kids').style.display = 'none';
-            document.getElementById('opt-lideres').style.display = 'none';
+        // Solo tutores de Notas (nombres/alias de notas.html) ven la tarjeta de Notas;
+        // el resto de invitados ven EDL/asistencia pero NO Notas.
+        const TUTORES_GUEST = [
+            'Iriela', 'Cristina', 'Marlit', 'Marlith', 'Kazumi', 'Patsy',
+            'Roger', 'Stefany', 'Stephany', 'Sthefany', 'Stefani', 'Thefa',
+            'Jhon', 'John', 'Paul', 'Evelyn', 'Milagros', 'Nataly', 'Nathaly', 'Arni'
+        ];
+        function norm(s) {
+            return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+        }
+        const nombreInv = norm(user.nombre);
+        const esTutor = nombreInv && nombreInv !== 'invitado' && TUTORES_GUEST.some(function (t) {
+            const nt = norm(t);
+            return nombreInv === nt || nombreInv.split(' ')[0] === nt || nombreInv.startsWith(nt);
+        });
+
+        if (esTutor) {
+            // Tutor: solo Registro de Notas
+            ['opt-ingreso', 'opt-edl', 'opt-kids', 'opt-lideres', 'opt-aula'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+        } else {
+            // No es tutor: sin Notas
+            var n = document.getElementById('opt-notas');
+            if (n) n.style.display = 'none';
+            if (user.nombre !== 'Agua Viva Hyo') {
+                document.getElementById('opt-kids').style.display = 'none';
+                document.getElementById('opt-lideres').style.display = 'none';
+            }
         }
 
         function cerrarSesion() { Auth.cerrarSesion(); }
