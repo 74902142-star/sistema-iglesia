@@ -101,6 +101,46 @@
         .sesion-cerrada .asist-sel.f { opacity: 0.85; }
         .sesion-futura { display: none !important; }
 
+        @media (max-width: 768px) {
+            .ng-hero { flex-direction: column; text-align: center; padding: 18px 16px; border-radius: 16px; gap: 12px; }
+            .ng-hero h1 { font-size: 19px; }
+            .ng-hero p { font-size: 12.5px; }
+            .ng-hero-icon { width: 56px; height: 56px; }
+            .ng-controls { flex-direction: column; align-items: stretch; padding: 14px; gap: 10px; }
+            .ng-field select { min-width: 0 !important; width: 100%; }
+            .ng-actions { margin-left: 0; justify-content: flex-start; }
+            .ng-btn { flex: 1 1 45%; justify-content: center; min-height: 44px; }
+            .ng-badge { align-self: flex-start; }
+            .ng-chips { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .ng-chip { padding: 10px 12px; border-radius: 12px; }
+            .ng-chip .v { font-size: 18px; }
+            .ng-table-wrap { border-radius: 14px; }
+            .ng-table-head { padding: 12px 12px 8px; }
+            .ng-table-head h3 { font-size: 14px; }
+            .ng-table-head span { font-size: 11px; }
+            .table-container { -webkit-overflow-scrolling: touch; }
+            #tablaNotas tbody .c-alumno { min-width: 140px; padding: 6px 8px; }
+            #tablaNotas thead .c-alumno { min-width: 140px; font-size: 11px; }
+            .c-alumno strong { font-size: 12px; }
+            .c-alumno .sub { font-size: 10px; }
+            .asist-sel { width: 40px; font-size: 12px; min-height: 36px; }
+            .ng-crec-btn { width: 38px; min-height: 36px; font-size: 11px; }
+            .ng-num { width: 58px; min-height: 36px; font-size: 12px; }
+            .th-ses, .td-ses { min-width: 46px; width: 46px; }
+            .th-crec, .td-crec { min-width: 42px; width: 42px; }
+            .ng-legend { padding: 14px 16px; font-size: 12.5px; border-radius: 12px; }
+            .ng-crec-card { margin: 12px; padding: 20px 18px; max-width: none; }
+            .ng-crec-row { margin-bottom: 14px; }
+            .ng-crec-row label { font-size: 14px; }
+            .ng-ck { width: 28px !important; height: 28px; }
+            .ng-crec-actions button { min-height: 46px; font-size: 15px; }
+            .ng-gate-card { margin: 16px auto; padding: 28px 20px; }
+        }
+        @media (max-width: 420px) {
+            .ng-chips { grid-template-columns: 1fr; }
+            .ng-btn { flex: 1 1 100%; }
+        }
+
         .ng-crec-modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
         .ng-crec-modal.show { display: flex; }
         .ng-crec-card { background: #fff; border-radius: 20px; padding: 26px 28px; width: 100%; max-width: 380px; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3); animation: ngUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -108,7 +148,8 @@
         .ng-crec-card .sub { font-size: 12.5px; color: #64748b; margin: 0 0 16px; }
         .ng-crec-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
         .ng-crec-row label { font-size: 13.5px; font-weight: 600; color: #334155; }
-        .ng-crec-row input { width: 88px; padding: 9px 10px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; text-align: center; outline: none; font-family: inherit; }
+        .ng-crec-row input[type="number"] { width: 88px; padding: 9px 10px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; text-align: center; outline: none; font-family: inherit; }
+        .ng-ck { width: 26px !important; height: 26px; accent-color: #1c6390; cursor: pointer; }
         .ng-crec-row input:focus { border-color: #1c6390; box-shadow: 0 0 0 3px rgba(28, 99, 144, 0.1); }
         .ng-crec-avg { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 10px 14px; text-align: center; margin: 14px 0 18px; font-size: 14px; color: #0c4a6e; font-weight: 700; }
         .ng-crec-actions { display: flex; gap: 10px; }
@@ -216,7 +257,7 @@
                         <div class="ng-hero-icon"><i data-lucide="clipboard-check" style="width:38px;height:38px;color:#fff;"></i></div>
                         <div>
                             <h1>Registro de Notas</h1>
-                            <p>Asistencia y Crecimiento Espiritual semana a semana (9 sesiones) · Trabajo final · Examen final — ciclo 202620</p>
+                            <p>Asistencia y Crecimiento (presentó/no presentó) semana a semana · Trabajo · Examen — ciclo 202620</p>
                         </div>
                     </div>
 
@@ -279,12 +320,13 @@
                         <span class="tag tag-t">T = Llegó Tarde (15)</span>
                         <span class="tag tag-f">F = Faltó (0)</span>
                         &nbsp;·&nbsp; <b>3 tardías = 1 falta</b>.<br>
-                        <b>Crecimiento Espiritual:</b> cada sesión se califican los <b>4 items</b>
-                        (Devocionales · Servicio · Montaña de oración · Versículo), de ahí sale
-                        <b>1 nota semanal</b>; el promedio de las 9 semanas vale <b>40%</b>.<br>
-                        <b>Semana a semana:</b> solo se abre la semana actual (lunes a domingo). Al cerrar la semana,
-                        lo que quede en blanco se toma como <b>F</b> (asistencia) o <b>0</b> (crecimiento) y ya no se
-                        puede editar; al lunes siguiente aparece la siguiente semana.<br>
+                        <b>Crecimiento Espiritual:</b> cada sesión se marcan los <b>4 items</b>
+                        (Devocionales · Servicio · Montaña de oración · Versículo) como
+                        <b>presentó (1)</b> o <b>no presentó (0)</b>. La nota semanal =
+                        (presentados ÷ 4) × 20; el promedio de las sesiones vale <b>40%</b>.<br>
+                        <b>Semanas abiertas:</b> siempre hay <b>2 semanas juntas</b> editables
+                        (la semana impar y la par siguiente). El <b>domingo 11:59 p.m.</b> se cierran ambas
+                        (en blanco = falta o 0) y el lunes se abre la siguiente pareja.<br>
                         <b>Componentes y pesos:</b> Crecimiento Espiritual (promedio semanal) <b>40%</b> ·
                         Examen Final <b>25%</b> · Trabajo Final <b>20%</b> · Asistencia <b>15%</b>.
                         Las notas van de <b>0 a 20</b> (no hay más) y los campos vacíos de la semana abierta no se cuentan (promedio parcial).<br>
@@ -302,11 +344,12 @@
         <div class="ng-crec-card">
             <h3>🌱 Crecimiento Espiritual</h3>
             <p class="sub" id="crecModalSub">Alumno · Sesión</p>
-            <div class="ng-crec-row"><label for="crecDev">Devocionales</label><input type="number" id="crecDev" min="0" max="20" step="0.5" placeholder="—"></div>
-            <div class="ng-crec-row"><label for="crecServ">Asistencia a su servicio</label><input type="number" id="crecServ" min="0" max="20" step="0.5" placeholder="—"></div>
-            <div class="ng-crec-row"><label for="crecMont">Montaña de oración</label><input type="number" id="crecMont" min="0" max="20" step="0.5" placeholder="—"></div>
-            <div class="ng-crec-row"><label for="crecVers">Versículo memorizado</label><input type="number" id="crecVers" min="0" max="20" step="0.5" placeholder="—"></div>
-            <div class="ng-crec-avg" id="crecModalAvg">Nota de la semana: —</div>
+            <p class="sub" style="margin:-8px 0 14px;">¿Presentó? (1 = sí, 0 = no)</p>
+            <div class="ng-crec-row"><label for="crecDev">Devocionales</label><input type="checkbox" id="crecDev" class="ng-ck"></div>
+            <div class="ng-crec-row"><label for="crecServ">Asistencia a su servicio</label><input type="checkbox" id="crecServ" class="ng-ck"></div>
+            <div class="ng-crec-row"><label for="crecMont">Montaña de oración</label><input type="checkbox" id="crecMont" class="ng-ck"></div>
+            <div class="ng-crec-row"><label for="crecVers">Versículo memorizado</label><input type="checkbox" id="crecVers" class="ng-ck"></div>
+            <div class="ng-crec-avg" id="crecModalAvg">Presentó 0 de 4</div>
             <div class="ng-crec-actions">
                 <button class="btn-crec-cancel" onclick="cerrarCrecModal()">Cancelar</button>
                 <button class="btn-crec-save" onclick="guardarCrecModal()">Guardar</button>
@@ -342,16 +385,31 @@
             { id: 'disc1_next', nombre: 'Discipulado 1 NEXT' },
             { id: 'disc2_next', nombre: 'Discipulado 2 NEXT' },
             { id: 'disc3_next', nombre: 'Discipulado 3 NEXT' },
-            { id: 'sem_consejeria', nombre: 'Seminario: Consejería' },
+            { id: 'disc1', nombre: 'Discipulado 1' },
             { id: 'disc2', nombre: 'Discipulado 2' },
             { id: 'disc3', nombre: 'Discipulado 3' },
             { id: 'lidere1', nombre: 'Lidere 1' },
             { id: 'lidere2', nombre: 'Lidere 2' },
             { id: 'lidere3', nombre: 'Lidere 3' },
             { id: 'sem_padres', nombre: 'Seminario: Escuela para Padres' },
-            { id: 'disc1', nombre: 'Discipulado 1' },
-            { id: 'sem_sanidad', nombre: 'Seminario: Sanidad Interior' }
+            { id: 'sem_sanidad', nombre: 'Seminario: Sanidad Interior' },
+            { id: 'sem_consejeria', nombre: 'Seminario: Consejería' }
         ];
+
+        const TUTORES = {
+            disc1_next: ['Iriela Quispe', 'Cristina Mayta'],
+            disc2_next: ['Marlit Cabello'],
+            disc3_next: ['Kazumi Quispe', 'Patsy Romero'],
+            disc1: ['Roger Porras'],
+            disc2: ['Violeta Huarcu'],
+            disc3: ['Joshua Sugasti'],
+            lidere1: ['Stefany Quispe'],
+            lidere2: ['Jhon Fernández'],
+            lidere3: ['Paúl Martínez'],
+            sem_padres: ['Evelyn Larrazabal'],
+            sem_sanidad: ['Milagros Maraví'],
+            sem_consejeria: ['Nataly Quispe', 'Arni Soriano']
+        };
 
         let cursoActual = null;
         let filas = [];
@@ -365,6 +423,29 @@
 
         function verCalculo() { return esAdmin; }
 
+        function normNombre(s) {
+            return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
+        }
+
+        function esTutorDe(cursoId) {
+            if (esAdmin) return true;
+            const n = normNombre(usuarioActual.nombre);
+            if (!n || n === 'invitado') return false;
+            const palabras = n.split(' ').filter(Boolean);
+            if (palabras.length < 2) return false;
+            return (TUTORES[cursoId] || []).some(function (t) {
+                const tn = normNombre(t);
+                if (n === tn || n.includes(tn)) return true;
+                return tn.split(' ').every(function (w) { return palabras.indexOf(w) >= 0; });
+            });
+        }
+
+        function puedeEditar() {
+            return esAdmin || esTutorDe(cursoActual);
+        }
+
+        function parDeSesion(n) { return Math.ceil(n / 2); }
+
         function sesionActual() {
             const hoy = (typeof hoyPeru === 'function' ? hoyPeru() : new Date().toISOString().slice(0, 10));
             const h = hoy.split('-').map(Number);
@@ -374,7 +455,9 @@
             return Math.min(SESIONES, Math.floor(diff / 7) + 1);
         }
 
-        function sesionCerrada(idx) { return (idx + 1) < sesionActual(); }
+        function sesionCerrada(idx) {
+            return parDeSesion(idx + 1) < parDeSesion(sesionActual());
+        }
         function sesionFutura(idx) { return (idx + 1) > sesionActual(); }
 
         function esc(s) {
@@ -421,13 +504,16 @@
                 document.getElementById('btnGuardarTodo').style.display = 'none';
             }
             const sem = sesionActual();
+            const par = parDeSesion(sem);
+            const finPar = Math.min(SESIONES, par * 2);
             const sb = document.getElementById('semanaBadge');
             sb.textContent = '📅 Semana ' + sem + ' de ' + SESIONES;
-            sb.title = 'Solo se abre la semana actual. Al terminar el domingo, la semana se cierra (en blanco = falta o 0) y aparece la siguiente.';
+            sb.title = 'Semanas abiertas: ' + (par * 2 - 1) + ' y ' + (par * 2 > SESIONES ? SESIONES : par * 2) +
+                '. Se cierran el domingo al terminar la semana ' + finPar + ' (11:59 p.m.).';
             if (typeof lucide !== 'undefined') lucide.createIcons();
             await cargarCiclo();
-            document.getElementById('selCurso').value = CURSOS[0].id;
-            await cargarCurso();
+            const sel = document.getElementById('selCurso');
+            if (sel.value) await cargarCurso();
         }
 
         function cacheKeyFor(curso) { return 'notas_cache_' + curso; }
@@ -435,7 +521,9 @@
 
         function poblarControles() {
             const sel = document.getElementById('selCurso');
-            sel.innerHTML = CURSOS.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + '</option>'; }).join('');
+            const lista = esAdmin ? CURSOS : CURSOS.filter(function (c) { return esTutorDe(c.id); });
+            sel.innerHTML = lista.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + '</option>'; }).join('');
+            if (!lista.length) sel.innerHTML = '<option value="">(sin cursos asignados)</option>';
             sel.onchange = cargarCurso;
         }
 
@@ -471,11 +559,13 @@
                 : 'Sin conexión con Supabase: se muestra la última lista guardada en este equipo.';
             const sel = document.getElementById('selCurso');
             const actual = sel.value;
-            sel.innerHTML = CURSOS.map(function (c) {
+            const lista = esAdmin ? CURSOS : CURSOS.filter(function (c) { return esTutorDe(c.id); });
+            sel.innerHTML = lista.map(function (c) {
                 const n = inscritosDe(c.id).length;
                 return '<option value="' + c.id + '">' + esc(c.nombre) + (n ? '  ·  ' + n + ' alumnos' : '') + '</option>';
             }).join('');
-            sel.value = actual && CURSOS.some(function (c) { return c.id === actual; }) ? actual : CURSOS[0].id;
+            if (!lista.length) sel.innerHTML = '<option value="">(sin cursos asignados)</option>';
+            else sel.value = actual && lista.some(function (c) { return c.id === actual; }) ? actual : lista[0].id;
         }
 
         async function actualizarLista() {
@@ -488,7 +578,14 @@
             Object.keys(timersGuardar).forEach(function (k) { clearTimeout(timersGuardar[k]); delete timersGuardar[k]; });
             const id = document.getElementById('selCurso').value;
             cursoActual = id;
-            if (!id) { filas = []; renderTabla(); return; }
+            if (!id) {
+                filas = [];
+                document.getElementById('headNotas').innerHTML = '';
+                document.getElementById('tbodyNotas').innerHTML =
+                    '<tr><td class="ng-empty" colspan="12">🔒 No tienes cursos asignados con ese nombre.<br>' +
+                    'Pide al administrador que te registre como tutor o verifica tu nombre al ingresar.</td></tr>';
+                return;
+            }
             filas = [];
             renderTabla('Cargando notas del curso…');
 
@@ -551,9 +648,10 @@
                 const o = {};
                 let any = false;
                 ITEMS_CREC.forEach(function (it) {
-                    const n = num(x[it.k]);
-                    o[it.k] = n;
-                    if (n !== null) any = true;
+                    const raw = x[it.k];
+                    const b = (raw === 1 || raw === true || raw === '1') ? 1 : (raw === 0 || raw === false || raw === '0') ? 0 : null;
+                    o[it.k] = b;
+                    if (b !== null) any = true;
                 });
                 return any ? o : null;
             });
@@ -563,12 +661,15 @@
 
         function notaSemanalCrec(item) {
             if (!item) return null;
-            const vals = [];
+            let presento = 0, contestado = 0;
             ITEMS_CREC.forEach(function (it) {
-                const n = num(item[it.k]);
-                if (n !== null) vals.push(n);
+                if (item[it.k] === 1 || item[it.k] === 0) {
+                    contestado++;
+                    if (item[it.k] === 1) presento++;
+                }
             });
-            return vals.length ? vals.reduce(function (s, v) { return s + v; }, 0) / vals.length : null;
+            if (!contestado) return null;
+            return (presento / 4) * 20;
         }
 
         function num(v) {
@@ -586,7 +687,7 @@
             for (let i = 0; i < SESIONES; i++) {
                 if (i + 1 > sem) break;
                 let m = a[i] || '';
-                if (!m && i + 1 < sem) m = 'F';
+                if (!m && sesionCerrada(i)) m = 'F';
                 if (VAL_ASIST[m] !== undefined) valAsist.push(VAL_ASIST[m]);
                 if (m === 'F') nF++;
                 else if (m === 'T') nT++;
@@ -600,7 +701,7 @@
                 if (i + 1 > sem) break;
                 const n = notaSemanalCrec(cr[i]);
                 if (n !== null) crecVals.push(n);
-                else if (i + 1 < sem) crecVals.push(0);
+                else if (sesionCerrada(i)) crecVals.push(0);
             }
             const crec = crecVals.length ? crecVals.reduce(function (s, v) { return s + v; }, 0) / crecVals.length : null;
 
@@ -675,6 +776,7 @@
         function renderFila(f) {
             const calc = verCalculo();
             const sem = sesionActual();
+            const edit = puedeEditar();
             let h = '<tr data-key="' + esc(f.key) + '">' +
                 '<td class="c-alumno"><strong>' + esc(f.nombres || '—') + '</strong>' +
                 '<span class="sub">' + (f.dni ? 'DNI ' + esc(f.dni) : 'Sin DNI') + '</span></td>';
@@ -682,29 +784,31 @@
             const cr = f.crecimiento || [];
             for (let i = 0; i < sem; i++) {
                 let v = a[i] || '';
-                const cerrada = i + 1 < sem;
+                const cerrada = sesionCerrada(i);
                 if (!v && cerrada) v = 'F';
+                const dis = (!edit || cerrada) ? ' disabled' : '';
                 h += '<td class="td-ses' + (cerrada ? ' sesion-cerrada' : '') + '" style="text-align:center"><select class="asist-sel' + (v ? ' ' + v.toLowerCase() : '') +
-                    '" data-idx="' + i + '"' + (cerrada ? ' disabled' : '') + '><option value=""' + (v === '' ? ' selected' : '') + '>—</option>' +
+                    '" data-idx="' + i + '"' + dis + '><option value=""' + (v === '' ? ' selected' : '') + '>—</option>' +
                     '<option' + (v === 'A' ? ' selected' : '') + '>A</option>' +
                     '<option' + (v === 'T' ? ' selected' : '') + '>T</option>' +
                     '<option' + (v === 'F' ? ' selected' : '') + '>F</option></select></td>';
             }
             for (let i = 0; i < sem; i++) {
                 const item = cr[i];
-                const cerrada = i + 1 < sem;
+                const cerrada = sesionCerrada(i);
                 const n = notaSemanalCrec(item);
                 let etiqueta;
                 if (cerrada) etiqueta = calc ? (n === null ? '0' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, '')) : (item ? '✓' : '0');
                 else etiqueta = calc ? (n === null ? '·' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, '')) : (item ? '✓' : '·');
+                const dis = (!edit || cerrada) ? ' disabled' : '';
                 h += '<td class="td-crec' + (cerrada ? ' sesion-cerrada' : '') + '" style="text-align:center"><button type="button" class="ng-crec-btn' +
-                    ((item || cerrada) ? ' full' : ' empty') + '" data-crec-idx="' + i + '"' + (cerrada ? ' disabled' : '') + ' ' +
-                    'title="Sesión ' + (i + 1) + (cerrada ? ' · cerrada' : ' · 4 items de crecimiento espiritual') + '">' + etiqueta + '</button></td>';
+                    ((item || cerrada) ? ' full' : ' empty') + '" data-crec-idx="' + i + '"' + dis + ' ' +
+                    'title="Sesión ' + (i + 1) + (cerrada ? ' · cerrada' : ' · presentó 1 / no presentó 0') + '">' + etiqueta + '</button></td>';
             }
             CAMPOS_NUM.forEach(function (k) {
                 const v = f[k];
                 h += '<td class="td-num" style="text-align:center"><input type="number" class="ng-num" data-field="' + k +
-                    '" min="0" max="20" step="0.5" value="' + (v === null || v === undefined ? '' : v) + '"></td>';
+                    '" min="0" max="20" step="0.5" value="' + (v === null || v === undefined ? '' : v) + '"' + (edit ? '' : ' disabled') + '></td>';
             });
             if (calc) {
                 h += '<td class="calc" data-calc="crec">—</td>' +
@@ -774,13 +878,13 @@
             const f = filaDeEvento(e);
             if (!f) return;
             const idx = +btn.dataset.crecIdx;
-            if (sesionCerrada(idx)) return;
+            if (sesionCerrada(idx) || !puedeEditar()) return;
             abrirCrecModal(f, idx);
         });
 
         document.getElementById('tbodyNotas').addEventListener('input', function (e) {
             const f = filaDeEvento(e);
-            if (!f) return;
+            if (!f || !puedeEditar()) return;
             aplicarCambio(e.target, f);
             if (verCalculo()) { actualizarFila(f); actualizarChips(); }
             programarGuardado(f);
@@ -788,7 +892,7 @@
 
         document.getElementById('tbodyNotas').addEventListener('change', function (e) {
             const f = filaDeEvento(e);
-            if (!f) return;
+            if (!f || !puedeEditar()) return;
             if (e.target.classList.contains('ng-num')) {
                 const v = num(e.target.value);
                 f[e.target.dataset.field] = v;
@@ -823,29 +927,27 @@
         }
 
         function abrirCrecModal(f, idx) {
+            if (!puedeEditar()) { toast('No puedes editar este curso', 'warning'); return; }
             crecEdit = { key: f.key, idx: idx };
             const item = (f.crecimiento || [])[idx] || {};
-            document.getElementById('crecDev').value = item.d === null || item.d === undefined ? '' : item.d;
-            document.getElementById('crecServ').value = item.s === null || item.s === undefined ? '' : item.s;
-            document.getElementById('crecMont').value = item.m === null || item.m === undefined ? '' : item.m;
-            document.getElementById('crecVers').value = item.v === null || item.v === undefined ? '' : item.v;
+            document.getElementById('crecDev').checked = item.d === 1;
+            document.getElementById('crecServ').checked = item.s === 1;
+            document.getElementById('crecMont').checked = item.m === 1;
+            document.getElementById('crecVers').checked = item.v === 1;
             document.getElementById('crecModalSub').textContent = (f.nombres || '—') + ' · Sesión ' + (idx + 1);
-            document.getElementById('crecModalAvg').style.display = verCalculo() ? 'block' : 'none';
+            document.getElementById('crecModalAvg').style.display = 'block';
             actualizarPromedioModal();
             document.getElementById('crecModal').classList.add('show');
             document.getElementById('crecDev').focus();
         }
 
         function actualizarPromedioModal() {
-            const item = {
-                d: num(document.getElementById('crecDev').value),
-                s: num(document.getElementById('crecServ').value),
-                m: num(document.getElementById('crecMont').value),
-                v: num(document.getElementById('crecVers').value)
-            };
-            const n = notaSemanalCrec(item);
-            document.getElementById('crecModalAvg').textContent =
-                'Nota de la semana: ' + (n === null ? '—' : (Math.round(n * 10) / 10).toFixed(1));
+            let p = 0;
+            if (document.getElementById('crecDev').checked) p++;
+            if (document.getElementById('crecServ').checked) p++;
+            if (document.getElementById('crecMont').checked) p++;
+            if (document.getElementById('crecVers').checked) p++;
+            document.getElementById('crecModalAvg').textContent = 'Presentó ' + p + ' de 4';
         }
 
         function cerrarCrecModal() {
@@ -857,24 +959,23 @@
             const f = filas.find(function (x) { return x.key === crecEdit.key; });
             if (!f || crecEdit.idx < 0) { cerrarCrecModal(); return; }
             const item = {
-                d: num(document.getElementById('crecDev').value),
-                s: num(document.getElementById('crecServ').value),
-                m: num(document.getElementById('crecMont').value),
-                v: num(document.getElementById('crecVers').value)
+                d: document.getElementById('crecDev').checked ? 1 : 0,
+                s: document.getElementById('crecServ').checked ? 1 : 0,
+                m: document.getElementById('crecMont').checked ? 1 : 0,
+                v: document.getElementById('crecVers').checked ? 1 : 0
             };
-            const any = ITEMS_CREC.some(function (it) { return item[it.k] !== null; });
             f.crecimiento = f.crecimiento || [];
             while (f.crecimiento.length < SESIONES) f.crecimiento.push(null);
-            f.crecimiento[crecEdit.idx] = any ? item : null;
+            f.crecimiento[crecEdit.idx] = item;
             const tr = trDe(f);
             if (tr) {
                 const btn = tr.querySelector('button.ng-crec-btn[data-crec-idx="' + crecEdit.idx + '"]');
                 if (btn) {
-                    const n = notaSemanalCrec(f.crecimiento[crecEdit.idx]);
-                    btn.className = 'ng-crec-btn' + (any ? ' full' : ' empty');
+                    const n = notaSemanalCrec(item);
+                    btn.className = 'ng-crec-btn full';
                     btn.textContent = verCalculo()
                         ? (n === null ? '·' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, ''))
-                        : (any ? '✓' : '·');
+                        : (item.d || item.s || item.m || item.v ? '✓' : '0');
                 }
             }
             if (verCalculo()) { actualizarFila(f); actualizarChips(); }
@@ -883,7 +984,7 @@
         }
 
         ['crecDev', 'crecServ', 'crecMont', 'crecVers'].forEach(function (id) {
-            document.getElementById(id).addEventListener('input', actualizarPromedioModal);
+            document.getElementById(id).addEventListener('change', actualizarPromedioModal);
         });
         document.getElementById('crecModal').addEventListener('click', function (e) {
             if (e.target === this) cerrarCrecModal();
@@ -986,13 +1087,13 @@
                 const row = [f.nombres, f.dni];
                 for (let i = 0; i < sem; i++) {
                     let v = a[i] || '';
-                    if (!v && i + 1 < sem) v = 'F';
+                    if (!v && sesionCerrada(i)) v = 'F';
                     row.push(v);
                 }
                 for (let i = 0; i < sem; i++) {
                     const n = notaSemanalCrec(cr[i]);
                     if (n !== null) row.push(Math.round(n * 10) / 10);
-                    else if (i + 1 < sem) row.push(0);
+                    else if (sesionCerrada(i)) row.push(0);
                     else row.push('');
                 }
                 CAMPOS_NUM.forEach(function (k) { row.push(f[k] === null || f[k] === undefined ? '' : f[k]); });
@@ -1009,8 +1110,9 @@
             if (calc) {
                 rows.push([]);
                 rows.push(['A = Asistió (20) · T = Llegó Tarde (15) · F = Faltó (0) · 3 tardías = 1 falta']);
-                rows.push(['Crec. Esp.: 4 items por sesión (Devocionales, Servicio, Montaña, Versículo); nota semanal = promedio de los 4; promedio de 9 semanas vale 40%']);
+                rows.push(['Crec. Esp.: 4 items presentó(1)/no presentó(0); nota semanal = (presentados/4)*20; promedio de sesiones vale 40%']);
                 rows.push(['Pesos: Crecimiento Espiritual 40% · Examen Final 25% · Trabajo Final 20% · Asistencia 15%']);
+                rows.push(['2 semanas abiertas juntas; se cierran domingo 11:59 p.m. (blanco en cerrada = falta/0)']);
                 rows.push(['Con 3 faltas la nota queda en 11.0 · Con más de 3 faltas: Desaprobado · Mínima aprobatoria: 11.0']);
             }
             const ws = XLSX.utils.aoa_to_sheet(rows);
