@@ -169,7 +169,7 @@
             <p>Bienvenido, <span class="user-name" id="userName">Invitado</span></p>
         </div>
 
-        <a href="ingreso.html" class="module-card" id="opt-ingreso">
+        <a href="ingreso.html" class="module-card" id="opt-ingreso" style="display:flex;">
             <div class="module-icon">
                 <i data-lucide="clipboard-list" style="width: 24px; height: 24px;"></i>
             </div>
@@ -179,7 +179,7 @@
             </div>
         </a>
 
-        <a href="edl.html" class="module-card" id="opt-edl">
+        <a href="edl.html" class="module-card" id="opt-edl" style="display:flex;">
             <div class="module-icon">
                 <i data-lucide="graduation-cap" style="width: 24px; height: 24px;"></i>
             </div>
@@ -219,7 +219,7 @@
             </div>
         </a>
 
-        <a href="notas.html" class="module-card" id="opt-notas">
+        <a href="notas.html" class="module-card" id="opt-notas" style="display:none;">
             <div class="module-icon" style="background:#1c6390;">
                 <i data-lucide="clipboard-check" style="width: 24px; height: 24px;"></i>
             </div>
@@ -234,7 +234,7 @@
         </button>
     </div>
 
-    <script src="auth.js"></script>
+    <script src="auth.js?v=3"></script>
     <script>
         // Init Lucide
         if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -245,15 +245,21 @@
         }
         document.getElementById('userName').textContent = user.nombre || 'Invitado';
 
-        // Invitado siempre ve: Conteo (asistencia) + Inscribirse (EDL)
-        // Registrar (Notas) solo aparece después de validar como tutor en notas.html
-        ['opt-kids', 'opt-lideres', 'opt-aula'].forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) el.style.display = 'none';
-        });
-        if (localStorage.getItem('tutorValidado') !== '1') {
-            document.getElementById('opt-notas').style.display = 'none';
+        // Forzar visibles: Conteo + Inscripción (también tras DOMContentLoaded de auth.js viejo)
+        function forzarTarjetas() {
+            document.getElementById('opt-ingreso').style.display = 'flex';
+            document.getElementById('opt-edl').style.display = 'flex';
+            ['opt-kids', 'opt-lideres', 'opt-aula'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            var n = document.getElementById('opt-notas');
+            if (localStorage.getItem('tutorValidado') === '1') n.style.display = 'flex';
+            else n.style.display = 'none';
         }
+        forzarTarjetas();
+        document.addEventListener('DOMContentLoaded', forzarTarjetas);
+        window.addEventListener('load', forzarTarjetas);
 
         function cerrarSesion() {
             localStorage.removeItem('tutorValidado');
