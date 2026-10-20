@@ -244,11 +244,15 @@
                     <div class="ng-gate-card">
                         <img src="logo.png" alt="Agua Viva">
                         <h2>🔒 Registro de Notas</h2>
-                        <p>Ingresa la contraseña del módulo para continuar</p>
+                        <p id="gateHint">Ingresa la contraseña del módulo para continuar</p>
+                        <div id="gateTutorBox" style="display:none; margin-bottom:14px;">
+                            <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;text-align:left;">Tu nombre (tutor)</label>
+                            <input type="text" id="notasTutorInput" class="ng-pass-input" style="letter-spacing:0;text-align:left;" placeholder="Ej: Violeta, Thefa, Roger…">
+                        </div>
                         <input type="password" id="notasPasswordInput" class="ng-pass-input" placeholder="••••••••"
                             onkeydown="if(event.key==='Enter')verificarPasswordNotas()">
                         <button class="ng-pass-btn" onclick="verificarPasswordNotas()">Ingresar</button>
-                        <p id="notasPasswordError" class="ng-pass-error">❌ Contraseña incorrecta</p>
+                        <p id="notasPasswordError" class="ng-pass-error">❌ Contraseña o nombre incorrecto</p>
                     </div>
                 </div>
 
@@ -262,10 +266,11 @@
                     </div>
 
                     <div class="ng-controls">
-                        <div class="ng-field">
+                        <div class="ng-field" id="campoCurso">
                             <label for="selCurso">Curso</label>
                             <select id="selCurso" style="min-width:310px"></select>
                         </div>
+                        <span id="tutorBadge" class="ng-badge info">—</span>
                         <span id="cicloBadge" class="ng-badge info">👥 Cargando lista del ciclo…</span>
                         <span id="semanaBadge" class="ng-badge warn">📅 Semana —</span>
                         <div class="ng-actions">
@@ -397,18 +402,27 @@
         ];
 
         const TUTORES = {
-            disc1_next: ['Iriela Quispe', 'Cristina Mayta'],
-            disc2_next: ['Marlit Cabello'],
-            disc3_next: ['Kazumi Quispe', 'Patsy Romero'],
-            disc1: ['Roger Porras'],
-            disc2: ['Violeta Huarcu'],
-            disc3: ['Joshua Sugasti'],
-            lidere1: ['Stefany Quispe'],
-            lidere2: ['Jhon Fernández'],
-            lidere3: ['Paúl Martínez'],
-            sem_padres: ['Evelyn Larrazabal'],
-            sem_sanidad: ['Milagros Maraví'],
-            sem_consejeria: ['Nataly Quispe', 'Arni Soriano']
+            disc1_next: [
+                { n: 'Iriela Quispe', a: ['Iriela'] },
+                { n: 'Cristina Mayta', a: ['Cristina'] }
+            ],
+            disc2_next: [{ n: 'Marlit Cabello', a: ['Marlit', 'Marlith'] }],
+            disc3_next: [
+                { n: 'Kazumi Quispe', a: ['Kazumi'] },
+                { n: 'Patsy Romero', a: ['Patsy'] }
+            ],
+            disc1: [{ n: 'Roger Porras', a: ['Roger'] }],
+            disc2: [{ n: 'Violeta Huarcu', a: ['Violeta', 'Vio'] }],
+            disc3: [{ n: 'Joshua Sugasti', a: ['Joshua'] }],
+            lidere1: [{ n: 'Stefany Quispe', a: ['Stefany', 'Stephany', 'Sthefany', 'Stefani', 'Thefa'] }],
+            lidere2: [{ n: 'Jhon Fernández', a: ['Jhon', 'John', 'Fernandez'] }],
+            lidere3: [{ n: 'Paúl Martínez', a: ['Paul', 'Paul Martinez'] }],
+            sem_padres: [{ n: 'Evelyn Larrazabal', a: ['Evelyn'] }],
+            sem_sanidad: [{ n: 'Milagros Maraví', a: ['Milagros'] }],
+            sem_consejeria: [
+                { n: 'Nataly Quispe', a: ['Nataly', 'Nathaly'] },
+                { n: 'Arni Soriano', a: ['Arni'] }
+            ]
         };
 
         let cursoActual = null;
@@ -427,21 +441,66 @@
             return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
         }
 
-        function esTutorDe(cursoId) {
-            if (esAdmin) return true;
-            const n = normNombre(usuarioActual.nombre);
-            if (!n || n === 'invitado') return false;
-            const palabras = n.split(' ').filter(Boolean);
-            if (palabras.length < 2) return false;
-            return (TUTORES[cursoId] || []).some(function (t) {
-                const tn = normNombre(t);
-                if (n === tn || n.includes(tn)) return true;
-                return tn.split(' ').every(function (w) { return palabras.indexOf(w) >= 0; });
+        function levenshtein(a, b) {
+            if (a === b) return 0;
+            const m = a.length, n = b.length;
+            if (!m) return n;
+            if (!n) return m;
+            let prev = new Array(n + 1);
+            let cur = new Array(n + 1);
+            for (let j = 0; j <= n; j++) prev[j] = j;
+            for (let i = 1; i <= m; i++) {
+                cur[0] = i;
+                for (let j = 1; j <= n; j++) {
+                    const cost = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
+                    cur[j] = Math.min(cur[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+                }
+                const t = prev; prev = cur; cur = t;
+            }
+            return prev[n];
+        }
+
+        function nombreMatchea(entrada, nombreUsuario) {
+            const nu = normNombre(nombreUsuario);
+            if (!nu || nu === 'invitado') return false;
+            const palabrasU = nu.split(' ').filter(Boolean);
+            const primeraU = palabrasU[0] || '';
+            const candidatos = [normNombre(entrada.n)].concat((entrada.a || []).map(normNombre));
+            return candidatos.some(function (c) {
+                if (!c) return false;
+                if (nu === c || nu.includes(c) || c.includes(nu)) return true;
+                const partes = c.split(' ');
+                if (palabrasU.some(function (p) { return partes.indexOf(p) >= 0; })) return true;
+                const primeraC = partes[0] || '';
+                if (primeraU && primeraC) {
+                    if (primeraU === primeraC) return true;
+                    const minL = Math.min(primeraU.length, primeraC.length);
+                    if (minL >= 3 && (primeraU.startsWith(primeraC.slice(0, 3)) || primeraC.startsWith(primeraU.slice(0, 3)))) return true;
+                    if (minL >= 4 && levenshtein(primeraU, primeraC) <= 1) return true;
+                    if (minL >= 5 && levenshtein(primeraU, primeraC) <= 2) return true;
+                }
+                return false;
             });
         }
 
+        function cursosDeTutor(nombre) {
+            if (esAdmin) return CURSOS.slice();
+            const n = normNombre(nombre);
+            if (!n || n === 'invitado') return [];
+            return CURSOS.filter(function (c) {
+                return (TUTORES[c.id] || []).some(function (e) { return nombreMatchea(e, nombre); });
+            });
+        }
+
+        function esTutorDe(cursoId, nombre) {
+            if (esAdmin) return true;
+            const nom = nombre !== undefined ? nombre : usuarioActual.nombre;
+            const lista = TUTORES[cursoId] || [];
+            return lista.some(function (e) { return nombreMatchea(e, nom); });
+        }
+
         function puedeEditar() {
-            return esAdmin || esTutorDe(cursoActual);
+            return esAdmin || esTutorDe(cursoActual, nombreTutor || usuarioActual.nombre);
         }
 
         function parDeSesion(n) { return Math.ceil(n / 2); }
@@ -479,16 +538,41 @@
             else { localStorage.removeItem('usuarioActual'); window.location.href = 'index.html'; }
         }
 
+        let nombreTutor = '';
+
         function verificarPasswordNotas() {
             const input = document.getElementById('notasPasswordInput').value.trim();
-            if (input === PASS_MODULO) {
-                document.getElementById('notasGate').style.display = 'none';
-                iniciarModulo();
-            } else {
+            if (input !== PASS_MODULO) {
                 document.getElementById('notasPasswordError').style.display = 'block';
                 document.getElementById('notasPasswordInput').value = '';
                 document.getElementById('notasPasswordInput').focus();
+                return;
             }
+            if (!esAdmin) {
+                const nom = document.getElementById('notasTutorInput').value.trim();
+                if (!nom) {
+                    document.getElementById('notasPasswordError').style.display = 'block';
+                    document.getElementById('notasPasswordError').textContent = '❌ Escribe tu nombre de tutor';
+                    document.getElementById('notasTutorInput').focus();
+                    return;
+                }
+                const cursos = cursosDeTutor(nom);
+                if (!cursos.length) {
+                    document.getElementById('notasPasswordError').style.display = 'block';
+                    document.getElementById('notasPasswordError').textContent = '❌ Nombre no registrado como tutor';
+                    document.getElementById('notasTutorInput').focus();
+                    return;
+                }
+                nombreTutor = nom;
+                usuarioActual.nombre = nom;
+                localStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+                document.getElementById('userName').innerText = nom;
+            } else {
+                nombreTutor = usuarioActual.nombre || 'Admin';
+            }
+            document.getElementById('notasPasswordError').style.display = 'none';
+            document.getElementById('notasGate').style.display = 'none';
+            iniciarModulo();
         }
 
         async function iniciarModulo() {
@@ -514,17 +598,55 @@
             await cargarCiclo();
             const sel = document.getElementById('selCurso');
             if (sel.value) await cargarCurso();
+            pintarIdentidadTutor();
         }
 
         function cacheKeyFor(curso) { return 'notas_cache_' + curso; }
         function cicloCacheKey() { return 'notas_ciclo_' + CICLO; }
 
+        function listaCursosTutor() {
+            if (esAdmin) return CURSOS.slice();
+            const nom = nombreTutor || usuarioActual.nombre;
+            return cursosDeTutor(nom);
+        }
+
         function poblarControles() {
             const sel = document.getElementById('selCurso');
-            const lista = esAdmin ? CURSOS : CURSOS.filter(function (c) { return esTutorDe(c.id); });
-            sel.innerHTML = lista.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + '</option>'; }).join('');
-            if (!lista.length) sel.innerHTML = '<option value="">(sin cursos asignados)</option>';
-            sel.onchange = cargarCurso;
+            const campo = document.getElementById('campoCurso');
+            const lista = listaCursosTutor();
+            if (lista.length === 1) {
+                campo.style.display = 'none';
+                cursoActual = lista[0].id;
+                sel.innerHTML = '<option value="' + lista[0].id + '" selected>' + esc(lista[0].nombre) + '</option>';
+            } else {
+                campo.style.display = '';
+                sel.innerHTML = lista.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + '</option>'; }).join('');
+                if (!lista.length) sel.innerHTML = '<option value="">(sin cursos asignados)</option>';
+                sel.onchange = cargarCurso;
+            }
+        }
+
+        function pintarIdentidadTutor() {
+            const el = document.getElementById('tutorBadge');
+            if (!el) return;
+            if (esAdmin) {
+                el.innerHTML = '👑 ' + esc(usuarioActual.nombre || 'Admin');
+                el.className = 'ng-badge ok';
+                return;
+            }
+            const lista = listaCursosTutor();
+            const nom = nombreTutor || usuarioActual.nombre || '';
+            if (lista.length === 1) {
+                el.innerHTML = '📘 ' + esc(lista[0].nombre) + ' · 👤 ' + esc(nom);
+                el.className = 'ng-badge info';
+                el.title = 'Solo puedes editar este curso.';
+            } else if (lista.length > 1) {
+                el.innerHTML = '👤 ' + esc(nom) + ' · ' + lista.length + ' cursos';
+                el.className = 'ng-badge info';
+            } else {
+                el.innerHTML = '🔒 Sin cursos asignados';
+                el.className = 'ng-badge warn';
+            }
         }
 
         function inscritosDe(cursoId) {
@@ -559,13 +681,23 @@
                 : 'Sin conexión con Supabase: se muestra la última lista guardada en este equipo.';
             const sel = document.getElementById('selCurso');
             const actual = sel.value;
-            const lista = esAdmin ? CURSOS : CURSOS.filter(function (c) { return esTutorDe(c.id); });
-            sel.innerHTML = lista.map(function (c) {
-                const n = inscritosDe(c.id).length;
-                return '<option value="' + c.id + '">' + esc(c.nombre) + (n ? '  ·  ' + n + ' alumnos' : '') + '</option>';
-            }).join('');
-            if (!lista.length) sel.innerHTML = '<option value="">(sin cursos asignados)</option>';
-            else sel.value = actual && lista.some(function (c) { return c.id === actual; }) ? actual : lista[0].id;
+            const lista = listaCursosTutor();
+            const campo = document.getElementById('campoCurso');
+            if (lista.length === 1) {
+                campo.style.display = 'none';
+                cursoActual = lista[0].id;
+                sel.innerHTML = '<option value="' + lista[0].id + '" selected>' + esc(lista[0].nombre) +
+                    (inscritosDe(lista[0].id).length ? '  ·  ' + inscritosDe(lista[0].id).length + ' alumnos' : '') + '</option>';
+            } else {
+                campo.style.display = '';
+                sel.innerHTML = lista.map(function (c) {
+                    const n = inscritosDe(c.id).length;
+                    return '<option value="' + c.id + '">' + esc(c.nombre) + (n ? '  ·  ' + n + ' alumnos' : '') + '</option>';
+                }).join('');
+                if (!lista.length) sel.innerHTML = '<option value="">(sin cursos asignados)</option>';
+                else sel.value = actual && lista.some(function (c) { return c.id === actual; }) ? actual : lista[0].id;
+            }
+            pintarIdentidadTutor();
         }
 
         async function actualizarLista() {
@@ -1155,7 +1287,12 @@
         if (esAdmin) {
             iniciarModulo();
         } else {
+            document.getElementById('gateTutorBox').style.display = 'block';
+            document.getElementById('gateHint').textContent = 'Escribe tu nombre de tutor y la contraseña del módulo';
+            const ti = document.getElementById('notasTutorInput');
+            if (usuarioActual.nombre && usuarioActual.nombre !== 'Invitado') ti.value = usuarioActual.nombre;
             document.getElementById('notasGate').style.display = 'block';
+            ti.focus();
         }
         if (typeof lucide !== 'undefined') lucide.createIcons();
     </script>
