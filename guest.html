@@ -219,13 +219,13 @@
             </div>
         </a>
 
-        <a href="notas.html" class="module-card" id="opt-notas" style="display:none;">
+        <a href="notas.html" class="module-card" id="opt-notas" style="display:flex;">
             <div class="module-icon" style="background:#1c6390;">
                 <i data-lucide="clipboard-check" style="width: 24px; height: 24px;"></i>
             </div>
             <div class="module-info">
                 <h3>Registro de Notas</h3>
-                <p>Los tutores registran asistencia, crecimiento espiritual y notas finales de cada curso.</p>
+                <p>Solo tutores. Entra con tu nombre y contraseña del módulo.</p>
             </div>
         </a>
 
@@ -245,17 +245,17 @@
         }
         document.getElementById('userName').textContent = user.nombre || 'Invitado';
 
-        // Forzar visibles: Conteo + Inscripción (también tras DOMContentLoaded de auth.js viejo)
+        // Forzar visibles: las 3 tarjetas (Conteo, Inscripción, Notas)
+        // La seguridad de Notas está en su gate (nombre + contraseña)
         function forzarTarjetas() {
-            document.getElementById('opt-ingreso').style.display = 'flex';
-            document.getElementById('opt-edl').style.display = 'flex';
+            ['opt-ingreso', 'opt-edl', 'opt-notas'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.style.display = 'flex';
+            });
             ['opt-kids', 'opt-lideres', 'opt-aula'].forEach(function (id) {
                 var el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
-            var n = document.getElementById('opt-notas');
-            if (localStorage.getItem('tutorValidado') === '1') n.style.display = 'flex';
-            else n.style.display = 'none';
         }
         forzarTarjetas();
         document.addEventListener('DOMContentLoaded', forzarTarjetas);
