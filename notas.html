@@ -90,8 +90,26 @@
         .asist-sel.t { background: #fef9c3; border-color: #fde047; color: #854d0e; }
         .asist-sel.f { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
         .ng-num { width: 70px; padding: 7px 4px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; text-align: center; outline: none; font-family: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
-        .ng-crec { width: 42px; padding: 6px 2px; font-size: 12.5px; }
         .ng-num:focus { border-color: #1c6390; box-shadow: 0 0 0 3px rgba(28, 99, 144, 0.12); background: #fff; }
+        .ng-crec-btn { width: 42px; padding: 5px 2px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; background: #fff; cursor: pointer; font-family: inherit; color: #00334f; transition: border-color 0.15s, background 0.15s; }
+        .ng-crec-btn:hover { border-color: #1c6390; background: #f0f9ff; }
+        .ng-crec-btn.full { background: #e0f2fe; border-color: #7dd3fc; }
+        .ng-crec-btn.empty { color: #94a3b8; font-weight: 500; }
+
+        .ng-crec-modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
+        .ng-crec-modal.show { display: flex; }
+        .ng-crec-card { background: #fff; border-radius: 20px; padding: 26px 28px; width: 100%; max-width: 380px; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3); animation: ngUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .ng-crec-card h3 { margin: 0 0 4px; font-size: 17px; font-weight: 800; color: #00334f; }
+        .ng-crec-card .sub { font-size: 12.5px; color: #64748b; margin: 0 0 16px; }
+        .ng-crec-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+        .ng-crec-row label { font-size: 13.5px; font-weight: 600; color: #334155; }
+        .ng-crec-row input { width: 88px; padding: 9px 10px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; text-align: center; outline: none; font-family: inherit; }
+        .ng-crec-row input:focus { border-color: #1c6390; box-shadow: 0 0 0 3px rgba(28, 99, 144, 0.1); }
+        .ng-crec-avg { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 10px 14px; text-align: center; margin: 14px 0 18px; font-size: 14px; color: #0c4a6e; font-weight: 700; }
+        .ng-crec-actions { display: flex; gap: 10px; }
+        .ng-crec-actions button { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+        .btn-crec-save { background: linear-gradient(135deg, #00334f, #1c6390); color: #fff; }
+        .btn-crec-cancel { background: #f1f5f9; color: #475569; }
 
         .calc { text-align: center; font-weight: 700; color: #00334f; white-space: nowrap; font-size: 13.5px; padding: 6px 8px !important; }
         .calc.strong { font-size: 16.5px; font-weight: 800; }
@@ -224,7 +242,7 @@
                         <button class="ng-btn ng-btn-green" onclick="agregarManual()">Agregar a la lista</button>
                     </div>
 
-                    <div class="ng-chips">
+                    <div class="ng-chips" id="chipBox">
                         <div class="ng-chip chip-blue"><div class="k">Alumnos del curso</div><div class="v" id="chipAlumnos">0</div></div>
                         <div class="ng-chip chip-teal"><div class="k">Con notas cargadas</div><div class="v" id="chipNotas">0</div></div>
                         <div class="ng-chip chip-navy"><div class="k">Promedio del curso</div><div class="v" id="chipProm">—</div></div>
@@ -248,15 +266,16 @@
                         </div>
                     </div>
 
-                    <div class="ng-legend">
+                    <div class="ng-legend" id="legendBox">
                         <h4>📘 ¿Cómo se calcula la nota?</h4>
                         <b>Asistencia (9 sesiones):</b>
                         <span class="tag tag-a">A = Asistió (20)</span>
                         <span class="tag tag-t">T = Llegó Tarde (15)</span>
                         <span class="tag tag-f">F = Faltó (0)</span>
                         &nbsp;·&nbsp; <b>3 tardías = 1 falta</b>.<br>
-                        <b>Crecimiento Espiritual:</b> se califica <b>cada sesión</b> (0–20) en su casilla de la semana;
-                        el promedio de las 9 semanas vale <b>40%</b>.<br>
+                        <b>Crecimiento Espiritual:</b> cada sesión se califican los <b>4 items</b>
+                        (Devocionales · Servicio · Montaña de oración · Versículo), de ahí sale
+                        <b>1 nota semanal</b>; el promedio de las 9 semanas vale <b>40%</b>.<br>
                         <b>Componentes y pesos:</b> Crecimiento Espiritual (promedio semanal) <b>40%</b> ·
                         Examen Final <b>25%</b> · Trabajo Final <b>20%</b> · Asistencia <b>15%</b>.
                         Las notas van de <b>0 a 20</b> (no hay más) y los campos vacíos no se cuentan (promedio parcial).<br>
@@ -266,6 +285,22 @@
                         inscripciones del ciclo 202620 (botón <b>Actualizar</b> para refrescar).
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ng-crec-modal" id="crecModal">
+        <div class="ng-crec-card">
+            <h3>🌱 Crecimiento Espiritual</h3>
+            <p class="sub" id="crecModalSub">Alumno · Sesión</p>
+            <div class="ng-crec-row"><label for="crecDev">Devocionales</label><input type="number" id="crecDev" min="0" max="20" step="0.5" placeholder="—"></div>
+            <div class="ng-crec-row"><label for="crecServ">Asistencia a su servicio</label><input type="number" id="crecServ" min="0" max="20" step="0.5" placeholder="—"></div>
+            <div class="ng-crec-row"><label for="crecMont">Montaña de oración</label><input type="number" id="crecMont" min="0" max="20" step="0.5" placeholder="—"></div>
+            <div class="ng-crec-row"><label for="crecVers">Versículo memorizado</label><input type="number" id="crecVers" min="0" max="20" step="0.5" placeholder="—"></div>
+            <div class="ng-crec-avg" id="crecModalAvg">Nota de la semana: —</div>
+            <div class="ng-crec-actions">
+                <button class="btn-crec-cancel" onclick="cerrarCrecModal()">Cancelar</button>
+                <button class="btn-crec-save" onclick="guardarCrecModal()">Guardar</button>
             </div>
         </div>
     </div>
@@ -288,6 +323,12 @@
         const VAL_ASIST = { A: 20, T: 15, F: 0 };
         const PESO = { crec: 0.40, examen: 0.25, trabajo: 0.20, asistencia: 0.15 };
         const CAMPOS_NUM = ['trabajoFinal', 'examenFinal'];
+        const ITEMS_CREC = [
+            { k: 'd', label: 'Devocionales' },
+            { k: 's', label: 'Asistencia a su servicio' },
+            { k: 'm', label: 'Montaña de oración' },
+            { k: 'v', label: 'Versículo memorizado' }
+        ];
         const CURSOS = [
             { id: 'disc1_next', nombre: 'Discipulado 1 NEXT' },
             { id: 'disc2_next', nombre: 'Discipulado 2 NEXT' },
@@ -309,7 +350,10 @@
         let cicloOk = true;
         let syncOk = true;
         let initHecha = false;
+        let crecEdit = { key: null, idx: -1 };
         const timersGuardar = {};
+
+        function verCalculo() { return esAdmin; }
 
         function esc(s) {
             return String(s === null || s === undefined ? '' : s)
@@ -347,6 +391,10 @@
             initHecha = true;
             document.getElementById('notasApp').style.display = 'block';
             poblarControles();
+            if (!verCalculo()) {
+                document.getElementById('chipBox').style.display = 'none';
+                document.getElementById('legendBox').style.display = 'none';
+            }
             if (typeof lucide !== 'undefined') lucide.createIcons();
             await cargarCiclo();
             document.getElementById('selCurso').value = CURSOS[0].id;
@@ -439,7 +487,7 @@
                 const key = r.id || (id + '|' + dni);
                 const base = map.get(key) || { key: key, curso: id, dni: dni, nombres: r.nombres || '—', refId: r.refId || '', asistencia: [], crecimiento: [] };
                 base.asistencia = normAsis(r.asistencia);
-                base.crecimiento = normNums(r.crecimiento);
+                base.crecimiento = normCrec(r.crecimiento);
                 CAMPOS_NUM.forEach(function (k) {
                     const v = r[k];
                     base[k] = (v === undefined || v === null || v === '') ? null : parseFloat(v);
@@ -464,18 +512,34 @@
             return out;
         }
 
-        function normNums(v) {
+        function normCrec(v) {
             let a = [];
             if (Array.isArray(v)) a = v;
             else if (typeof v === 'string' && v) { try { a = JSON.parse(v); } catch (e) { a = []; } }
             if (!Array.isArray(a)) a = [];
             const out = a.slice(0, SESIONES).map(function (x) {
-                if (x === null || x === undefined || x === '') return null;
-                const n = parseFloat(x);
-                return isNaN(n) ? null : Math.min(20, Math.max(0, n));
+                if (!x || typeof x !== 'object') return null;
+                const o = {};
+                let any = false;
+                ITEMS_CREC.forEach(function (it) {
+                    const n = num(x[it.k]);
+                    o[it.k] = n;
+                    if (n !== null) any = true;
+                });
+                return any ? o : null;
             });
             while (out.length < SESIONES) out.push(null);
             return out;
+        }
+
+        function notaSemanalCrec(item) {
+            if (!item) return null;
+            const vals = [];
+            ITEMS_CREC.forEach(function (it) {
+                const n = num(item[it.k]);
+                if (n !== null) vals.push(n);
+            });
+            return vals.length ? vals.reduce(function (s, v) { return s + v; }, 0) / vals.length : null;
         }
 
         function num(v) {
@@ -495,8 +559,8 @@
             const faltas = nF + Math.floor(nT / 3);
 
             const crecVals = [];
-            (f.crecimiento || []).slice(0, SESIONES).forEach(function (v) {
-                const n = num(v);
+            (f.crecimiento || []).slice(0, SESIONES).forEach(function (item) {
+                const n = notaSemanalCrec(item);
                 if (n !== null) crecVals.push(n);
             });
             const crec = crecVals.length ? crecVals.reduce(function (s, v) { return s + v; }, 0) / crecVals.length : null;
@@ -532,38 +596,43 @@
         function renderTabla(mensaje) {
             const head = document.getElementById('headNotas');
             const tbody = document.getElementById('tbodyNotas');
+            const calc = verCalculo();
+            const nCols = calc ? (SESIONES * 2 + 8) : (SESIONES * 2 + 3);
             if (mensaje) {
                 head.innerHTML = '';
-                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (SESIONES * 2 + 8) + '">' + esc(mensaje) + '</td></tr>';
+                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + nCols + '">' + esc(mensaje) + '</td></tr>';
                 return;
             }
             let r1 = '<tr><th rowspan="2" class="c-alumno">Alumno</th>' +
                 '<th colspan="' + SESIONES + '" class="th-grp th-asist">Asistencia · 9 sesiones (A · T · F)</th>' +
-                '<th colspan="' + SESIONES + '" class="th-grp th-crec">Crec. Esp. · por sesión (0-20)</th>' +
-                '<th colspan="2" class="th-grp th-fin">Finales (0-20)</th>' +
-                '<th colspan="5" class="th-grp th-calc">Cálculo automático</th></tr>';
+                '<th colspan="' + SESIONES + '" class="th-grp th-crec">Crec. Esp. · por sesión</th>' +
+                '<th colspan="2" class="th-grp th-fin">Finales (0-20)</th>';
+            if (calc) r1 += '<th colspan="5" class="th-grp th-calc">Cálculo automático</th>';
+            r1 += '</tr>';
             let r2 = '<tr>';
             for (let i = 1; i <= SESIONES; i++) r2 += '<th class="th-ses" title="Sesión ' + i + ' · asistencia">S' + i + '</th>';
-            for (let i = 1; i <= SESIONES; i++) r2 += '<th class="th-crec" title="Sesión ' + i + ' · crecimiento espiritual (0-20)">' + i + '</th>';
-            r2 += '<th class="th-num">Trabajo</th><th class="th-num">Examen</th>' +
-                '<th data-calc="crec">Crec. Esp.</th><th data-calc="asist">Asist.</th>' +
+            for (let i = 1; i <= SESIONES; i++) r2 += '<th class="th-crec" title="Sesión ' + i + ' · crecimiento espiritual (4 items)">' + i + '</th>';
+            r2 += '<th class="th-num">Trabajo</th><th class="th-num">Examen</th>';
+            if (calc) r2 += '<th data-calc="crec">Crec. Esp.</th><th data-calc="asist">Asist.</th>' +
                 '<th data-calc="faltas">Faltas</th><th data-calc="prom">Promedio</th>' +
-                '<th data-calc="cond">Condición</th></tr>';
+                '<th data-calc="cond">Condición</th>';
+            r2 += '</tr>';
             head.innerHTML = r1 + r2;
 
             if (!filas.length) {
-                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (SESIONES * 2 + 8) + '">' +
+                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + nCols + '">' +
                     '📭 Aún no hay alumnos en este curso.<br>Se cargan automáticamente desde las inscripciones del ciclo ' + CICLO +
                     ' — pulsa <b>Actualizar</b> — o agrégalos con <b>Agregar alumno</b>.</td></tr>';
-                actualizarChips();
+                if (calc) actualizarChips();
                 return;
             }
             tbody.innerHTML = filas.map(renderFila).join('');
             filas.forEach(actualizarFila);
-            actualizarChips();
+            if (calc) actualizarChips();
         }
 
         function renderFila(f) {
+            const calc = verCalculo();
             let h = '<tr data-key="' + esc(f.key) + '">' +
                 '<td class="c-alumno"><strong>' + esc(f.nombres || '—') + '</strong>' +
                 '<span class="sub">' + (f.dni ? 'DNI ' + esc(f.dni) : 'Sin DNI') + '</span></td>';
@@ -578,20 +647,28 @@
                     '<option' + (v === 'F' ? ' selected' : '') + '>F</option></select></td>';
             }
             for (let i = 0; i < SESIONES; i++) {
-                const cv = cr[i];
-                h += '<td class="td-crec" style="text-align:center"><input type="number" class="ng-num ng-crec" data-crec="' + i +
-                    '" min="0" max="20" step="0.5" value="' + (cv === null || cv === undefined ? '' : cv) + '"></td>';
+                const item = cr[i];
+                const n = notaSemanalCrec(item);
+                const etiqueta = calc
+                    ? (n === null ? '·' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, ''))
+                    : (item ? '✓' : '·');
+                h += '<td class="td-crec" style="text-align:center"><button type="button" class="ng-crec-btn' +
+                    (item ? ' full' : ' empty') + '" data-crec-idx="' + i + '" ' +
+                    'title="Sesión ' + (i + 1) + ' · 4 items de crecimiento espiritual">' + etiqueta + '</button></td>';
             }
             CAMPOS_NUM.forEach(function (k) {
                 const v = f[k];
                 h += '<td class="td-num" style="text-align:center"><input type="number" class="ng-num" data-field="' + k +
                     '" min="0" max="20" step="0.5" value="' + (v === null || v === undefined ? '' : v) + '"></td>';
             });
-            h += '<td class="calc" data-calc="crec">—</td>' +
-                '<td class="calc" data-calc="asist">—</td>' +
-                '<td class="calc" data-calc="faltas">0</td>' +
-                '<td class="calc strong" data-calc="prom">—</td>' +
-                '<td class="td-cond" style="text-align:center"><span class="cond cond-ne" data-calc="cond">—</span></td></tr>';
+            if (calc) {
+                h += '<td class="calc" data-calc="crec">—</td>' +
+                    '<td class="calc" data-calc="asist">—</td>' +
+                    '<td class="calc" data-calc="faltas">0</td>' +
+                    '<td class="calc strong" data-calc="prom">—</td>' +
+                    '<td class="td-cond" style="text-align:center"><span class="cond cond-ne" data-calc="cond">—</span></td>';
+            }
+            h += '</tr>';
             return h;
         }
 
@@ -600,10 +677,13 @@
         }
 
         function actualizarFila(f) {
+            if (!verCalculo()) return;
             const tr = trDe(f);
             if (!tr) return;
             const r = calcular(f);
-            tr.querySelector('[data-calc="crec"]').textContent = r.crec === null ? '—' : r.crec.toFixed(1);
+            const cCrec = tr.querySelector('[data-calc="crec"]');
+            if (!cCrec) return;
+            cCrec.textContent = r.crec === null ? '—' : r.crec.toFixed(1);
             tr.querySelector('[data-calc="asist"]').textContent = r.asistencia === null ? '—' : r.asistencia.toFixed(1);
             const faltasEl = tr.querySelector('[data-calc="faltas"]');
             faltasEl.textContent = r.faltas + (r.faltas > 3 ? ' ⛔' : '');
@@ -618,6 +698,7 @@
         }
 
         function actualizarChips() {
+            if (!verCalculo()) return;
             const rs = filas.map(function (f) { return calcular(f); });
             const conNota = rs.filter(function (r) { return r.nota !== null; });
             const prom = conNota.length ? conNota.reduce(function (s, r) { return s + r.nota; }, 0) / conNota.length : null;
@@ -642,31 +723,31 @@
             }
         }
 
+        document.getElementById('tbodyNotas').addEventListener('click', function (e) {
+            const btn = e.target.closest ? e.target.closest('button.ng-crec-btn') : null;
+            if (!btn) return;
+            const f = filaDeEvento(e);
+            if (!f) return;
+            abrirCrecModal(f, +btn.dataset.crecIdx);
+        });
+
         document.getElementById('tbodyNotas').addEventListener('input', function (e) {
             const f = filaDeEvento(e);
             if (!f) return;
             aplicarCambio(e.target, f);
-            actualizarFila(f);
-            actualizarChips();
+            if (verCalculo()) { actualizarFila(f); actualizarChips(); }
             programarGuardado(f);
         });
 
         document.getElementById('tbodyNotas').addEventListener('change', function (e) {
             const f = filaDeEvento(e);
             if (!f) return;
-            if (e.target.classList.contains('ng-crec')) {
-                f.crecimiento = f.crecimiento || [];
-                while (f.crecimiento.length < SESIONES) f.crecimiento.push(null);
-                const v = num(e.target.value);
-                f.crecimiento[+e.target.dataset.crec] = v;
-                e.target.value = v === null ? '' : v;
-            } else if (e.target.classList.contains('ng-num')) {
+            if (e.target.classList.contains('ng-num')) {
                 const v = num(e.target.value);
                 f[e.target.dataset.field] = v;
                 e.target.value = v === null ? '' : v;
             }
-            actualizarFila(f);
-            actualizarChips();
+            if (verCalculo()) { actualizarFila(f); actualizarChips(); }
             programarGuardado(f);
         });
 
@@ -683,11 +764,6 @@
                 while (f.asistencia.length < SESIONES) f.asistencia.push('');
                 f.asistencia[+t.dataset.idx] = t.value;
                 t.className = 'asist-sel' + (t.value ? ' ' + t.value.toLowerCase() : '');
-            } else if (t.classList.contains('ng-crec')) {
-                f.crecimiento = f.crecimiento || [];
-                while (f.crecimiento.length < SESIONES) f.crecimiento.push(null);
-                const n = parseFloat(t.value);
-                f.crecimiento[+t.dataset.crec] = t.value === '' || isNaN(n) ? null : Math.min(20, Math.max(0, n));
             } else if (t.classList.contains('ng-num')) {
                 const n = parseFloat(t.value);
                 f[t.dataset.field] = t.value === '' || isNaN(n) ? null : Math.min(20, Math.max(0, n));
@@ -698,6 +774,73 @@
             clearTimeout(timersGuardar[f.key]);
             timersGuardar[f.key] = setTimeout(function () { guardarFila(f); }, 700);
         }
+
+        function abrirCrecModal(f, idx) {
+            crecEdit = { key: f.key, idx: idx };
+            const item = (f.crecimiento || [])[idx] || {};
+            document.getElementById('crecDev').value = item.d === null || item.d === undefined ? '' : item.d;
+            document.getElementById('crecServ').value = item.s === null || item.s === undefined ? '' : item.s;
+            document.getElementById('crecMont').value = item.m === null || item.m === undefined ? '' : item.m;
+            document.getElementById('crecVers').value = item.v === null || item.v === undefined ? '' : item.v;
+            document.getElementById('crecModalSub').textContent = (f.nombres || '—') + ' · Sesión ' + (idx + 1);
+            document.getElementById('crecModalAvg').style.display = verCalculo() ? 'block' : 'none';
+            actualizarPromedioModal();
+            document.getElementById('crecModal').classList.add('show');
+            document.getElementById('crecDev').focus();
+        }
+
+        function actualizarPromedioModal() {
+            const item = {
+                d: num(document.getElementById('crecDev').value),
+                s: num(document.getElementById('crecServ').value),
+                m: num(document.getElementById('crecMont').value),
+                v: num(document.getElementById('crecVers').value)
+            };
+            const n = notaSemanalCrec(item);
+            document.getElementById('crecModalAvg').textContent =
+                'Nota de la semana: ' + (n === null ? '—' : (Math.round(n * 10) / 10).toFixed(1));
+        }
+
+        function cerrarCrecModal() {
+            document.getElementById('crecModal').classList.remove('show');
+            crecEdit = { key: null, idx: -1 };
+        }
+
+        function guardarCrecModal() {
+            const f = filas.find(function (x) { return x.key === crecEdit.key; });
+            if (!f || crecEdit.idx < 0) { cerrarCrecModal(); return; }
+            const item = {
+                d: num(document.getElementById('crecDev').value),
+                s: num(document.getElementById('crecServ').value),
+                m: num(document.getElementById('crecMont').value),
+                v: num(document.getElementById('crecVers').value)
+            };
+            const any = ITEMS_CREC.some(function (it) { return item[it.k] !== null; });
+            f.crecimiento = f.crecimiento || [];
+            while (f.crecimiento.length < SESIONES) f.crecimiento.push(null);
+            f.crecimiento[crecEdit.idx] = any ? item : null;
+            const tr = trDe(f);
+            if (tr) {
+                const btn = tr.querySelector('button.ng-crec-btn[data-crec-idx="' + crecEdit.idx + '"]');
+                if (btn) {
+                    const n = notaSemanalCrec(f.crecimiento[crecEdit.idx]);
+                    btn.className = 'ng-crec-btn' + (any ? ' full' : ' empty');
+                    btn.textContent = verCalculo()
+                        ? (n === null ? '·' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, ''))
+                        : (any ? '✓' : '·');
+                }
+            }
+            if (verCalculo()) { actualizarFila(f); actualizarChips(); }
+            programarGuardado(f);
+            cerrarCrecModal();
+        }
+
+        ['crecDev', 'crecServ', 'crecMont', 'crecVers'].forEach(function (id) {
+            document.getElementById(id).addEventListener('input', actualizarPromedioModal);
+        });
+        document.getElementById('crecModal').addEventListener('click', function (e) {
+            if (e.target === this) cerrarCrecModal();
+        });
 
         function filaARegistro(f) {
             const r = {
@@ -777,11 +920,12 @@
             if (typeof XLSX === 'undefined') { toast('No se pudo cargar el exportador de Excel', 'error'); return; }
             if (!cursoActual || !filas.length) { toast('No hay alumnos para exportar', 'warning'); return; }
             const curso = CURSOS.find(function (c) { return c.id === cursoActual; });
+            const calc = verCalculo();
             const head = ['Alumno', 'DNI'];
             for (let i = 1; i <= SESIONES; i++) head.push('Asist S' + i);
             for (let i = 1; i <= SESIONES; i++) head.push('Crec ' + i);
-            head.push('Trabajo Final', 'Examen Final',
-                'Crec. Esp.', 'Asistencia', 'Faltas', 'Promedio', 'Condición');
+            head.push('Trabajo Final', 'Examen Final');
+            if (calc) head.push('Crec. Esp.', 'Asistencia', 'Faltas', 'Promedio', 'Condición');
             const rows = [
                 ['REGISTRO DE NOTAS — ' + (curso ? curso.nombre : cursoActual)],
                 ['Ciclo ' + CICLO + ' · ' + SESIONES + ' sesiones · ' + hoyPeru()],
@@ -789,31 +933,39 @@
                 head
             ];
             filas.forEach(function (f) {
-                const r = calcular(f);
                 const a = (f.asistencia || []).slice(0, SESIONES);
                 const cr = (f.crecimiento || []).slice(0, SESIONES);
                 const row = [f.nombres, f.dni];
                 for (let i = 0; i < SESIONES; i++) row.push(a[i] || '');
-                for (let i = 0; i < SESIONES; i++) row.push(cr[i] === null || cr[i] === undefined ? '' : cr[i]);
+                for (let i = 0; i < SESIONES; i++) {
+                    const n = notaSemanalCrec(cr[i]);
+                    row.push(n === null ? '' : Math.round(n * 10) / 10);
+                }
                 CAMPOS_NUM.forEach(function (k) { row.push(f[k] === null || f[k] === undefined ? '' : f[k]); });
-                row.push(r.crec === null ? '' : Math.round(r.crec * 10) / 10);
-                row.push(r.asistencia === null ? '' : Math.round(r.asistencia * 10) / 10);
-                row.push(r.faltas);
-                row.push(r.nota === null ? '' : Math.round(r.nota * 10) / 10);
-                row.push(r.condicion);
+                if (calc) {
+                    const r = calcular(f);
+                    row.push(r.crec === null ? '' : Math.round(r.crec * 10) / 10);
+                    row.push(r.asistencia === null ? '' : Math.round(r.asistencia * 10) / 10);
+                    row.push(r.faltas);
+                    row.push(r.nota === null ? '' : Math.round(r.nota * 10) / 10);
+                    row.push(r.condicion);
+                }
                 rows.push(row);
             });
-            rows.push([]);
-            rows.push(['A = Asistió (20) · T = Llegó Tarde (15) · F = Faltó (0) · 3 tardías = 1 falta']);
-            rows.push(['Crec. Esp. se califica cada sesión (0-20); su promedio vale 40%']);
-            rows.push(['Pesos: Crecimiento Espiritual 40% · Examen Final 25% · Trabajo Final 20% · Asistencia 15%']);
-            rows.push(['Con 3 faltas la nota queda en 11.0 · Con más de 3 faltas: Desaprobado · Mínima aprobatoria: 11.0']);
+            if (calc) {
+                rows.push([]);
+                rows.push(['A = Asistió (20) · T = Llegó Tarde (15) · F = Faltó (0) · 3 tardías = 1 falta']);
+                rows.push(['Crec. Esp.: 4 items por sesión (Devocionales, Servicio, Montaña, Versículo); nota semanal = promedio de los 4; promedio de 9 semanas vale 40%']);
+                rows.push(['Pesos: Crecimiento Espiritual 40% · Examen Final 25% · Trabajo Final 20% · Asistencia 15%']);
+                rows.push(['Con 3 faltas la nota queda en 11.0 · Con más de 3 faltas: Desaprobado · Mínima aprobatoria: 11.0']);
+            }
             const ws = XLSX.utils.aoa_to_sheet(rows);
             ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: head.length - 1 } }];
             const anchos = [{ wch: 40 }, { wch: 12 }];
             for (let i = 0; i < SESIONES * 2; i++) anchos.push({ wch: 8 });
-            [{ wch: 14 }, { wch: 13 },
+            if (calc) [{ wch: 14 }, { wch: 13 },
             { wch: 11 }, { wch: 11 }, { wch: 8 }, { wch: 11 }, { wch: 14 }].forEach(function (c) { anchos.push(c); });
+            else [{ wch: 14 }, { wch: 13 }].forEach(function (c) { anchos.push(c); });
             ws['!cols'] = anchos;
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Notas');
