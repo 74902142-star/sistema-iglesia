@@ -75,7 +75,8 @@
         #tablaNotas tbody tr:hover td { background: #eaf4ff; }
         .c-alumno strong { display: block; font-size: 13.5px; color: #0f172a; font-weight: 700; line-height: 1.25; }
         .c-alumno .sub { display: block; font-size: 11px; color: #94a3b8; font-weight: 500; margin-top: 1px; }
-        .th-ses, .td-ses { min-width: 64px; width: 64px; }
+        .th-ses, .td-ses { min-width: 54px; width: 54px; }
+        .th-crec, .td-crec { min-width: 50px; width: 50px; }
         .th-num, .td-num { min-width: 80px; }
         th[data-calc="crec"], td.calc[data-calc="crec"] { min-width: 78px; }
         th[data-calc="asist"], td.calc[data-calc="asist"] { min-width: 70px; }
@@ -83,12 +84,13 @@
         th[data-calc="prom"], td.calc[data-calc="prom"] { min-width: 94px; }
         th[data-calc="cond"], .td-cond { min-width: 124px; }
 
-        .asist-sel { width: 54px; padding: 6px 3px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 800; text-align: center; outline: none; background: #fff; cursor: pointer; font-family: inherit; appearance: auto; transition: box-shadow 0.15s; }
+        .asist-sel { width: 46px; padding: 6px 2px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 800; text-align: center; outline: none; background: #fff; cursor: pointer; font-family: inherit; appearance: auto; transition: box-shadow 0.15s; }
         .asist-sel:focus { border-color: #1c6390; box-shadow: 0 0 0 3px rgba(28, 99, 144, 0.12); }
         .asist-sel.a { background: #dcfce7; border-color: #86efac; color: #166534; }
         .asist-sel.t { background: #fef9c3; border-color: #fde047; color: #854d0e; }
         .asist-sel.f { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
         .ng-num { width: 70px; padding: 7px 4px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; text-align: center; outline: none; font-family: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
+        .ng-crec { width: 42px; padding: 6px 2px; font-size: 12.5px; }
         .ng-num:focus { border-color: #1c6390; box-shadow: 0 0 0 3px rgba(28, 99, 144, 0.12); background: #fff; }
 
         .calc { text-align: center; font-weight: 700; color: #00334f; white-space: nowrap; font-size: 13.5px; padding: 6px 8px !important; }
@@ -191,7 +193,7 @@
                         <div class="ng-hero-icon"><i data-lucide="clipboard-check" style="width:38px;height:38px;color:#fff;"></i></div>
                         <div>
                             <h1>Registro de Notas</h1>
-                            <p>Asistencia (9 sesiones) · Crecimiento espiritual · Trabajo final · Examen final — ciclo 202620</p>
+                            <p>Asistencia y Crecimiento Espiritual semana a semana (9 sesiones) · Trabajo final · Examen final — ciclo 202620</p>
                         </div>
                     </div>
 
@@ -232,7 +234,7 @@
                     <div class="ng-table-wrap">
                         <div class="ng-table-head">
                             <h3><i data-lucide="table-2" style="width:17px;height:17px;"></i> Hoja de notas</h3>
-                            <span>Autoguardado al escribir · <b>*</b> = promedio parcial · 9 casillas de asistencia por alumno</span>
+                            <span>Autoguardado al escribir · <b>*</b> = promedio parcial · 9 casillas de asistencia y 9 de crecimiento por alumno</span>
                         </div>
                         <div class="table-container">
                             <table id="tablaNotas">
@@ -253,10 +255,11 @@
                         <span class="tag tag-t">T = Llegó Tarde (15)</span>
                         <span class="tag tag-f">F = Faltó (0)</span>
                         &nbsp;·&nbsp; <b>3 tardías = 1 falta</b>.<br>
-                        <b>Componentes y pesos:</b> Crecimiento Espiritual <b>40%</b> (promedio de Devocionales,
-                        Asistencia a su servicio, Montaña de oración y Versículo memorizado) · Examen Final
-                        <b>25%</b> · Trabajo Final <b>20%</b> · Asistencia <b>15%</b>. Las notas van de <b>0 a 20</b>
-                        (no hay más) y los campos vacíos no se cuentan (promedio parcial).<br>
+                        <b>Crecimiento Espiritual:</b> se califica <b>cada sesión</b> (0–20) en su casilla de la semana;
+                        el promedio de las 9 semanas vale <b>40%</b>.<br>
+                        <b>Componentes y pesos:</b> Crecimiento Espiritual (promedio semanal) <b>40%</b> ·
+                        Examen Final <b>25%</b> · Trabajo Final <b>20%</b> · Asistencia <b>15%</b>.
+                        Las notas van de <b>0 a 20</b> (no hay más) y los campos vacíos no se cuentan (promedio parcial).<br>
                         <b>Reglas de faltas:</b> con <b>3 faltas</b> la nota final queda fija en <b>11.0</b>; con
                         <b>más de 3 faltas</b> el alumno queda <b>Desaprobado</b> sin importar sus notas.<br>
                         <b>Mínima aprobatoria: 11.0.</b> Los alumnos se cargan automáticamente desde las
@@ -284,7 +287,7 @@
         const MIN_APROB = 11;
         const VAL_ASIST = { A: 20, T: 15, F: 0 };
         const PESO = { crec: 0.40, examen: 0.25, trabajo: 0.20, asistencia: 0.15 };
-        const CAMPOS_NUM = ['devocionales', 'servicio', 'montana', 'versiculo', 'trabajoFinal', 'examenFinal'];
+        const CAMPOS_NUM = ['trabajoFinal', 'examenFinal'];
         const CURSOS = [
             { id: 'disc1_next', nombre: 'Discipulado 1 NEXT' },
             { id: 'disc2_next', nombre: 'Discipulado 2 NEXT' },
@@ -427,15 +430,16 @@
             inscritosDe(id).forEach(function (r) {
                 const dni = (r.dni || '').toString().trim();
                 const key = id + '|' + (dni || ('ref' + r.id));
-                const base = { key: key, curso: id, dni: dni, nombres: r.nombres, refId: r.id, asistencia: [] };
+                const base = { key: key, curso: id, dni: dni, nombres: r.nombres, refId: r.id, asistencia: [], crecimiento: [] };
                 CAMPOS_NUM.forEach(function (k) { base[k] = null; });
                 map.set(key, base);
             });
             guardadas.forEach(function (r) {
                 const dni = (r.dni || '').toString().trim();
                 const key = r.id || (id + '|' + dni);
-                const base = map.get(key) || { key: key, curso: id, dni: dni, nombres: r.nombres || '—', refId: r.refId || '', asistencia: [] };
+                const base = map.get(key) || { key: key, curso: id, dni: dni, nombres: r.nombres || '—', refId: r.refId || '', asistencia: [], crecimiento: [] };
                 base.asistencia = normAsis(r.asistencia);
+                base.crecimiento = normNums(r.crecimiento);
                 CAMPOS_NUM.forEach(function (k) {
                     const v = r[k];
                     base[k] = (v === undefined || v === null || v === '') ? null : parseFloat(v);
@@ -460,6 +464,20 @@
             return out;
         }
 
+        function normNums(v) {
+            let a = [];
+            if (Array.isArray(v)) a = v;
+            else if (typeof v === 'string' && v) { try { a = JSON.parse(v); } catch (e) { a = []; } }
+            if (!Array.isArray(a)) a = [];
+            const out = a.slice(0, SESIONES).map(function (x) {
+                if (x === null || x === undefined || x === '') return null;
+                const n = parseFloat(x);
+                return isNaN(n) ? null : Math.min(20, Math.max(0, n));
+            });
+            while (out.length < SESIONES) out.push(null);
+            return out;
+        }
+
         function num(v) {
             if (v === null || v === undefined || v === '') return null;
             const n = parseFloat(v);
@@ -477,9 +495,9 @@
             const faltas = nF + Math.floor(nT / 3);
 
             const crecVals = [];
-            ['devocionales', 'servicio', 'montana', 'versiculo'].forEach(function (k) {
-                const v = num(f[k]);
-                if (v !== null) crecVals.push(v);
+            (f.crecimiento || []).slice(0, SESIONES).forEach(function (v) {
+                const n = num(v);
+                if (n !== null) crecVals.push(n);
             });
             const crec = crecVals.length ? crecVals.reduce(function (s, v) { return s + v; }, 0) / crecVals.length : null;
 
@@ -516,28 +534,25 @@
             const tbody = document.getElementById('tbodyNotas');
             if (mensaje) {
                 head.innerHTML = '';
-                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (SESIONES + 12) + '">' + esc(mensaje) + '</td></tr>';
+                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (SESIONES * 2 + 8) + '">' + esc(mensaje) + '</td></tr>';
                 return;
             }
             let r1 = '<tr><th rowspan="2" class="c-alumno">Alumno</th>' +
                 '<th colspan="' + SESIONES + '" class="th-grp th-asist">Asistencia · 9 sesiones (A · T · F)</th>' +
-                '<th colspan="4" class="th-grp th-crec">Crecimiento Espiritual (0-20)</th>' +
+                '<th colspan="' + SESIONES + '" class="th-grp th-crec">Crec. Esp. · por sesión (0-20)</th>' +
                 '<th colspan="2" class="th-grp th-fin">Finales (0-20)</th>' +
                 '<th colspan="5" class="th-grp th-calc">Cálculo automático</th></tr>';
             let r2 = '<tr>';
-            for (let i = 1; i <= SESIONES; i++) r2 += '<th class="th-ses" title="Sesión ' + i + '">S' + i + '</th>';
-            r2 += '<th class="th-num" title="Devocionales">Devoc.</th>' +
-                '<th class="th-num" title="Asistencia a su servicio">Servicio</th>' +
-                '<th class="th-num" title="Montaña de oración">Montaña</th>' +
-                '<th class="th-num" title="Versículo memorizado">Versículo</th>' +
-                '<th class="th-num">Trabajo</th><th class="th-num">Examen</th>' +
+            for (let i = 1; i <= SESIONES; i++) r2 += '<th class="th-ses" title="Sesión ' + i + ' · asistencia">S' + i + '</th>';
+            for (let i = 1; i <= SESIONES; i++) r2 += '<th class="th-crec" title="Sesión ' + i + ' · crecimiento espiritual (0-20)">' + i + '</th>';
+            r2 += '<th class="th-num">Trabajo</th><th class="th-num">Examen</th>' +
                 '<th data-calc="crec">Crec. Esp.</th><th data-calc="asist">Asist.</th>' +
                 '<th data-calc="faltas">Faltas</th><th data-calc="prom">Promedio</th>' +
                 '<th data-calc="cond">Condición</th></tr>';
             head.innerHTML = r1 + r2;
 
             if (!filas.length) {
-                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (SESIONES + 12) + '">' +
+                tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + (SESIONES * 2 + 8) + '">' +
                     '📭 Aún no hay alumnos en este curso.<br>Se cargan automáticamente desde las inscripciones del ciclo ' + CICLO +
                     ' — pulsa <b>Actualizar</b> — o agrégalos con <b>Agregar alumno</b>.</td></tr>';
                 actualizarChips();
@@ -553,6 +568,7 @@
                 '<td class="c-alumno"><strong>' + esc(f.nombres || '—') + '</strong>' +
                 '<span class="sub">' + (f.dni ? 'DNI ' + esc(f.dni) : 'Sin DNI') + '</span></td>';
             const a = f.asistencia || [];
+            const cr = f.crecimiento || [];
             for (let i = 0; i < SESIONES; i++) {
                 const v = a[i] || '';
                 h += '<td class="td-ses" style="text-align:center"><select class="asist-sel' + (v ? ' ' + v.toLowerCase() : '') +
@@ -560,6 +576,11 @@
                     '<option' + (v === 'A' ? ' selected' : '') + '>A</option>' +
                     '<option' + (v === 'T' ? ' selected' : '') + '>T</option>' +
                     '<option' + (v === 'F' ? ' selected' : '') + '>F</option></select></td>';
+            }
+            for (let i = 0; i < SESIONES; i++) {
+                const cv = cr[i];
+                h += '<td class="td-crec" style="text-align:center"><input type="number" class="ng-num ng-crec" data-crec="' + i +
+                    '" min="0" max="20" step="0.5" value="' + (cv === null || cv === undefined ? '' : cv) + '"></td>';
             }
             CAMPOS_NUM.forEach(function (k) {
                 const v = f[k];
@@ -633,7 +654,13 @@
         document.getElementById('tbodyNotas').addEventListener('change', function (e) {
             const f = filaDeEvento(e);
             if (!f) return;
-            if (e.target.classList.contains('ng-num')) {
+            if (e.target.classList.contains('ng-crec')) {
+                f.crecimiento = f.crecimiento || [];
+                while (f.crecimiento.length < SESIONES) f.crecimiento.push(null);
+                const v = num(e.target.value);
+                f.crecimiento[+e.target.dataset.crec] = v;
+                e.target.value = v === null ? '' : v;
+            } else if (e.target.classList.contains('ng-num')) {
                 const v = num(e.target.value);
                 f[e.target.dataset.field] = v;
                 e.target.value = v === null ? '' : v;
@@ -656,6 +683,11 @@
                 while (f.asistencia.length < SESIONES) f.asistencia.push('');
                 f.asistencia[+t.dataset.idx] = t.value;
                 t.className = 'asist-sel' + (t.value ? ' ' + t.value.toLowerCase() : '');
+            } else if (t.classList.contains('ng-crec')) {
+                f.crecimiento = f.crecimiento || [];
+                while (f.crecimiento.length < SESIONES) f.crecimiento.push(null);
+                const n = parseFloat(t.value);
+                f.crecimiento[+t.dataset.crec] = t.value === '' || isNaN(n) ? null : Math.min(20, Math.max(0, n));
             } else if (t.classList.contains('ng-num')) {
                 const n = parseFloat(t.value);
                 f[t.dataset.field] = t.value === '' || isNaN(n) ? null : Math.min(20, Math.max(0, n));
@@ -676,10 +708,9 @@
                 nombres: f.nombres || '',
                 sesiones: SESIONES,
                 asistencia: (f.asistencia || []).slice(0, SESIONES),
-                devocionales: f.devocionales,
-                servicio: f.servicio,
-                montana: f.montana,
-                versiculo: f.versiculo,
+                crecimiento: (f.crecimiento || []).slice(0, SESIONES).map(function (v) {
+                    return (v === null || v === undefined || v === '') ? null : v;
+                }),
                 trabajoFinal: f.trabajoFinal,
                 examenFinal: f.examenFinal,
                 actualizado: hoyPeru() + ' ' + horaPeru(),
@@ -728,9 +759,10 @@
             if (!nom) { toast('Escribe los nombres del alumno', 'error'); return; }
             const key = cursoActual + '|' + (dni || ('refman' + Date.now()));
             if (filas.some(function (f) { return f.key === key; })) { toast('Ese alumno ya está en la lista', 'warning'); return; }
-            const f = { key: key, curso: cursoActual, dni: dni, nombres: nom, refId: '', asistencia: [] };
+            const f = { key: key, curso: cursoActual, dni: dni, nombres: nom, refId: '', asistencia: [], crecimiento: [] };
             CAMPOS_NUM.forEach(function (k) { f[k] = null; });
             while (f.asistencia.length < SESIONES) f.asistencia.push('');
+            while (f.crecimiento.length < SESIONES) f.crecimiento.push(null);
             filas.push(f);
             filas.sort(function (a, b) { return (a.nombres || '').localeCompare(b.nombres || '', 'es'); });
             renderTabla();
@@ -746,8 +778,9 @@
             if (!cursoActual || !filas.length) { toast('No hay alumnos para exportar', 'warning'); return; }
             const curso = CURSOS.find(function (c) { return c.id === cursoActual; });
             const head = ['Alumno', 'DNI'];
-            for (let i = 1; i <= SESIONES; i++) head.push('S' + i);
-            head.push('Devocionales', 'Servicio', 'Montaña', 'Versículo', 'Trabajo Final', 'Examen Final',
+            for (let i = 1; i <= SESIONES; i++) head.push('Asist S' + i);
+            for (let i = 1; i <= SESIONES; i++) head.push('Crec ' + i);
+            head.push('Trabajo Final', 'Examen Final',
                 'Crec. Esp.', 'Asistencia', 'Faltas', 'Promedio', 'Condición');
             const rows = [
                 ['REGISTRO DE NOTAS — ' + (curso ? curso.nombre : cursoActual)],
@@ -758,8 +791,10 @@
             filas.forEach(function (f) {
                 const r = calcular(f);
                 const a = (f.asistencia || []).slice(0, SESIONES);
+                const cr = (f.crecimiento || []).slice(0, SESIONES);
                 const row = [f.nombres, f.dni];
                 for (let i = 0; i < SESIONES; i++) row.push(a[i] || '');
+                for (let i = 0; i < SESIONES; i++) row.push(cr[i] === null || cr[i] === undefined ? '' : cr[i]);
                 CAMPOS_NUM.forEach(function (k) { row.push(f[k] === null || f[k] === undefined ? '' : f[k]); });
                 row.push(r.crec === null ? '' : Math.round(r.crec * 10) / 10);
                 row.push(r.asistencia === null ? '' : Math.round(r.asistencia * 10) / 10);
@@ -770,13 +805,14 @@
             });
             rows.push([]);
             rows.push(['A = Asistió (20) · T = Llegó Tarde (15) · F = Faltó (0) · 3 tardías = 1 falta']);
+            rows.push(['Crec. Esp. se califica cada sesión (0-20); su promedio vale 40%']);
             rows.push(['Pesos: Crecimiento Espiritual 40% · Examen Final 25% · Trabajo Final 20% · Asistencia 15%']);
             rows.push(['Con 3 faltas la nota queda en 11.0 · Con más de 3 faltas: Desaprobado · Mínima aprobatoria: 11.0']);
             const ws = XLSX.utils.aoa_to_sheet(rows);
             ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: head.length - 1 } }];
             const anchos = [{ wch: 40 }, { wch: 12 }];
-            for (let i = 0; i < SESIONES; i++) anchos.push({ wch: 6 });
-            [{ wch: 13 }, { wch: 11 }, { wch: 11 }, { wch: 12 }, { wch: 14 }, { wch: 13 },
+            for (let i = 0; i < SESIONES * 2; i++) anchos.push({ wch: 8 });
+            [{ wch: 14 }, { wch: 13 },
             { wch: 11 }, { wch: 11 }, { wch: 8 }, { wch: 11 }, { wch: 14 }].forEach(function (c) { anchos.push(c); });
             ws['!cols'] = anchos;
             const wb = XLSX.utils.book_new();
