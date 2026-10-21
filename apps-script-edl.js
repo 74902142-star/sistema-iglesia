@@ -36,7 +36,8 @@ const COLOR_TITULO = '#00334F';
 const COLOR_HEADER = '#1C6390';
 const COLOR_PAR = '#FFFFFF';
 const COLOR_IMPAR = '#F1F5F9';
-const ANCHOS_PX = [45, 246, 80, 88, 220, 158, 141, 176];
+// Anchos en píxeles: suficientes para que no se corte nada
+const ANCHOS_PX = [50, 280, 100, 110, 240, 180, 160, 200];
 
 // ══════════════ DISPARADORES ══════════════
 
@@ -252,13 +253,10 @@ function escribirHoja_(hoja, titulo, datos, hojaOrigen) {
     }
   }
 
-  // Anchos de columna (los mismos del ciclo anterior cuando existen).
+  // Anchos de columna: siempre los correctos (no heredar de la hoja anterior
+  // porque puede tener anchos rotos).
   for (let c = 1; c <= COLUMNAS.length; c++) {
-    let ancho = ANCHOS_PX[c - 1];
-    if (hojaOrigen) {
-      try { ancho = hojaOrigen.getColumnWidth(c); } catch (e) { /* usa el ancho base */ }
-    }
-    hoja.setColumnWidth(c, ancho);
+    hoja.setColumnWidth(c, ANCHOS_PX[c - 1]);
   }
 
   hoja.setFrozenRows(3);
