@@ -1337,11 +1337,15 @@
             }
             const ws = XLSX.utils.aoa_to_sheet(rows);
             ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: head.length - 1 } }];
-            const anchos = [{ wch: 40 }, { wch: 12 }];
-            for (let i = 0; i < sem * 2; i++) anchos.push({ wch: 8 });
-            if (calc) [{ wch: 14 }, { wch: 13 },
-            { wch: 11 }, { wch: 11 }, { wch: 8 }, { wch: 11 }, { wch: 14 }].forEach(function (c) { anchos.push(c); });
-            else [{ wch: 14 }, { wch: 13 }].forEach(function (c) { anchos.push(c); });
+            // Anchos generosos para que no se corte nada
+            const anchos = [{ wch: 42 }, { wch: 14 }];
+            for (let i = 0; i < sem; i++) anchos.push({ wch: 10 });
+            for (let i = 0; i < sem; i++) anchos.push({ wch: 10 });
+            anchos.push({ wch: 16 }, { wch: 16 });
+            if (calc) {
+                [{ wch: 13 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 15 }]
+                    .forEach(function (c) { anchos.push(c); });
+            }
             ws['!cols'] = anchos;
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Notas');
