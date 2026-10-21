@@ -48,6 +48,48 @@ const Auth = {
     }
 };
 
+// ══════════════ Cierre por inactividad (5 minutos) ══════════════
+// Vale para admin e invitado: si no hay actividad (ratón, teclado, táctil)
+// durante 5 minutos, se cierra la sesión y se vuelve a index.html.
+(function () {
+    var TIMEOUT_MS = 5 * 60 * 1000; // 5 minutos
+    var timer = null;
+
+    function haySesion() {
+        try { return !!localStorage.getItem('usuarioActual'); } catch (e) { return false; }
+    }
+
+    function cerrarPorInactividad() {
+        if (!haySesion()) return;
+        try {
+            localStorage.removeItem('usuarioActual');
+            localStorage.removeItem('tutorValidado');
+        } catch (e) { }
+        // Evita bucle si ya estamos en index
+        var pag = (location.pathname || '').split('/').pop() || '';
+        if (pag !== 'index.html' && pag !== '' && pag !== '/') {
+            window.location.href = 'index.html';
+        }
+    }
+
+    function reiniciarTimer() {
+        if (!haySesion()) return;
+        clearTimeout(timer);
+        timer = setTimeout(cerrarPorInactividad, TIMEOUT_MS);
+    }
+
+    // Cualquier interacción del usuario reinicia el contador
+    ['mousemove', 'mousedown', 'keydown', 'keyup', 'touchstart', 'touchmove', 'scroll', 'click', 'focus']
+        .forEach(function (ev) {
+            document.addEventListener(ev, reiniciarTimer, { passive: true });
+        });
+
+    // Al cargar la página, si hay sesión, arrancar el contador
+    document.addEventListener('DOMContentLoaded', reiniciarTimer);
+    // Por si auth.js se carga después del DOMContentLoaded
+    if (document.readyState !== 'loading') reiniciarTimer();
+})();
+
 // Invitados: en el menú lateral solo ven el módulo al que entraron
 // (Notas, Ingreso/Conteo o EDL). No ven Aula, Kids, etc.
 document.addEventListener('DOMContentLoaded', function () {
