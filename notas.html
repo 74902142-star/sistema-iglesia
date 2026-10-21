@@ -59,7 +59,7 @@
         .ng-table-head span { font-size: 12.5px; color: #94a3b8; }
         .ng-table-head b { color: #1c6390; }
         .ng-table-wrap .table-container { padding: 0 10px 12px; border: none; border-radius: 0; box-shadow: none; }
-        #tablaNotas { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; }
+        #tablaNotas { width: 100%; min-width: max-content; border-collapse: separate; border-spacing: 0; }
         #tablaNotas th { font-size: 12px; padding: 8px 6px; text-align: center; white-space: nowrap; }
         #tablaNotas thead tr:first-child th { border-bottom: none; }
         #tablaNotas thead tr:nth-child(2) th { background: #f8fafc; color: #334155; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
@@ -68,21 +68,21 @@
         .th-crec { background: #0e7490 !important; }
         .th-fin { background: #00334f !important; }
         .th-calc { background: #334155 !important; }
-        #tablaNotas thead .c-alumno { background: #00334f !important; color: #fff; position: sticky; left: 0; z-index: 3; font-size: 12px; vertical-align: middle; min-width: 230px; border-bottom: none; }
-        #tablaNotas tbody .c-alumno { position: sticky; left: 0; background: #fff; z-index: 1; text-align: left; padding: 8px 12px; min-width: 230px; border-right: 2px solid #eef2f7; }
-        #tablaNotas tbody td { border-bottom: 1px solid #f1f5f9; padding: 5px 4px; vertical-align: middle; background: #fff; }
+        #tablaNotas thead .c-alumno { background: #00334f !important; color: #fff; position: sticky; left: 0; z-index: 3; font-size: 12px; vertical-align: middle; width: 230px; min-width: 230px; border-bottom: none; }
+        #tablaNotas tbody .c-alumno { position: sticky; left: 0; background: #fff; z-index: 1; text-align: left; padding: 8px 12px; width: 230px; min-width: 230px; border-right: 2px solid #eef2f7; }
+        #tablaNotas tbody td { border-bottom: 1px solid #f1f5f9; padding: 5px 4px; vertical-align: middle; background: #fff; box-sizing: border-box; }
         #tablaNotas tbody tr:nth-child(even) td { background: #f8fafc; }
         #tablaNotas tbody tr:hover td { background: #eaf4ff; }
         .c-alumno strong { display: block; font-size: 13.5px; color: #0f172a; font-weight: 700; line-height: 1.25; }
         .c-alumno .sub { display: block; font-size: 11px; color: #94a3b8; font-weight: 500; margin-top: 1px; }
-        .th-ses, .td-ses { min-width: 54px; width: 54px; }
-        .th-crec, .td-crec { min-width: 50px; width: 50px; }
-        .th-num, .td-num { min-width: 80px; }
-        th[data-calc="crec"], td.calc[data-calc="crec"] { min-width: 78px; }
-        th[data-calc="asist"], td.calc[data-calc="asist"] { min-width: 70px; }
-        th[data-calc="faltas"], td.calc[data-calc="faltas"] { min-width: 74px; }
-        th[data-calc="prom"], td.calc[data-calc="prom"] { min-width: 94px; }
-        th[data-calc="cond"], .td-cond { min-width: 124px; }
+        .th-ses, .td-ses { width: 56px; min-width: 56px; max-width: 56px; }
+        .th-crec, .td-crec { width: 52px; min-width: 52px; max-width: 52px; }
+        .th-num, .td-num { width: 84px; min-width: 84px; max-width: 84px; }
+        th[data-calc="crec"], td.calc[data-calc="crec"] { width: 80px; min-width: 80px; }
+        th[data-calc="asist"], td.calc[data-calc="asist"] { width: 72px; min-width: 72px; }
+        th[data-calc="faltas"], td.calc[data-calc="faltas"] { width: 76px; min-width: 76px; }
+        th[data-calc="prom"], td.calc[data-calc="prom"] { width: 96px; min-width: 96px; }
+        th[data-calc="cond"], .td-cond { width: 128px; min-width: 128px; }
 
         .asist-sel { width: 46px; padding: 6px 2px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 800; text-align: center; outline: none; background: #fff; cursor: pointer; font-family: inherit; appearance: auto; transition: box-shadow 0.15s; }
         .asist-sel:focus { border-color: #1c6390; box-shadow: 0 0 0 3px rgba(28, 99, 144, 0.12); }
