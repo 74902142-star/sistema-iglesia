@@ -673,6 +673,19 @@
                 if (selModal) selModal.innerHTML = vacio;
                 if (selGuest) selGuest.innerHTML = vacio;
             }
+            // Admin: también los cursos de ciclos anteriores que no estén en el actual
+            if (esAdmin && selModal) {
+                const idsActuales = {};
+                cursosDe(CICLO_ACTUAL).forEach(c => { idsActuales[c.id] = true; });
+                Object.keys(CURSOS_POR_CICLO).forEach(ciclo => {
+                    if (ciclo === CICLO_ACTUAL) return;
+                    CURSOS_POR_CICLO[ciclo].forEach(c => {
+                        if (idsActuales[c.id]) return;
+                        idsActuales[c.id] = true;
+                        selModal.innerHTML += `<option value="${c.id}">${c.nombre} (ciclo ${ciclo})</option>`;
+                    });
+                });
+            }
             actualizarFiltroCursos();
         }
 
