@@ -662,7 +662,7 @@
             const selGuest = document.getElementById('guestCurso');
             let abiertos = 0;
             cursosDe(CICLO_ACTUAL).forEach(c => {
-                if (cursoCerrado(c)) return;   // cerró al terminar su 2ª clase: ya no se lista
+                if (!esAdmin && cursoCerrado(c)) return;   // solo invitados: cerró al terminar su 2ª clase
                 abiertos++;
                 const opt = `<option value="${c.id}">${c.nombre}</option>`;
                 if (selModal) selModal.innerHTML += opt;
