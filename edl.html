@@ -605,12 +605,28 @@
             ]
         };
 
+        // Orden: 1) NEXT  2) Discipulados  3) Lidere  4) Seminarios
+        function grupoCurso(c) {
+            const n = String(c.nombre || '').toLowerCase();
+            if (n.indexOf('next') !== -1) return 0;
+            if (n.indexOf('discipulado') !== -1) return 1;
+            if (n.indexOf('lidere') !== -1) return 2;
+            return 3;
+        }
+
+        function ordenarCursos(lista) {
+            return lista.slice().sort(function (a, b) {
+                return (grupoCurso(a) - grupoCurso(b)) ||
+                    String(a.nombre).localeCompare(String(b.nombre), 'es', { numeric: true });
+            });
+        }
+
         function cursosDe(ciclo) {
-            return CURSOS_POR_CICLO[ciclo] || CURSOS_POR_CICLO[CICLO_ACTUAL];
+            return ordenarCursos(CURSOS_POR_CICLO[ciclo] || CURSOS_POR_CICLO[CICLO_ACTUAL]);
         }
 
         function todosLosCursos() {
-            return Object.keys(CURSOS_POR_CICLO).reduce(function (acc, k) { return acc.concat(CURSOS_POR_CICLO[k]); }, []);
+            return ordenarCursos(Object.keys(CURSOS_POR_CICLO).reduce(function (acc, k) { return acc.concat(CURSOS_POR_CICLO[k]); }, []));
         }
 
         // ── Cierre de inscripciones: al terminar la 2ª clase (inicio + 7 días,
@@ -661,30 +677,39 @@
             const selModal = document.getElementById('insCurso');
             const selGuest = document.getElementById('guestCurso');
             let abiertos = 0;
+            // Lista para invitados (y base del admin): ciclo actual, solo abiertos para invitados
+            const lista = [];
             cursosDe(CICLO_ACTUAL).forEach(c => {
                 if (!esAdmin && cursoCerrado(c)) return;   // solo invitados: cerró al terminar su 2ª clase
                 abiertos++;
-                const opt = `<option value="${c.id}">${c.nombre}</option>`;
+                lista.push({ c: c, etiqueta: c.nombre });
+            });
+            // Admin: también los cursos de ciclos anteriores que no estén en el actual
+            if (esAdmin) {
+                const ids = {};
+                lista.forEach(x => { ids[x.c.id] = true; });
+                Object.keys(CURSOS_POR_CICLO).forEach(ciclo => {
+                    if (ciclo === CICLO_ACTUAL) return;
+                    CURSOS_POR_CICLO[ciclo].forEach(c => {
+                        if (ids[c.id]) return;
+                        ids[c.id] = true;
+                        lista.push({ c: c, etiqueta: c.nombre + ' (ciclo ' + ciclo + ')' });
+                    });
+                });
+            }
+            lista.sort(function (a, b) {
+                return (grupoCurso(a.c) - grupoCurso(b.c)) ||
+                    String(a.c.nombre).localeCompare(String(b.c.nombre), 'es', { numeric: true });
+            });
+            lista.forEach(x => {
+                const opt = `<option value="${x.c.id}">${x.etiqueta}</option>`;
                 if (selModal) selModal.innerHTML += opt;
-                if (selGuest) selGuest.innerHTML += opt;
+                if (selGuest && x.etiqueta === x.c.nombre) selGuest.innerHTML += opt;
             });
             if (abiertos === 0) {
                 const vacio = '<option value="" disabled selected>No hay cursos abiertos</option>';
                 if (selModal) selModal.innerHTML = vacio;
                 if (selGuest) selGuest.innerHTML = vacio;
-            }
-            // Admin: también los cursos de ciclos anteriores que no estén en el actual
-            if (esAdmin && selModal) {
-                const idsActuales = {};
-                cursosDe(CICLO_ACTUAL).forEach(c => { idsActuales[c.id] = true; });
-                Object.keys(CURSOS_POR_CICLO).forEach(ciclo => {
-                    if (ciclo === CICLO_ACTUAL) return;
-                    CURSOS_POR_CICLO[ciclo].forEach(c => {
-                        if (idsActuales[c.id]) return;
-                        idsActuales[c.id] = true;
-                        selModal.innerHTML += `<option value="${c.id}">${c.nombre} (ciclo ${ciclo})</option>`;
-                    });
-                });
             }
             actualizarFiltroCursos();
         }
