@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (u && u.rol === 'invitado') {
             var path = (location.pathname || '').split('/').pop() || 'guest.html';
             // Ocultar siempre: Aula, Kids, Lideres, Dashboard, Configuración
-            ['nav-aula', 'nav-kids', 'nav-lideres', 'nav-dashboard', 'nav-config'].forEach(function (id) {
+            ['nav-aula', 'nav-kids', 'nav-lideres', 'nav-dashboard', 'nav-config', 'nav-anfitriones', 'nav-creativos'].forEach(function (id) {
                 var el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
