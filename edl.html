@@ -1178,6 +1178,8 @@
                     timestamp: new Date().toISOString()
                 };
                 if (data.pagoCaptura === undefined) delete data.pagoCaptura;
+                // Al editar se conserva quién creó la inscripción y cuándo
+                if (editandoId) { delete data.creadoPor; delete data.timestamp; }
 
                 if (!editandoId) {
                     const existente = await verificarDuplicado(docNum, cursoId);
