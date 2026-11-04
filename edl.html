@@ -57,7 +57,7 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="supabase.js?v=1"></script>
+    <script src="supabase.js?v=2"></script>
     <script src="auth.js"></script>
 </head>
 
@@ -229,6 +229,7 @@
                                             <th>Monto</th>
                                             <th>Estado</th>
                                             <th>Método</th>
+                                            <th>Observaciones</th>
                                             <th>Creado por</th>
                                             <th>Acciones</th>
                                         </tr>
@@ -522,6 +523,11 @@
                                     alt="Vista previa">
                             </div>
                         </div>
+                    </div>
+                    <div class="form-group" id="insObservacionesGroup">
+                        <label>Observaciones <span style="font-weight:400;color:var(--text-secondary);">(solo admin)</span></label>
+                        <textarea id="insObservaciones" class="form-control" rows="3" maxlength="500"
+                            placeholder="Ej: Becado, pagó el pastor, pagó su líder, pendiente de pago…"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width:100%;margin-top:20px;"><i
                             data-lucide="save" style="width:16px; height:16px;"></i> Guardar inscripción</button>
@@ -1005,7 +1011,7 @@
                 if (inscripciones.length > 0) {
                     aplicarFiltros();
                 } else {
-                    document.getElementById('tablaInscripciones').innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:#dc2626;">⚠️ Sin conexión. Intenta de nuevo más tarde.</td></tr>';
+                    document.getElementById('tablaInscripciones').innerHTML = '<tr><td colspan="14" style="text-align:center;padding:24px;color:#dc2626;">⚠️ Sin conexión. Intenta de nuevo más tarde.</td></tr>';
                 }
             }
         }
@@ -1060,7 +1066,7 @@
                 const vacio = cicloSel
                     ? `No hay inscripciones en el ciclo ${cicloSel} todavía. Cambia el filtro de ciclo para ver los demás.`
                     : 'No hay inscripciones';
-                tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:48px;color:var(--text-muted);">${vacio}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="14" style="text-align:center;padding:48px;color:var(--text-muted);">${vacio}</td></tr>`;
                 return;
             }
             tbody.innerHTML = inscripcionesFiltradas.map(i => {
@@ -1094,6 +1100,7 @@
                             ${metodo} ${capturaHtml}
                         </div>
                     </td>
+                    <td style="min-width:160px;max-width:260px;white-space:normal;"><span style="font-size:11.5px;color:var(--text-primary);" title="${escAttr(i.observaciones || '')}">${i.observaciones ? escHtml(i.observaciones) : '<span style="color:var(--text-secondary);">-</span>'}</span></td>
                     <td><span style="font-size:11.5px;color:var(--text-secondary);">${i.creadoPor || '-'}</span></td>
                     <td>
                         <button class="action-btn btn-edit btn" style="padding:6px;border-radius:6px;" onclick="editarInscripcion('${i.id}')" title="Editar"><i data-lucide="edit" style="width:14px;height:14px;"></i></button>
@@ -1107,6 +1114,9 @@
             }).join('');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
+
+        function escHtml(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function escAttr(t) { return escHtml(t).replace(/"/g, '&quot;'); }
 
         async function verificarDuplicado(dni, cursoId) {
             // Solo avisa si ya está en el MISMO curso de ESTE ciclo
@@ -1162,6 +1172,7 @@
                     estadoPago: document.getElementById('insEstado').value,
                     metodoPago: document.getElementById('insMetodoPago').value || '',
                     pagoCaptura: pagoCaptura,
+                    observaciones: document.getElementById('insObservaciones').value.trim(),
                     ciclo: CICLO_ACTUAL,
                     creadoPor: usuarioActual ? usuarioActual.nombre : 'Admin',
                     timestamp: new Date().toISOString()
@@ -1210,6 +1221,7 @@
             document.getElementById('insCapturaFilename').classList.remove('visible');
             document.getElementById('cursoInfo').style.display = 'none';
             document.getElementById('insMonto').value = '';
+            document.getElementById('insObservaciones').value = '';
             document.getElementById('modalTitle').innerText = 'Nueva Inscripción';
             document.getElementById('modalInscripcion').style.display = 'flex';
         }
@@ -1237,6 +1249,7 @@
             selIns.dispatchEvent(new Event('change'));
             document.getElementById('insEstado').value = i.estadoPago;
             document.getElementById('insMetodoPago').value = i.metodoPago || '';
+            document.getElementById('insObservaciones').value = i.observaciones || '';
             const isDigital = ['yape', 'plin', 'transferencia'].includes(i.metodoPago || '');
             document.getElementById('insCapturaGroup').style.display = isDigital ? 'block' : 'none';
             const preview = document.getElementById('insCapturaPreview');
@@ -1280,21 +1293,22 @@
                 return {
                     Nombres: i.nombres, DNI: i.dni, Celular: i.celular, Correo: i.correo,
                     Lider: i.lider, Sede: i.sede || '-', Curso: i.cursoNombre || curso?.nombre,
-                    'Fecha/Horario': i.fechaHorario || (curso ? `${curso.dia} ${curso.hora}` : '')
+                    'Fecha/Horario': i.fechaHorario || (curso ? `${curso.dia} ${curso.hora}` : ''),
+                    Observaciones: i.observaciones || ''
                 };
             }).sort((a, b) => (a.Curso || '').localeCompare(b.Curso || ''));
 
             const rows = [
                 ['INSCRIPCIONES ESCUELA DE LIDERAZGO 2026'],
                 [],
-                ['Nombres', 'DNI', 'Celular', 'Correo', 'Lider', 'Sede', 'Curso', 'Fecha/Horario'],
-                ...datos.map(d => [d.Nombres, d.DNI, d.Celular, d.Correo, d.Lider, d.Sede, d.Curso, d['Fecha/Horario']])
+                ['Nombres', 'DNI', 'Celular', 'Correo', 'Lider', 'Sede', 'Curso', 'Fecha/Horario', 'Observaciones'],
+                ...datos.map(d => [d.Nombres, d.DNI, d.Celular, d.Correo, d.Lider, d.Sede, d.Curso, d['Fecha/Horario'], d.Observaciones])
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(rows);
 
             // Merge title row
-            ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }];
+            ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }];
 
             // Column widths
             ws['!cols'] = [
@@ -1305,7 +1319,8 @@
                 { wch: 25 }, // Lider
                 { wch: 22 }, // Sede
                 { wch: 28 }, // Curso
-                { wch: 40 }  // Fecha/Horario
+                { wch: 40 }, // Fecha/Horario
+                { wch: 40 }  // Observaciones
             ];
 
             const wb = XLSX.utils.book_new();

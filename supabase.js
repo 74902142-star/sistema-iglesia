@@ -115,7 +115,7 @@
     // Evita que un campo nuevo en un formulario rompa el guardado.
     var TABLE_COLUMNS = {
         registros: ['id', 'fecha', 'sede', 'semana', 'mes', 'totalGeneral', 'totalVarones', 'totalMujeres', 'totalKV', 'totalKM', 'registradoPor', 'origen', 'creadoEn', 'asistentes', 'ministerios'],
-        inscripciones: ['id', 'celular', 'nombres', 'metodoPago', 'pagoCaptura', 'dni', 'timestamp', 'docTipo', 'cursoId', 'correo', 'creadoPor', 'origen', 'cursoNombre', 'estadoPago', 'fechaHorario', 'sede', 'lider', 'monto', 'ciclo'],
+        inscripciones: ['id', 'celular', 'nombres', 'metodoPago', 'pagoCaptura', 'dni', 'timestamp', 'docTipo', 'cursoId', 'correo', 'creadoPor', 'origen', 'cursoNombre', 'estadoPago', 'fechaHorario', 'sede', 'lider', 'monto', 'ciclo', 'observaciones'],
         kids_maestros: ['id', 'lider', 'nombres', 'sexo', 'dni', 'createdAt', 'origen', 'celular'],
         kids_asistencia: ['id', 'fecha', 'timestamp', 'hora', 'maestroId', 'origen'],
         lideres_maestros: ['id', 'lider', 'nombres', 'sexo', 'dni', 'createdAt', 'origen', 'celular'],

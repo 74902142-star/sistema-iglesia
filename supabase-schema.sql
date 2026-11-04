@@ -40,8 +40,11 @@ create table if not exists inscripciones (
   "sede" text,
   "lider" text,
   "monto" integer default 0,
-  "ciclo" text
+  "ciclo" text,
+  "observaciones" text
 );
+-- Si la tabla ya existe, agregar la columna:
+alter table inscripciones add column if not exists "observaciones" text;
 
 create table if not exists kids_maestros (
   "id" text primary key,
