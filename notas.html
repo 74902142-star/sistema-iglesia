@@ -334,9 +334,9 @@
                         (Devocionales · Servicio · Montaña de oración · Versículo) como
                         <b>presentó (1)</b> o <b>no presentó (0)</b>. La nota semanal =
                         (presentados ÷ 4) × 20; el promedio de las sesiones vale <b>40%</b>.<br>
-                        <b>Semanas abiertas:</b> siempre hay <b>2 semanas juntas</b> editables
-                        (la semana impar y la par siguiente). El <b>domingo 11:59 p.m.</b> se cierran ambas
-                        (en blanco = falta o 0) y el lunes se abre la siguiente pareja.<br>
+                        <b>Semana abierta:</b> solo la <b>semana actual</b> es editable.
+                        El <b>domingo 11:59 p.m.</b> se cierra
+                        (en blanco = falta o 0) y el lunes se abre la siguiente.<br>
                         <b>Componentes y pesos:</b> Crecimiento Espiritual (promedio semanal) <b>40%</b> ·
                         Examen Final <b>25%</b> · Trabajo Final <b>20%</b> · Asistencia <b>15%</b>.
                         Las notas van de <b>0 a 20</b> (no hay más) y los campos vacíos de la semana abierta no se cuentan (promedio parcial).<br>
@@ -438,7 +438,10 @@
         let initHecha = false;
         let crecEdit = { key: null, idx: -1 };
         const timersGuardar = {};
-        const INICIO_CICLO = '2026-10-12';
+        // Cursos regulares: semana 3 va del 2 al 8 nov (corrido 2 semanas).
+        const INICIO_CICLO = '2026-10-19';
+        // Escuela para Padres tiene su propio calendario: semana 2 del 2 al 8 nov.
+        const INICIO_POR_CURSO = { sem_padres: '2026-10-26' };
 
         function verCalculo() { return esAdmin; }
 
@@ -513,14 +516,14 @@
         function sesionActual() {
             const hoy = (typeof hoyPeru === 'function' ? hoyPeru() : new Date().toISOString().slice(0, 10));
             const h = hoy.split('-').map(Number);
-            const i = INICIO_CICLO.split('-').map(Number);
+            const i = ((INICIO_POR_CURSO[cursoActual]) || INICIO_CICLO).split('-').map(Number);
             const diff = Math.floor((Date.UTC(h[0], h[1] - 1, h[2]) - Date.UTC(i[0], i[1] - 1, i[2])) / 86400000);
             if (diff < 0) return 1;
             return Math.min(SESIONES, Math.floor(diff / 7) + 1);
         }
 
         function sesionCerrada(idx) {
-            return parDeSesion(idx + 1) < parDeSesion(sesionActual());
+            return (idx + 1) < sesionActual();
         }
         function sesionFutura(idx) { return (idx + 1) > sesionActual(); }
 
@@ -631,18 +634,19 @@
                 document.getElementById('btnExcel').style.display = 'none';
                 document.getElementById('btnGuardarTodo').style.display = 'none';
             }
-            const sem = sesionActual();
-            const par = parDeSesion(sem);
-            const finPar = Math.min(SESIONES, par * 2);
-            const sb = document.getElementById('semanaBadge');
-            sb.textContent = '📅 Semana ' + sem + ' de ' + SESIONES;
-            sb.title = 'Semanas abiertas: ' + (par * 2 - 1) + ' y ' + (par * 2 > SESIONES ? SESIONES : par * 2) +
-                '. Se cierran el domingo al terminar la semana ' + finPar + ' (11:59 p.m.).';
+            actualizarBadgeSemana();
             if (typeof lucide !== 'undefined') lucide.createIcons();
             await cargarCiclo();
             const sel = document.getElementById('selCurso');
             if (sel.value) await cargarCurso();
             pintarIdentidadTutor();
+        }
+
+        function actualizarBadgeSemana() {
+            const sem = sesionActual();
+            const sb = document.getElementById('semanaBadge');
+            sb.textContent = '📅 Semana ' + sem + ' de ' + SESIONES;
+            sb.title = 'Solo la semana ' + sem + ' está abierta. Se cierra el domingo 11:59 p.m.';
         }
 
         function cacheKeyFor(curso) { return 'notas_cache_' + curso; }
@@ -773,6 +777,7 @@
             Object.keys(timersGuardar).forEach(function (k) { clearTimeout(timersGuardar[k]); delete timersGuardar[k]; });
             const id = document.getElementById('selCurso').value;
             cursoActual = id;
+            actualizarBadgeSemana();
             if (!id) {
                 filas = [];
                 document.getElementById('headNotas').innerHTML = '';
@@ -1333,7 +1338,7 @@
                 rows.push(['A = Asistió (20) · T = Llegó Tarde (15) · F = Faltó (0) · 3 tardías = 1 falta']);
                 rows.push(['Crec. Esp.: 4 items presentó(1)/no presentó(0); nota semanal = (presentados/4)*20; promedio de sesiones vale 40%']);
                 rows.push(['Pesos: Crecimiento Espiritual 40% · Examen Final 25% · Trabajo Final 20% · Asistencia 15%']);
-                rows.push(['2 semanas abiertas juntas; se cierran domingo 11:59 p.m. (blanco en cerrada = falta/0)']);
+                rows.push(['1 semana abierta; se cierra domingo 11:59 p.m. (blanco en cerrada = falta/0)']);
                 rows.push(['Con 3 faltas la nota queda en 11.0 · Con más de 3 faltas: Desaprobado · Mínima aprobatoria: 11.0']);
             }
             const ws = XLSX.utils.aoa_to_sheet(rows);
