@@ -1012,8 +1012,9 @@
                 let v = a[i] || '';
                 const cerrada = sesionCerrada(i);
                 if (!v && cerrada) v = 'F';
-                const dis = (!edit || cerrada) ? ' disabled' : '';
-                h += '<td class="td-ses' + (cerrada ? ' sesion-cerrada' : '') + '" style="text-align:center"><select class="asist-sel' + (v ? ' ' + v.toLowerCase() : '') +
+                const bloq = cerrada && !esEditorNotas;   // Jhon edita también las semanas cerradas
+                const dis = (!edit || bloq) ? ' disabled' : '';
+                h += '<td class="td-ses' + (bloq ? ' sesion-cerrada' : '') + '" style="text-align:center"><select class="asist-sel' + (v ? ' ' + v.toLowerCase() : '') +
                     '" data-idx="' + i + '"' + dis + '><option value=""' + (v === '' ? ' selected' : '') + '>—</option>' +
                     '<option' + (v === 'A' ? ' selected' : '') + '>A</option>' +
                     '<option' + (v === 'T' ? ' selected' : '') + '>T</option>' +
@@ -1026,10 +1027,11 @@
                 let etiqueta;
                 if (cerrada) etiqueta = calc ? (n === null ? '0' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, '')) : (item ? '✓' : '0');
                 else etiqueta = calc ? (n === null ? '·' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, '')) : (item ? '✓' : '·');
-                const dis = (!edit || cerrada) ? ' disabled' : '';
-                h += '<td class="td-crec' + (cerrada ? ' sesion-cerrada' : '') + '" style="text-align:center"><button type="button" class="ng-crec-btn' +
+                const bloq = cerrada && !esEditorNotas;
+                const dis = (!edit || bloq) ? ' disabled' : '';
+                h += '<td class="td-crec' + (bloq ? ' sesion-cerrada' : '') + '" style="text-align:center"><button type="button" class="ng-crec-btn' +
                     ((item || cerrada) ? ' full' : ' empty') + '" data-crec-idx="' + i + '"' + dis + ' ' +
-                    'title="Sesión ' + (i + 1) + (cerrada ? ' · cerrada' : ' · presentó 1 / no presentó 0') + '">' + etiqueta + '</button></td>';
+                    'title="Sesión ' + (i + 1) + (bloq ? ' · cerrada' : ' · presentó 1 / no presentó 0') + '">' + etiqueta + '</button></td>';
             }
             CAMPOS_NUM.forEach(function (k) {
                 const v = f[k];
@@ -1104,7 +1106,7 @@
             const f = filaDeEvento(e);
             if (!f) return;
             const idx = +btn.dataset.crecIdx;
-            if (sesionCerrada(idx) || !puedeEditar()) return;
+            if ((sesionCerrada(idx) && !esEditorNotas) || !puedeEditar()) return;
             abrirCrecModal(f, idx);
         });
 
