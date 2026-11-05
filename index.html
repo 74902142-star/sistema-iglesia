@@ -384,7 +384,7 @@
             { email: "jhonfernandezcondor@gmail.com", password: "JSferco18", nombre: "Jhon Smith", rol: "admin" },
             { email: "kperezsuasnabar@gmail.com", password: "72566646", nombre: "Patricia Perez", rol: "admin" },
             // Solo EDL (registrar inscripciones) y ver notas; no edita notas
-            { email: "aguavivavoces@gmail.com", password: "elitas", nombre: "Agua Viva Voces", rol: "voces" }
+            { email: "aguavivavoces@gmail.com", password: "elitas", nombre: "Elizabeth", rol: "voces" }
         ];
 
         // Siempre se sincroniza la lista de usuarios (así los equipos que ya
@@ -455,7 +455,7 @@
                         rol: usuario.rol,
                         sede: usuario.sede || 'admin'
                     }));
-                    mostrarNotificacion('✅ ¡Bienvenido ' + usuario.nombre + '!', 'success');
+                    mostrarNotificacion('✅ ¡' + (usuario.nombre === 'Elizabeth' ? 'Bienvenida ' : 'Bienvenido ') + usuario.nombre + '!', 'success');
                     setTimeout(() => window.location.href = (usuario.rol === 'voces' ? 'edl.html' : 'dashboard.html'), 800);
                 } else {
                     mostrarNotificacion('❌ Correo o contraseña incorrectos', 'error');
