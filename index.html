@@ -375,25 +375,30 @@
         </div>
     </div>
 
-    <script src="auth.js"></script>
+    <script src="auth.js?v=4"></script>
     <script>
         // Init Lucide
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
         const USERS = [
             { email: "jhonfernandezcondor@gmail.com", password: "JSferco18", nombre: "Jhon Smith", rol: "admin" },
-            { email: "kperezsuasnabar@gmail.com", password: "72566646", nombre: "Patricia Perez", rol: "admin" }
+            { email: "kperezsuasnabar@gmail.com", password: "72566646", nombre: "Patricia Perez", rol: "admin" },
+            // Solo EDL (registrar inscripciones) y ver notas; no edita notas
+            { email: "aguavivavoces@gmail.com", password: "elitas", nombre: "Agua Viva Voces", rol: "voces" }
         ];
 
-        if (!localStorage.getItem('iglesia_usuarios')) {
-            localStorage.setItem('iglesia_usuarios', JSON.stringify(USERS));
-        }
+        // Siempre se sincroniza la lista de usuarios (así los equipos que ya
+        // tenían la lista guardada también reciben los usuarios nuevos).
+        localStorage.setItem('iglesia_usuarios', JSON.stringify(USERS));
 
         if (Auth.esAdmin()) {
             window.location.href = 'dashboard.html';
         }
         if (Auth.esInvitado()) {
             window.location.href = 'guest.html';
+        }
+        if (Auth.esVoces()) {
+            window.location.href = 'edl.html';
         }
 
         const adminSection = document.getElementById('adminSection');
@@ -451,7 +456,7 @@
                         sede: usuario.sede || 'admin'
                     }));
                     mostrarNotificacion('✅ ¡Bienvenido ' + usuario.nombre + '!', 'success');
-                    setTimeout(() => window.location.href = 'dashboard.html', 800);
+                    setTimeout(() => window.location.href = (usuario.rol === 'voces' ? 'edl.html' : 'dashboard.html'), 800);
                 } else {
                     mostrarNotificacion('❌ Correo o contraseña incorrectos', 'error');
                     btn.disabled = false;

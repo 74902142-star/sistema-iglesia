@@ -18,6 +18,12 @@ const Auth = {
         return u && u.rol === 'invitado';
     },
 
+    /** Usuario de EDL: registra inscripciones y solo ve notas */
+    esVoces() {
+        const u = this.getUsuario();
+        return u && u.rol === 'voces';
+    },
+
     entrarComoInvitado(nombre) {
         localStorage.setItem('usuarioActual', JSON.stringify({
             rol: 'invitado',
@@ -89,6 +95,20 @@ const Auth = {
     // Por si auth.js se carga después del DOMContentLoaded
     if (document.readyState !== 'loading') reiniciarTimer();
 })();
+
+// Usuario "voces": en el menú solo ve EDL y Registro de Notas + Cerrar Sesión.
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        var u = Auth.getUsuario();
+        if (u && u.rol === 'voces') {
+            ['nav-dashboard', 'nav-registro', 'nav-anfitriones', 'nav-creativos', 'nav-kids',
+             'nav-lideres', 'nav-aula', 'nav-config'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+        }
+    } catch (e) { }
+});
 
 // Invitados: en el menú lateral solo ven el módulo al que entraron
 // (Notas, Ingreso/Conteo o EDL) + Cerrar Sesión. No ven Aula, Kids, etc.

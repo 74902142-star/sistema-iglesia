@@ -58,7 +58,7 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="supabase.js?v=2"></script>
-    <script src="auth.js"></script>
+    <script src="auth.js?v=4"></script>
 </head>
 
 <body>
@@ -229,7 +229,7 @@
                                             <th>Monto</th>
                                             <th>Estado</th>
                                             <th>Método</th>
-                                            <th>Observaciones</th>
+                                            <th class="solo-admin-col">Observaciones</th>
                                             <th>Creado por</th>
                                             <th>Acciones</th>
                                         </tr>
@@ -541,13 +541,19 @@
         if (!usuarioActual) { window.location.href = 'index.html'; }
         const esAdmin = usuarioActual.rol === 'admin';
         const esInvitado = usuarioActual.rol === 'invitado';
-        if (!esAdmin && !esInvitado) { window.location.href = 'index.html'; }
+        const esVoces = usuarioActual.rol === 'voces';   // registra y ve inscripciones; no edita/borra ni ve Observaciones
+        if (!esAdmin && !esInvitado && !esVoces) { window.location.href = 'index.html'; }
         document.getElementById('userName').innerText = esAdmin ? usuarioActual.nombre : usuarioActual.nombre;
-        document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : '👥 Invitado';
+        document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : (esVoces ? '✍️ Inscripciones' : '👥 Invitado');
         document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
 
+        if (esVoces) {
+            var stVoces = document.createElement('style');
+            stVoces.textContent = '.solo-admin-col{display:none !important;}';
+            document.head.appendChild(stVoces);
+        }
         // Show/hide admin and guest sections
-        if (esAdmin) {
+        if (esAdmin || esVoces) {
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
             document.querySelectorAll('.guest-only').forEach(el => el.style.display = 'none');
         } else if (esInvitado) {
@@ -686,12 +692,12 @@
             // Lista para invitados (y base del admin): ciclo actual, solo abiertos para invitados
             const lista = [];
             cursosDe(CICLO_ACTUAL).forEach(c => {
-                if (!esAdmin && cursoCerrado(c)) return;   // solo invitados: cerró al terminar su 2ª clase
+                if (!esAdmin && !esVoces && cursoCerrado(c)) return;   // solo invitados: cerró al terminar su 2ª clase
                 abiertos++;
                 lista.push({ c: c, etiqueta: c.nombre });
             });
             // Admin: también los cursos de ciclos anteriores que no estén en el actual
-            if (esAdmin) {
+            if (esAdmin || esVoces) {
                 const ids = {};
                 lista.forEach(x => { ids[x.c.id] = true; });
                 Object.keys(CURSOS_POR_CICLO).forEach(ciclo => {
@@ -1100,15 +1106,15 @@
                             ${metodo} ${capturaHtml}
                         </div>
                     </td>
-                    <td style="min-width:160px;max-width:260px;white-space:normal;"><span style="font-size:11.5px;color:var(--text-primary);" title="${escAttr(i.observaciones || '')}">${i.observaciones ? escHtml(i.observaciones) : '<span style="color:var(--text-secondary);">-</span>'}</span></td>
+                    <td class="solo-admin-col" style="min-width:160px;max-width:260px;white-space:normal;"><span style="font-size:11.5px;color:var(--text-primary);" title="${escAttr(i.observaciones || '')}">${i.observaciones ? escHtml(i.observaciones) : '<span style="color:var(--text-secondary);">-</span>'}</span></td>
                     <td><span style="font-size:11.5px;color:var(--text-secondary);">${i.creadoPor || '-'}</span></td>
-                    <td>
+                    <td>${esVoces ? '<span style="font-size:11px;color:var(--text-secondary);">Solo lectura</span>' : `
                         <button class="action-btn btn-edit btn" style="padding:6px;border-radius:6px;" onclick="editarInscripcion('${i.id}')" title="Editar"><i data-lucide="edit" style="width:14px;height:14px;"></i></button>
                         ${i.estadoPago === 'Canceló'
                             ? `<button class="action-btn btn-cancel btn" style="padding:6px;border-radius:6px;" onclick="toggleEstadoPago('${i.id}','Debe')" title="Cancelar inscripción"><i data-lucide="x-circle" style="width:14px;height:14px;"></i></button>`
                             : `<button class="action-btn btn-ok btn" style="padding:6px;border-radius:6px;" onclick="toggleEstadoPago('${i.id}','Canceló')" title="Confirmar inscripción"><i data-lucide="check-circle" style="width:14px;height:14px;"></i></button>`
                         }
-                        <button class="action-btn btn-del btn" style="padding:6px;border-radius:6px;" onclick="eliminarInscripcion('${i.id}')" title="Eliminar"><i data-lucide="trash" style="width:14px;height:14px;"></i></button>
+                        <button class="action-btn btn-del btn" style="padding:6px;border-radius:6px;" onclick="eliminarInscripcion('${i.id}')" title="Eliminar"><i data-lucide="trash" style="width:14px;height:14px;"></i></button>`}
                     </td>
                 </tr>`;
             }).join('');
@@ -1172,7 +1178,7 @@
                     estadoPago: document.getElementById('insEstado').value,
                     metodoPago: document.getElementById('insMetodoPago').value || '',
                     pagoCaptura: pagoCaptura,
-                    observaciones: document.getElementById('insObservaciones').value.trim(),
+                    observaciones: esAdmin ? document.getElementById('insObservaciones').value.trim() : '',
                     ciclo: CICLO_ACTUAL,
                     creadoPor: usuarioActual ? usuarioActual.nombre : 'Admin',
                     timestamp: new Date().toISOString()
@@ -1212,6 +1218,7 @@
         });
 
         function abrirModal() {
+            document.getElementById('insObservacionesGroup').style.display = esAdmin ? '' : 'none';
             editandoId = null;
             document.getElementById('formInscripcion').reset();
             document.getElementById('insEstado').value = 'Debe';
@@ -1229,6 +1236,7 @@
         }
 
         async function editarInscripcion(id) {
+            if (!esAdmin) return;
             const i = await firestoreGetDoc('inscripciones', id);
             editandoId = id;
             document.getElementById('insNombres').value = i.nombres;
@@ -1266,6 +1274,7 @@
         }
 
         async function eliminarInscripcion(id) {
+            if (!esAdmin) return;
             if (confirm('¿Eliminar esta inscripción?')) {
                 try {
                     await firestoreDeleteDoc('inscripciones', id);
@@ -1278,6 +1287,7 @@
         }
 
         async function toggleEstadoPago(id, nuevoEstado) {
+            if (!esAdmin) return;
             try {
                 await firestoreUpdateDoc('inscripciones', id, { estadoPago: nuevoEstado });
             } catch(e) { console.warn('Update Supabase failed, updating locally'); }
@@ -1296,7 +1306,7 @@
                     Nombres: i.nombres, DNI: i.dni, Celular: i.celular, Correo: i.correo,
                     Lider: i.lider, Sede: i.sede || '-', Curso: i.cursoNombre || curso?.nombre,
                     'Fecha/Horario': i.fechaHorario || (curso ? `${curso.dia} ${curso.hora}` : ''),
-                    Observaciones: i.observaciones || ''
+                    Observaciones: esVoces ? '' : (i.observaciones || '')
                 };
             }).sort((a, b) => (a.Curso || '').localeCompare(b.Curso || ''));
 

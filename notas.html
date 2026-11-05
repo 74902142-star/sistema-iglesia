@@ -187,7 +187,7 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="supabase.js?v=2"></script>
-    <script src="auth.js"></script>
+    <script src="auth.js?v=4"></script>
 </head>
 
 <body>
@@ -372,10 +372,14 @@
         if (!usuarioActual) { window.location.href = 'index.html'; }
         const esAdmin = usuarioActual.rol === 'admin';
         const esInvitado = usuarioActual.rol === 'invitado';
-        if (!esAdmin && !esInvitado) { window.location.href = 'index.html'; }
+        const esVoces = usuarioActual.rol === 'voces';           // solo ve notas, no edita
+        const EMAIL_EDITOR_NOTAS = 'jhonfernandezcondor@gmail.com'; // único admin que edita notas
+        const esEditorNotas = esAdmin && (usuarioActual.email || '').toLowerCase() === EMAIL_EDITOR_NOTAS;
+        const verTodo = esAdmin || esVoces;                      // ve todos los cursos y los cálculos
+        if (!esAdmin && !esInvitado && !esVoces) { window.location.href = 'index.html'; }
 
         document.getElementById('userName').innerText = usuarioActual.nombre || '—';
-        document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : '👥 Invitado';
+        document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : (esVoces ? '👁️ Solo lectura' : '👥 Invitado');
         document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
 
         const PASS_MODULO = 'AguaViva2026';
@@ -443,7 +447,7 @@
         // Escuela para Padres tiene su propio calendario: semana 2 del 2 al 8 nov.
         const INICIO_POR_CURSO = { sem_padres: '2026-10-26' };
 
-        function verCalculo() { return esAdmin; }
+        function verCalculo() { return verTodo; }
 
         function normNombre(s) {
             return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
@@ -501,14 +505,19 @@
         }
 
         function esTutorDe(cursoId, nombre) {
-            if (esAdmin) return true;
+            if (verTodo) return false;   // admin/voces no se validan como tutor (ver puedeEditar)
             const nom = nombre !== undefined ? nombre : usuarioActual.nombre;
             const lista = TUTORES[cursoId] || [];
             return lista.some(function (e) { return nombreMatchea(e, nom); });
         }
 
+        // Admin/voces: ¿pueden editar en general? (para ocultar botones de guardar)
+        function puedeEditarNotasGlobal() { return verTodo ? esEditorNotas : true; }
+
         function puedeEditar() {
-            return esAdmin || esTutorDe(cursoActual, nombreTutor || usuarioActual.nombre);
+            if (esAdmin) return esEditorNotas;   // solo Jhon edita notas
+            if (esVoces) return false;           // solo lectura
+            return esTutorDe(cursoActual, nombreTutor || usuarioActual.nombre);
         }
 
         function parDeSesion(n) { return Math.ceil(n / 2); }
@@ -558,7 +567,7 @@
                 document.getElementById('notasPasswordInput').focus();
                 return;
             }
-            if (!esAdmin) {
+            if (!verTodo) {
                 const nom = document.getElementById('notasTutorInput').value.trim();
                 if (!nom) {
                     document.getElementById('notasPasswordError').style.display = 'block';
@@ -634,6 +643,10 @@
                 document.getElementById('btnExcel').style.display = 'none';
                 document.getElementById('btnGuardarTodo').style.display = 'none';
             }
+            if (!puedeEditarNotasGlobal()) {
+                document.getElementById('btnAgregar').style.display = 'none';
+                document.getElementById('btnGuardarTodo').style.display = 'none';
+            }
             actualizarBadgeSemana();
             if (typeof lucide !== 'undefined') lucide.createIcons();
             await cargarCiclo();
@@ -653,7 +666,7 @@
         function cicloCacheKey() { return 'notas_ciclo_' + CICLO; }
 
         function listaCursosTutor() {
-            if (esAdmin) return CURSOS.slice();
+            if (verTodo) return CURSOS.slice();
             const nom = nombreTutor || usuarioActual.nombre;
             return cursosDeTutor(nom);
         }
@@ -663,7 +676,7 @@
             const campo = document.getElementById('campoCurso');
             let lista = listaCursosTutor();
             // Tutor invitado con curso preseleccionado: solo ese
-            if (cursoPreseleccionado && !esAdmin) {
+            if (cursoPreseleccionado && !verTodo) {
                 lista = lista.filter(function (c) { return c.id === cursoPreseleccionado; });
                 if (lista.length) {
                     cursoActual = lista[0].id;
@@ -688,14 +701,14 @@
         function pintarIdentidadTutor() {
             const el = document.getElementById('tutorBadge');
             if (!el) return;
-            if (esAdmin) {
-                el.innerHTML = '👑 ' + esc(usuarioActual.nombre || 'Admin');
-                el.className = 'ng-badge ok';
+            if (verTodo) {
+                el.innerHTML = (esVoces ? '👁️ ' : '👑 ') + esc(usuarioActual.nombre || 'Admin') + (puedeEditarNotasGlobal() ? '' : ' · solo lectura');
+                el.className = puedeEditarNotasGlobal() ? 'ng-badge ok' : 'ng-badge info';
                 return;
             }
             const lista = listaCursosTutor();
             const nom = nombreTutor || usuarioActual.nombre || '';
-            const visibles = (cursoPreseleccionado && !esAdmin)
+            const visibles = (cursoPreseleccionado && !verTodo)
                 ? lista.filter(function (c) { return c.id === cursoPreseleccionado; })
                 : lista;
             if (visibles.length === 1) {
@@ -745,7 +758,7 @@
             const actual = sel.value;
             let lista = listaCursosTutor();
             // Invitado con curso preseleccionado: solo ese
-            if (cursoPreseleccionado && !esAdmin) {
+            if (cursoPreseleccionado && !verTodo) {
                 lista = lista.filter(function (c) { return c.id === cursoPreseleccionado; });
                 if (lista.length) cursoActual = lista[0].id;
             }
@@ -1233,6 +1246,7 @@
         }
 
         async function guardarFila(f) {
+            if (!puedeEditar()) return;   // solo lectura: nunca escribe
             const r = filaARegistro(f);
             guardarLocal(r);
             try {
@@ -1270,6 +1284,7 @@
         }
 
         function agregarManual() {
+            if (!puedeEditar()) { toast('No tienes permiso para editar notas', 'warning'); return; }
             const nom = document.getElementById('manualNombres').value.trim();
             const dni = document.getElementById('manualDni').value.trim();
             if (!cursoActual) { toast('Elige un curso primero', 'error'); return; }
@@ -1382,7 +1397,7 @@
             });
         }
 
-        if (esAdmin) {
+        if (verTodo) {
             iniciarModulo();
         } else {
             document.getElementById('gateTutorBox').style.display = 'block';
