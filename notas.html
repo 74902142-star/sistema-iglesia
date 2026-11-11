@@ -280,11 +280,28 @@
                         <span id="semanaBadge" class="ng-badge warn">📅 Semana —</span>
                         <div class="ng-actions">
                             <span id="syncBadge" class="ng-badge ok">✓ Sincronizado</span>
+                            <button class="ng-btn ng-btn-soft" id="btnModoEditor" onclick="alternarModoEditor()" style="display:none" title="Cambiar la semana abierta de un curso"><i data-lucide="settings-2" style="width:15px;height:15px;"></i> Modo editor</button>
                             <button class="ng-btn ng-btn-soft" id="btnActualizar" onclick="actualizarLista()" title="Volver a bajar la lista de inscritos y las notas"><i data-lucide="refresh-cw" style="width:15px;height:15px;"></i> Actualizar</button>
                             <button class="ng-btn ng-btn-soft" id="btnAgregar" onclick="alternarManual()"><i data-lucide="user-plus" style="width:15px;height:15px;"></i> Agregar alumno</button>
                             <button class="ng-btn ng-btn-soft" id="btnExcel" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width:15px;height:15px;"></i> Excel</button>
                             <button class="ng-btn ng-btn-primary" id="btnGuardarTodo" onclick="guardarTodo()"><i data-lucide="save" style="width:15px;height:15px;"></i> Guardar todo</button>
                         </div>
+                    </div>
+
+                    <div class="ng-manual" id="editorPanel" style="border-color:#f59e0b;background:#fffbeb">
+                        <div class="ng-field">
+                            <label for="edCurso">Curso</label>
+                            <select id="edCurso" style="min-width:290px" onchange="edActualizarInfo()"></select>
+                        </div>
+                        <div class="ng-field">
+                            <label for="edSemana">Semana que debe estar abierta</label>
+                            <select id="edSemana" style="min-width:150px"></select>
+                        </div>
+                        <button class="ng-btn ng-btn-primary" onclick="edAplicar()">Aplicar</button>
+                        <button class="ng-btn ng-btn-soft" onclick="edRestablecer()" title="Quita el ajuste y vuelve al calendario normal">Calendario normal</button>
+                        <button class="ng-btn ng-btn-soft" onclick="alternarModoEditor()">Salir del modo editor</button>
+                        <div id="edInfo" style="flex-basis:100%;font-size:12.5px;color:#92400e"></div>
+                        <div style="flex-basis:100%;font-size:12px;color:#78716c">Solo reabre esa semana (no borra notas). Desde hoy el curso avanza solo cada lunes a partir de la semana elegida. Las semanas anteriores quedan cerradas.</div>
                     </div>
 
                     <div class="ng-manual" id="manualBox">
@@ -522,10 +539,25 @@
 
         function parDeSesion(n) { return Math.ceil(n / 2); }
 
+        // Ajustes hechos desde el "Modo editor" (tabla config_notas): curso -> fecha de inicio
+        let CONFIG_INICIOS = {};
+        try { CONFIG_INICIOS = JSON.parse(localStorage.getItem('notas_config_inicios') || '{}') || {}; } catch (e) { CONFIG_INICIOS = {}; }
+        function inicioDe(curso) { return CONFIG_INICIOS[curso] || INICIO_POR_CURSO[curso] || INICIO_CICLO; }
+
+        async function cargarConfig() {
+            try {
+                const rows = await SB.select('config_notas', {});
+                const m = {};
+                rows.forEach(function (r) { if (r.cursoId && r.inicio) m[r.cursoId] = r.inicio; });
+                CONFIG_INICIOS = m;
+                localStorage.setItem('notas_config_inicios', JSON.stringify(m));
+            } catch (e) { console.warn('config_notas:', e && e.message || e); }
+        }
+
         function sesionActual() {
             const hoy = (typeof hoyPeru === 'function' ? hoyPeru() : new Date().toISOString().slice(0, 10));
             const h = hoy.split('-').map(Number);
-            const i = ((INICIO_POR_CURSO[cursoActual]) || INICIO_CICLO).split('-').map(Number);
+            const i = inicioDe(cursoActual).split('-').map(Number);
             const diff = Math.floor((Date.UTC(h[0], h[1] - 1, h[2]) - Date.UTC(i[0], i[1] - 1, i[2])) / 86400000);
             if (diff < 0) return 1;
             return Math.min(SESIONES, Math.floor(diff / 7) + 1);
@@ -647,6 +679,8 @@
                 document.getElementById('btnAgregar').style.display = 'none';
                 document.getElementById('btnGuardarTodo').style.display = 'none';
             }
+            if (esEditorNotas) document.getElementById('btnModoEditor').style.display = '';
+            await cargarConfig();
             actualizarBadgeSemana();
             if (typeof lucide !== 'undefined') lucide.createIcons();
             await cargarCiclo();
@@ -780,7 +814,84 @@
             pintarIdentidadTutor();
         }
 
+        // ───────── Modo editor (solo Jhon): semana abierta por curso ─────────
+        function lunesDeHoy() {
+            const h = hoyPeru().split('-').map(Number);
+            const d = new Date(Date.UTC(h[0], h[1] - 1, h[2]));
+            const dow = (d.getUTCDay() + 6) % 7;   // lunes = 0
+            d.setUTCDate(d.getUTCDate() - dow);
+            return d;
+        }
+        function semanaDeCurso(id) {
+            const prev = cursoActual; cursoActual = id;
+            const n = sesionActual(); cursoActual = prev;
+            return n;
+        }
+        function edActualizarInfo() {
+            const id = document.getElementById('edCurso').value;
+            if (!id) return;
+            const aj = CONFIG_INICIOS[id] ? ' (ajustada desde el Modo editor)' : '';
+            document.getElementById('edInfo').textContent = 'Hoy este curso está en la semana ' + semanaDeCurso(id) + ' de ' + SESIONES + aj + '.';
+            document.getElementById('edSemana').value = String(semanaDeCurso(id));
+        }
+        function alternarModoEditor() {
+            if (!esEditorNotas) return;
+            const p = document.getElementById('editorPanel');
+            if (p.classList.contains('show')) { p.classList.remove('show'); return; }
+            if (!confirm('¿Activar el Modo editor?\n\nPodrás cambiar la semana abierta de un curso. Se apaga solo al salir de la página.')) return;
+            const sc = document.getElementById('edCurso');
+            sc.innerHTML = CURSOS.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + '</option>'; }).join('');
+            if (cursoActual) sc.value = cursoActual;
+            let w = ''; for (let i = 1; i <= SESIONES; i++) w += '<option value="' + i + '">Semana ' + i + '</option>';
+            document.getElementById('edSemana').innerHTML = w;
+            p.classList.add('show');
+            edActualizarInfo();
+        }
+        async function edGuardarInicio(id, inicio, semana) {
+            const nombreCurso = (CURSOS.find(function (c) { return c.id === id; }) || {}).nombre || id;
+            if (inicio) {
+                await SB.request('/rest/v1/config_notas?on_conflict=id', {
+                    method: 'POST',
+                    headers: { 'Prefer': 'resolution=merge-duplicates' },
+                    body: JSON.stringify({ id: id, cursoId: id, inicio: inicio, semana: semana, actualizado: new Date().toISOString(), actualizadoPor: usuarioActual.email || usuarioActual.nombre })
+                });
+                CONFIG_INICIOS[id] = inicio;
+            } else {
+                await SB.request('/rest/v1/config_notas?id=eq.' + encodeURIComponent(id), { method: 'DELETE' });
+                delete CONFIG_INICIOS[id];
+            }
+            localStorage.setItem('notas_config_inicios', JSON.stringify(CONFIG_INICIOS));
+            actualizarBadgeSemana();
+            if (cursoActual) await cargarCurso();
+            edActualizarInfo();
+            return nombreCurso;
+        }
+        async function edAplicar() {
+            if (!esEditorNotas) return;
+            const id = document.getElementById('edCurso').value;
+            const n = +document.getElementById('edSemana').value;
+            const nombre = (CURSOS.find(function (c) { return c.id === id; }) || {}).nombre || id;
+            if (!id || !n) return;
+            if (!confirm('¿Poner "' + nombre + '" en la semana ' + n + ' desde hoy?\n\nSolo esa semana quedará abierta; las anteriores se cierran. No se borra ninguna nota.')) return;
+            const ini = lunesDeHoy();
+            ini.setUTCDate(ini.getUTCDate() - (n - 1) * 7);
+            try {
+                await edGuardarInicio(id, ini.toISOString().slice(0, 10), n);
+                toast('✅ ' + nombre + ': semana ' + n + ' abierta', 'success');
+            } catch (e) { toast('❌ No se pudo guardar el cambio: ' + (e && e.message || e), 'error'); }
+        }
+        async function edRestablecer() {
+            if (!esEditorNotas) return;
+            const id = document.getElementById('edCurso').value;
+            if (!id) return;
+            if (!CONFIG_INICIOS[id]) { toast('Ese curso ya sigue el calendario normal', 'warning'); return; }
+            if (!confirm('¿Quitar el ajuste y volver al calendario normal de este curso?')) return;
+            try { await edGuardarInicio(id, null, null); toast('✅ Calendario normal restablecido', 'success'); }
+            catch (e) { toast('❌ No se pudo guardar el cambio: ' + (e && e.message || e), 'error'); }
+        }
+
         async function actualizarLista() {
+            await cargarConfig();
             await cargarCiclo();
             if (cursoActual) await cargarCurso();
             toast('🔄 Lista actualizada: ' + inscritosDe(cursoActual).length + ' alumnos en este curso');

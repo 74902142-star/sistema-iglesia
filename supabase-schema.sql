@@ -157,3 +157,17 @@ end $$;
 
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
+
+-- Modo editor de Registro de Notas: ajuste de la fecha de inicio (semana abierta) por curso
+create table if not exists config_notas (
+  "id" text primary key,
+  "cursoId" text,
+  "inicio" text,
+  "semana" integer,
+  "actualizado" text,
+  "actualizadoPor" text
+);
+alter table config_notas enable row level security;
+drop policy if exists "public_access" on config_notas;
+create policy "public_access" on config_notas for all to anon, authenticated using (true) with check (true);
+grant all on config_notas to anon, authenticated, service_role;
