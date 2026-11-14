@@ -186,9 +186,9 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="supabase.js?v=2"></script>
-    <script src="auth.js?v=4"></script>
-    <link rel="stylesheet" href="theme.css?v=1">
+    <script src="supabase.js?v=3"></script>
+    <script src="auth.js?v=5"></script>
+    <link rel="stylesheet" href="theme.css?v=16">
 </head>
 
 <body>
@@ -245,7 +245,7 @@
                 <div id="notasGate" style="display:none;">
                     <div class="ng-gate-card">
                         <img src="logo.png" alt="Agua Viva">
-                        <h2>🔒 Registro de Notas</h2>
+                        <h2>Registro de Notas</h2>
                         <p id="gateHint">Escribe tu nombre y un apellido</p>
                         <div id="gateTutorBox" style="display:none; margin-bottom:14px;">
                             <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;text-align:left;">Tu nombre y un apellido</label>
@@ -258,7 +258,7 @@
                         <input type="password" id="notasPasswordInput" class="ng-pass-input" placeholder="••••••••"
                             onkeydown="if(event.key==='Enter')verificarPasswordNotas()">
                         <button class="ng-pass-btn" onclick="verificarPasswordNotas()">Ingresar</button>
-                        <p id="notasPasswordError" class="ng-pass-error">❌ Contraseña o nombre incorrecto</p>
+                        <p id="notasPasswordError" class="ng-pass-error">Contraseña o nombre incorrecto</p>
                     </div>
                 </div>
 
@@ -267,7 +267,7 @@
                         <div class="ng-hero-icon"><i data-lucide="clipboard-check" style="width:38px;height:38px;color:#fff;"></i></div>
                         <div>
                             <h1>Registro de Notas</h1>
-                            <p>Asistencia y Crecimiento (presentó/no presentó) semana a semana · Trabajo · Examen — ciclo 202620</p>
+                            <p>Asistencia y crecimiento espiritual, semana tras semana · Trabajo · Examen · Ciclo 202620</p>
                         </div>
                     </div>
 
@@ -277,8 +277,8 @@
                             <select id="selCurso" style="min-width:310px"></select>
                         </div>
                         <span id="tutorBadge" class="ng-badge info">—</span>
-                        <span id="cicloBadge" class="ng-badge info">👥 Cargando lista del ciclo…</span>
-                        <span id="semanaBadge" class="ng-badge warn">📅 Semana —</span>
+                        <span id="cicloBadge" class="ng-badge info">Cargando lista del ciclo…</span>
+                        <span id="semanaBadge" class="ng-badge warn">Semana —</span>
                         <div class="ng-actions">
                             <span id="syncBadge" class="ng-badge ok">✓ Sincronizado</span>
                             <button class="ng-btn ng-btn-soft" id="btnModoEditor" onclick="alternarModoEditor()" style="display:none" title="Cambiar la semana abierta de un curso"><i data-lucide="settings-2" style="width:15px;height:15px;"></i> Modo editor</button>
@@ -289,20 +289,49 @@
                         </div>
                     </div>
 
-                    <div class="ng-manual" id="editorPanel" style="border-color:#f59e0b;background:#fffbeb">
-                        <div class="ng-field">
-                            <label for="edCurso">Curso</label>
-                            <select id="edCurso" style="min-width:290px" onchange="edActualizarInfo()"></select>
+                    <div class="ng-manual" id="editorPanel">
+                        <div class="ed-head">
+                            <h4><i data-lucide="sliders-horizontal" style="width:18px;height:18px;"></i> Modo editor</h4>
+                            <button class="ng-btn ng-btn-soft" onclick="alternarModoEditor()">Salir del modo editor</button>
                         </div>
-                        <div class="ng-field">
-                            <label for="edSemana">Semana que debe estar abierta</label>
-                            <select id="edSemana" style="min-width:150px"></select>
+
+                        <div class="ed-bloque">
+                            <h5>Habilitar semanas cerradas</h5>
+                            <p class="ed-ayuda">Elige a quién y qué semanas vuelven a poder editarse. Las demás siguen cerradas. No se borra ninguna nota.</p>
+                            <div class="ed-fila">
+                                <div class="ng-field">
+                                    <label for="habCurso">Para</label>
+                                    <select id="habCurso" style="min-width:290px" onchange="habPintar()"></select>
+                                </div>
+                                <div class="ng-field" style="flex:1 1 320px">
+                                    <label>Semanas habilitadas</label>
+                                    <div id="habSemanas" class="hab-chips" role="group" aria-label="Semanas habilitadas"></div>
+                                </div>
+                            </div>
+                            <div class="ed-fila">
+                                <button class="ng-btn ng-btn-primary" onclick="habAplicar('guardar')"><i data-lucide="lock-open" style="width:15px;height:15px;"></i> Aplicar habilitación</button>
+                                <button class="ng-btn ng-btn-soft" onclick="habAplicar('todas')">Habilitar todas las semanas</button>
+                                <button class="ng-btn ng-btn-soft" onclick="habAplicar('ninguna')">Cerrar todas</button>
+                            </div>
+                            <div id="habInfo" class="ed-info"></div>
                         </div>
-                        <button class="ng-btn ng-btn-primary" onclick="edAplicar()">Aplicar</button>
-                        <button class="ng-btn ng-btn-soft" onclick="edRestablecer()" title="Quita el ajuste y vuelve al calendario normal">Calendario normal</button>
-                        <button class="ng-btn ng-btn-soft" onclick="alternarModoEditor()">Salir del modo editor</button>
-                        <div id="edInfo" style="flex-basis:100%;font-size:12.5px;color:#92400e"></div>
-                        <div style="flex-basis:100%;font-size:12px;color:#78716c">Solo reabre esa semana (no borra notas). Desde hoy el curso avanza solo cada lunes a partir de la semana elegida. Las semanas anteriores quedan cerradas.</div>
+
+                        <div class="ed-bloque">
+                            <h5>Semana abierta de cada curso</h5>
+                            <div class="ed-fila">
+                                <div class="ng-field">
+                                    <label for="edCurso">Curso</label>
+                                    <select id="edCurso" style="min-width:290px" onchange="edActualizarInfo()"></select>
+                                </div>
+                                <div class="ng-field">
+                                    <label for="edSemana">Semana que debe estar abierta</label>
+                                    <select id="edSemana" style="min-width:150px"></select>
+                                </div>
+                                <button class="ng-btn ng-btn-primary" onclick="edAplicar()">Aplicar</button>
+                                <button class="ng-btn ng-btn-soft" onclick="edRestablecer()" title="Quita el ajuste y vuelve al calendario normal">Calendario normal</button>
+                            </div>
+                            <div id="edInfo" class="ed-info"></div>
+                        </div>
                     </div>
 
                     <div class="ng-manual" id="manualBox">
@@ -342,7 +371,7 @@
                     </div>
 
                     <div class="ng-legend" id="legendBox">
-                        <h4>📘 ¿Cómo se calcula la nota?</h4>
+                        <h4>¿Cómo se calcula la nota?</h4>
                         <b>Asistencia (9 sesiones):</b>
                         <span class="tag tag-a">A = Asistió (20)</span>
                         <span class="tag tag-t">T = Llegó Tarde (15)</span>
@@ -370,7 +399,7 @@
 
     <div class="ng-crec-modal" id="crecModal">
         <div class="ng-crec-card">
-            <h3>🌱 Crecimiento Espiritual</h3>
+            <h3>Crecimiento Espiritual</h3>
             <p class="sub" id="crecModalSub">Alumno · Sesión</p>
             <p class="sub" style="margin:-8px 0 14px;">¿Presentó? (1 = sí, 0 = no)</p>
             <div class="ng-crec-row"><label for="crecDev">Devocionales</label><input type="checkbox" id="crecDev" class="ng-ck"></div>
@@ -397,7 +426,7 @@
         if (!esAdmin && !esInvitado && !esVoces) { window.location.href = 'index.html'; }
 
         document.getElementById('userName').innerText = usuarioActual.nombre || '—';
-        document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : (esVoces ? '👁️ Solo lectura' : '👥 Invitado');
+        document.getElementById('userRole').innerText = esAdmin ? 'Administrador' : (esVoces ? 'Solo lectura' : 'Invitado');
         document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
 
         const PASS_MODULO = 'AguaViva2026';
@@ -543,6 +572,10 @@
         // Ajustes hechos desde el "Modo editor" (tabla config_notas): curso -> fecha de inicio
         let CONFIG_INICIOS = {};
         try { CONFIG_INICIOS = JSON.parse(localStorage.getItem('notas_config_inicios') || '{}') || {}; } catch (e) { CONFIG_INICIOS = {}; }
+        // Semanas cerradas que Jhon vuelve a habilitar (tabla notas_habilitadas): curso -> [números de semana]
+        let HABILITADAS = {};
+        try { HABILITADAS = JSON.parse(localStorage.getItem('notas_habilitadas') || '{}') || {}; } catch (e) { HABILITADAS = {}; }
+        function semanaHabilitada(idx) { return (HABILITADAS[cursoActual] || []).indexOf(idx + 1) !== -1; }
         function inicioDe(curso) { return CONFIG_INICIOS[curso] || INICIO_POR_CURSO[curso] || INICIO_CICLO; }
 
         async function cargarConfig() {
@@ -553,6 +586,13 @@
                 CONFIG_INICIOS = m;
                 localStorage.setItem('notas_config_inicios', JSON.stringify(m));
             } catch (e) { console.warn('config_notas:', e && e.message || e); }
+            try {
+                const hr = await SB.select('notas_habilitadas', {});
+                const h = {};
+                hr.forEach(function (r) { try { const a = JSON.parse(r.semanas || '[]'); if (r.cursoId && a.length) h[r.cursoId] = a; } catch (e) { } });
+                HABILITADAS = h;
+                localStorage.setItem('notas_habilitadas', JSON.stringify(h));
+            } catch (e) { console.warn('notas_habilitadas:', e && e.message || e); }
         }
 
         function sesionActual() {
@@ -604,14 +644,14 @@
                 const nom = document.getElementById('notasTutorInput').value.trim();
                 if (!nom) {
                     document.getElementById('notasPasswordError').style.display = 'block';
-                    document.getElementById('notasPasswordError').textContent = '❌ Escribe tu nombre y un apellido';
+                    document.getElementById('notasPasswordError').textContent = ' Escribe tu nombre y un apellido';
                     document.getElementById('notasTutorInput').focus();
                     return;
                 }
                 const cursos = cursosDeTutor(nom);
                 if (!cursos.length) {
                     document.getElementById('notasPasswordError').style.display = 'block';
-                    document.getElementById('notasPasswordError').textContent = '❌ Nombre no registrado como tutor';
+                    document.getElementById('notasPasswordError').textContent = ' Nombre no registrado como tutor';
                     document.getElementById('notasTutorInput').focus();
                     return;
                 }
@@ -693,7 +733,7 @@
         function actualizarBadgeSemana() {
             const sem = sesionActual();
             const sb = document.getElementById('semanaBadge');
-            sb.textContent = '📅 Semana ' + sem + ' de ' + SESIONES;
+            sb.textContent = 'Semana ' + sem + ' de ' + SESIONES;
             sb.title = 'Solo la semana ' + sem + ' está abierta. Se cierra el domingo 11:59 p.m.';
         }
 
@@ -737,7 +777,7 @@
             const el = document.getElementById('tutorBadge');
             if (!el) return;
             if (verTodo) {
-                el.innerHTML = (esVoces ? '👁️ ' : '👑 ') + esc(usuarioActual.nombre || 'Admin') + (puedeEditarNotasGlobal() ? '' : ' · solo lectura');
+                el.innerHTML = (esVoces ? ' ' : ' ') + esc(usuarioActual.nombre || 'Admin') + (puedeEditarNotasGlobal() ? '' : ' · solo lectura');
                 el.className = puedeEditarNotasGlobal() ? 'ng-badge ok' : 'ng-badge info';
                 return;
             }
@@ -747,14 +787,14 @@
                 ? lista.filter(function (c) { return c.id === cursoPreseleccionado; })
                 : lista;
             if (visibles.length === 1) {
-                el.innerHTML = '📘 ' + esc(visibles[0].nombre) + ' · 👤 ' + esc(nom);
+                el.innerHTML = ' ' + esc(visibles[0].nombre) + ' ·  ' + esc(nom);
                 el.className = 'ng-badge info';
                 el.title = 'Solo puedes editar este curso.';
             } else if (visibles.length > 1) {
-                el.innerHTML = '👤 ' + esc(nom) + ' · ' + visibles.length + ' cursos';
+                el.innerHTML = ' ' + esc(nom) + ' · ' + visibles.length + ' cursos';
                 el.className = 'ng-badge info';
             } else {
-                el.innerHTML = '🔒 Sin cursos asignados';
+                el.innerHTML = ' Sin cursos asignados';
                 el.className = 'ng-badge warn';
             }
         }
@@ -785,7 +825,7 @@
             const total = inscripcionesCiclo.filter(function (r) { return r.cursoId && (r.nombres || '').trim(); }).length;
             const el = document.getElementById('cicloBadge');
             el.className = 'ng-badge ' + (cicloOk ? 'info' : 'warn');
-            el.innerHTML = cicloOk ? '👥 ' + total + ' alumnos en el ciclo ' + CICLO : '⚠ Lista local (' + total + ')';
+            el.innerHTML = cicloOk ? total + ' alumnos en el ciclo ' + CICLO : 'Lista local (' + total + ')';
             el.title = cicloOk
                 ? 'Lista tomada de las inscripciones EDL del ciclo ' + CICLO + '. Pulsa Actualizar para refrescar.'
                 : 'Sin conexión con Supabase: se muestra la última lista guardada en este equipo.';
@@ -835,18 +875,83 @@
             document.getElementById('edInfo').textContent = 'Hoy este curso está en la semana ' + semanaDeCurso(id) + ' de ' + SESIONES + aj + '.';
             document.getElementById('edSemana').value = String(semanaDeCurso(id));
         }
+
+        // ── Habilitar semanas cerradas (solo Jhon) ──
+        let habSeleccion = [];
+        function habCursosDe(alcance) { return alcance === '*' ? CURSOS.map(function (c) { return c.id; }) : [alcance]; }
+        function habPintar() {
+            const alcance = document.getElementById('habCurso').value;
+            const ids = habCursosDe(alcance);
+            // Una semana aparece marcada si está habilitada en todos los cursos del alcance
+            habSeleccion = [];
+            for (let s = 1; s <= SESIONES; s++) {
+                if (ids.length && ids.every(function (id) { return (HABILITADAS[id] || []).indexOf(s) !== -1; })) habSeleccion.push(s);
+            }
+            const box = document.getElementById('habSemanas');
+            let h = '';
+            for (let s = 1; s <= SESIONES; s++) {
+                const on = habSeleccion.indexOf(s) !== -1;
+                h += '<button type="button" class="hab-chip' + (on ? ' on' : '') + '" aria-pressed="' + on + '" onclick="habAlternar(' + s + ')">Semana ' + s + '</button>';
+            }
+            box.innerHTML = h;
+            const resumen = ids.filter(function (id) { return (HABILITADAS[id] || []).length; }).length;
+            document.getElementById('habInfo').textContent = alcance === '*'
+                ? (resumen ? resumen + ' de ' + ids.length + ' cursos tienen semanas habilitadas.' : 'Ningún curso tiene semanas habilitadas.')
+                : ((HABILITADAS[alcance] || []).length ? 'Habilitadas en este curso: semana ' + (HABILITADAS[alcance] || []).join(', ') + '.' : 'Este curso no tiene semanas habilitadas.');
+        }
+        function habAlternar(s) {
+            const i = habSeleccion.indexOf(s);
+            if (i === -1) habSeleccion.push(s); else habSeleccion.splice(i, 1);
+            document.querySelectorAll('#habSemanas .hab-chip').forEach(function (b, k) {
+                const on = habSeleccion.indexOf(k + 1) !== -1;
+                b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+            });
+        }
+        async function habAplicar(modo) {
+            if (!esEditorNotas) return;
+            const alcance = document.getElementById('habCurso').value;
+            const ids = habCursosDe(alcance);
+            let sem = habSeleccion.slice();
+            if (modo === 'todas') { sem = []; for (let s = 1; s <= SESIONES; s++) sem.push(s); }
+            if (modo === 'ninguna') sem = [];
+            sem.sort(function (a, b) { return a - b; });
+            const quien = alcance === '*' ? 'todos los cursos' : ((CURSOS.find(function (c) { return c.id === alcance; }) || {}).nombre || alcance);
+            const que = sem.length ? 'semana ' + sem.join(', ') + ' habilitada' + (sem.length > 1 ? 's' : '') : 'ninguna semana habilitada (todas siguen el calendario normal)';
+            if (!confirm('Para ' + quien + ': ' + que + '.\n\n¿Aplicar?')) return;
+            const ahora = new Date().toISOString();
+            const filas = ids.map(function (id) {
+                return { id: id, cursoId: id, semanas: JSON.stringify(sem), actualizado: ahora, actualizadoPor: usuarioActual.email || usuarioActual.nombre };
+            });
+            try {
+                await SB.request('/rest/v1/notas_habilitadas?on_conflict=id', {
+                    method: 'POST',
+                    headers: { 'Prefer': 'resolution=merge-duplicates' },
+                    body: JSON.stringify(filas)
+                });
+                ids.forEach(function (id) { if (sem.length) HABILITADAS[id] = sem.slice(); else delete HABILITADAS[id]; });
+                localStorage.setItem('notas_habilitadas', JSON.stringify(HABILITADAS));
+                habPintar();
+                if (cursoActual) await cargarCurso();
+                toast(sem.length ? 'Semanas habilitadas para ' + quien : 'Habilitaciones quitadas para ' + quien, 'success');
+            } catch (e) { toast('No se pudo guardar: ' + (e && e.message || e), 'error'); }
+        }
+
         function alternarModoEditor() {
             if (!esEditorNotas) return;
             const p = document.getElementById('editorPanel');
             if (p.classList.contains('show')) { p.classList.remove('show'); return; }
-            if (!confirm('¿Activar el Modo editor?\n\nPodrás cambiar la semana abierta de un curso. Se apaga solo al salir de la página.')) return;
             const sc = document.getElementById('edCurso');
             sc.innerHTML = CURSOS.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + '</option>'; }).join('');
             if (cursoActual) sc.value = cursoActual;
             let w = ''; for (let i = 1; i <= SESIONES; i++) w += '<option value="' + i + '">Semana ' + i + '</option>';
             document.getElementById('edSemana').innerHTML = w;
+            const hc = document.getElementById('habCurso');
+            hc.innerHTML = '<option value="*">Todos los cursos</option>' + CURSOS.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + '</option>'; }).join('');
+            if (cursoActual) hc.value = cursoActual;
             p.classList.add('show');
+            habPintar();
             edActualizarInfo();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
         async function edGuardarInicio(id, inicio, semana) {
             const nombreCurso = (CURSOS.find(function (c) { return c.id === id; }) || {}).nombre || id;
@@ -878,8 +983,8 @@
             ini.setUTCDate(ini.getUTCDate() - (n - 1) * 7);
             try {
                 await edGuardarInicio(id, ini.toISOString().slice(0, 10), n);
-                toast('✅ ' + nombre + ': semana ' + n + ' abierta', 'success');
-            } catch (e) { toast('❌ No se pudo guardar el cambio: ' + (e && e.message || e), 'error'); }
+                toast(' ' + nombre + ': semana ' + n + ' abierta', 'success');
+            } catch (e) { toast('No se pudo guardar el cambio: ' + (e && e.message || e), 'error'); }
         }
         async function edRestablecer() {
             if (!esEditorNotas) return;
@@ -887,15 +992,15 @@
             if (!id) return;
             if (!CONFIG_INICIOS[id]) { toast('Ese curso ya sigue el calendario normal', 'warning'); return; }
             if (!confirm('¿Quitar el ajuste y volver al calendario normal de este curso?')) return;
-            try { await edGuardarInicio(id, null, null); toast('✅ Calendario normal restablecido', 'success'); }
-            catch (e) { toast('❌ No se pudo guardar el cambio: ' + (e && e.message || e), 'error'); }
+            try { await edGuardarInicio(id, null, null); toast('Calendario normal restablecido', 'success'); }
+            catch (e) { toast('No se pudo guardar el cambio: ' + (e && e.message || e), 'error'); }
         }
 
         async function actualizarLista() {
             await cargarConfig();
             await cargarCiclo();
             if (cursoActual) await cargarCurso();
-            toast('🔄 Lista actualizada: ' + inscritosDe(cursoActual).length + ' alumnos en este curso');
+            toast('Lista actualizada: ' + inscritosDe(cursoActual).length + ' alumnos en este curso');
         }
 
         async function cargarCurso() {
@@ -907,7 +1012,7 @@
                 filas = [];
                 document.getElementById('headNotas').innerHTML = '';
                 document.getElementById('tbodyNotas').innerHTML =
-                    '<tr><td class="ng-empty" colspan="12">🔒 No tienes cursos asignados con ese nombre.<br>' +
+                    '<tr><td class="ng-empty" colspan="12">No tienes cursos asignados con ese nombre.<br>' +
                     'Pide al administrador que te registre como tutor o verifica tu nombre al ingresar.</td></tr>';
                 return;
             }
@@ -1101,7 +1206,7 @@
 
             if (!filas.length) {
                 tbody.innerHTML = '<tr><td class="ng-empty" colspan="' + nCols + '">' +
-                    '📭 Aún no hay alumnos en este curso.<br>Se cargan automáticamente desde las inscripciones del ciclo ' + CICLO +
+                    'Aún no hay alumnos en este curso.<br>Se cargan automáticamente desde las inscripciones del ciclo ' + CICLO +
                     ' — pulsa <b>Actualizar</b>.</td></tr>';
                 if (calc) actualizarChips();
                 return;
@@ -1124,7 +1229,7 @@
                 let v = a[i] || '';
                 const cerrada = sesionCerrada(i);
                 if (!v && cerrada) v = 'F';
-                const bloq = cerrada && !esEditorNotas;   // Jhon edita también las semanas cerradas
+                const bloq = cerrada && !esEditorNotas && !semanaHabilitada(i);   // Jhon edita también las cerradas; las habilitadas se abren para todos
                 const dis = (!edit || bloq) ? ' disabled' : '';
                 h += '<td class="td-ses' + (bloq ? ' sesion-cerrada' : '') + '" style="text-align:center"><select class="asist-sel' + (v ? ' ' + v.toLowerCase() : '') +
                     '" data-idx="' + i + '"' + dis + '><option value=""' + (v === '' ? ' selected' : '') + '>—</option>' +
@@ -1139,7 +1244,7 @@
                 let etiqueta;
                 if (cerrada) etiqueta = calc ? (n === null ? '0' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, '')) : (item ? '✓' : '0');
                 else etiqueta = calc ? (n === null ? '·' : (Math.round(n * 10) / 10).toFixed(1).replace(/\.0$/, '')) : (item ? '✓' : '·');
-                const bloq = cerrada && !esEditorNotas;
+                const bloq = cerrada && !esEditorNotas && !semanaHabilitada(i);
                 const dis = (!edit || bloq) ? ' disabled' : '';
                 h += '<td class="td-crec' + (bloq ? ' sesion-cerrada' : '') + '" style="text-align:center"><button type="button" class="ng-crec-btn' +
                     ((item || cerrada) ? ' full' : ' empty') + '" data-crec-idx="' + i + '"' + dis + ' ' +
@@ -1175,7 +1280,7 @@
             cCrec.textContent = r.crec === null ? '—' : r.crec.toFixed(1);
             tr.querySelector('[data-calc="asist"]').textContent = r.asistencia === null ? '—' : r.asistencia.toFixed(1);
             const faltasEl = tr.querySelector('[data-calc="faltas"]');
-            faltasEl.textContent = r.faltas + (r.faltas > 3 ? ' ⛔' : '');
+            faltasEl.textContent = r.faltas + (r.faltas > 3 ? ' ' : '');
             faltasEl.style.color = r.faltas > 0 ? '#dc2626' : '';
             const promEl = tr.querySelector('[data-calc="prom"]');
             promEl.textContent = r.nota === null ? '—' : r.nota.toFixed(1);
@@ -1207,7 +1312,7 @@
                 el.title = 'Las notas se guardan en Supabase y se ven desde cualquier equipo.';
             } else {
                 el.className = 'ng-badge warn';
-                el.innerHTML = '⚠ Solo en este equipo';
+                el.innerHTML = ' Solo en este equipo';
                 el.title = 'No se pudo contactar con Supabase: las notas quedan guardadas en este equipo y se sincronizarán al volver la conexión.';
             }
         }
@@ -1218,7 +1323,7 @@
             const f = filaDeEvento(e);
             if (!f) return;
             const idx = +btn.dataset.crecIdx;
-            if ((sesionCerrada(idx) && !esEditorNotas) || !puedeEditar()) return;
+            if ((sesionCerrada(idx) && !esEditorNotas && !semanaHabilitada(idx)) || !puedeEditar()) return;
             abrirCrecModal(f, idx);
         });
 
@@ -1386,9 +1491,9 @@
                     if (syncOk) ok++; else fail++;
                 } catch (e) { fail++; }
             }
-            if (fail === 0) toast('💾 ' + ok + ' notas guardadas y sincronizadas', 'success');
-            else if (ok === 0) toast('⚠ No se pudo guardar en la nube. Quedan en este equipo.', 'warning');
-            else toast('💾 ' + ok + ' guardadas · ' + fail + ' solo en este equipo', 'warning');
+            if (fail === 0) toast(' ' + ok + ' notas guardadas y sincronizadas', 'success');
+            else if (ok === 0) toast('No se pudo guardar en la nube. Quedan en este equipo.', 'warning');
+            else toast(' ' + ok + ' guardadas · ' + fail + ' solo en este equipo', 'warning');
         }
 
         function alternarManual() {
@@ -1485,7 +1590,7 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Notas');
             XLSX.writeFile(wb, 'notas_' + cursoActual + '_' + hoyPeru() + '.xlsx');
-            toast('📎 Excel exportado');
+            toast(' Excel exportado');
         }
 
         const sidebarMobileToggle = document.getElementById('sidebarMobileToggle');
@@ -1521,6 +1626,9 @@
             document.getElementById('notasTutorInput').focus();
         }
         if (typeof lucide !== 'undefined') lucide.createIcons();
+    
+        // Desde Configuración: abre el modo editor
+        window.addEventListener('load', () => { if (/[?&]editor=1/.test(location.search)) setTimeout(() => { try { if (esEditorNotas && !document.getElementById('editorPanel').offsetParent) alternarModoEditor(); } catch (e) { } }, 1500); });
     </script>
 </body>
 

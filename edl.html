@@ -57,9 +57,9 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="supabase.js?v=2"></script>
-    <script src="auth.js?v=4"></script>
-    <link rel="stylesheet" href="theme.css?v=1">
+    <script src="supabase.js?v=3"></script>
+    <script src="auth.js?v=5"></script>
+    <link rel="stylesheet" href="theme.css?v=16">
 </head>
 
 <body>
@@ -179,18 +179,18 @@
                         <!-- Filters Bar -->
                         <div class="filters-bar">
                             <div class="filter-group">
-                                <label>🔍 Buscar</label>
+                                <label>Buscar</label>
                                 <input type="text" id="filtroBusqueda" class="filter-input"
                                     placeholder="Nombre o DNI...">
                             </div>
                             <div class="filter-group">
-                                <label>📚 Curso</label>
+                                <label>Curso</label>
                                 <select id="filtroCurso" class="filter-select">
                                     <option value="">Todos los cursos</option>
                                 </select>
                             </div>
                             <div class="filter-group">
-                                <label>📅 Ciclo</label>
+                                <label>Ciclo</label>
                                 <select id="filtroCiclo" class="filter-select">
                                     <option value="">Todos los ciclos</option>
                                     <option value="202620" selected>202620 (Actual)</option>
@@ -223,6 +223,8 @@
                                             <th class="sortable" onclick="ordenarTabla('dni')">DNI</th>
                                             <th class="sortable" onclick="ordenarTabla('celular')">Celular</th>
                                             <th>Correo</th>
+                                            <th>F. nacimiento</th>
+                                            <th>Edad</th>
                                             <th class="sortable" onclick="ordenarTabla('lider')">Líder</th>
                                             <th class="sortable" onclick="ordenarTabla('curso')">Curso</th>
                                             <th class="sortable" onclick="ordenarTabla('sede')">Sede</th>
@@ -242,6 +244,33 @@
                         </div>
                     </div>
 
+                    <!-- Info card -->
+                    <div class="section-card"
+                        style="background: linear-gradient(135deg, #f8fafc, #f1f4f9); border: 1px solid var(--border-light); margin-top:24px;">
+                        <h3 style="font-size:16px; font-weight:700; color:var(--brand-blue); margin-bottom:12px;">
+                            Información EDL</h3>
+                        <p style="font-size:13.5px; line-height:1.6; color:var(--text-secondary);">Buen día amados
+                            hermanos , no es tiempo de detenernos, es necesario seguir avanzando y seguir
+                            preparándote, por ello te animamos a inscribirte  en los cursos y seminarios que tenemos
+                            este ciclo en la EDL. .</p>
+                        <p style="margin-top:12px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">
+                            El requisito para el seminario de Int. Dones del Espíritu Santo es haber aprobado el
+                            Discipulado 3.</p>
+                        <p style="margin-top:8px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">El
+                            seminario de Apologética no tiene requisito.</p>
+                        <p style="margin-top:12px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">
+                             Inscripciones en oficina, o al Yape o Plin al número <strong>964940579</strong> y
+                            enviar la captura.</p>
+                        <div
+                            style="margin-top:16px; padding:16px; background:#ffffff; border-radius:12px; border:1.5px solid var(--border-light); font-size:13.5px; line-height:1.6;">
+                            <strong style="color:var(--brand-blue);">Costos:</strong><br>
+                            Discipulado 1: S/ 30.00<br>
+                            Discipulado 2 y 3: S/ 50.00<br>
+                            Lidere 1,2 y 3: S/ 50.00<br>
+                            Seminarios: S/ 50.00
+                        </div>
+                    </div>
+
                     <!-- Guest EDL form -->
                     <div class="section-card guest-only">
 
@@ -255,7 +284,7 @@
                                 <p>Acceso para inscripción de cursos</p>
                             </div>
                             <div class="edl-pass-card">
-                                <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+                                <div style="font-size:40px;margin-bottom:12px;"><i data-lucide="lock" style="width:1em;height:1em;"></i></div>
                                 <h2>Acceso Restringido</h2>
                                 <p>Ingresa la contraseña para continuar</p>
                                 <input type="password" id="edlPasswordInput" class="edl-pass-input"
@@ -265,7 +294,7 @@
                                     Ingresar
                                 </button>
                                 <p id="edlPasswordError" class="edl-pass-error">
-                                    ❌ Contraseña incorrecta
+                                     Contraseña incorrecta
                                 </p>
                             </div>
                         </div>
@@ -273,7 +302,7 @@
                         <!-- Guest Content (hidden until password verified) -->
                         <div id="edlGuestContent" style="display:none;">
                         <div class="section-header">
-                            <div class="section-title">✏️ Inscríbete a la EDL</div>
+                            <div class="section-title">Inscríbete a la EDL</div>
                         </div>
                         <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Completa tus datos
                             para inscribirte a un curso o seminario.</p>
@@ -311,6 +340,11 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label>Fecha de nacimiento *</label>
+                                <input type="date" id="guestFechaNac" class="form-control" required max="2026-12-31">
+                                <div class="edad-chip" id="guestEdad" aria-live="polite"></div>
+                            </div>
+                            <div class="form-group">
                                 <label>Líder de GC *</label>
                                 <input type="text" id="guestLider" class="form-control" required
                                     placeholder="Nombre del líder">
@@ -346,15 +380,15 @@
                                     <label>Captura de pago</label>
                                     <div class="captura-zone" id="guestCapturaZone"
                                         onclick="document.getElementById('guestPagoCaptura').click()">
-                                        <div class="captura-zone-icon">🖼️</div>
+                                        <div class="captura-zone-icon"></div>
                                         <div class="captura-zone-title">Sube tu comprobante de pago</div>
                                         <div class="captura-zone-sub">Yape, Plin o Transferencia</div>
                                         <div class="captura-zone-actions">
                                             <button type="button" class="captura-btn"
-                                                onclick="event.stopPropagation();document.getElementById('guestPagoCaptura').click()">📁
+                                                onclick="event.stopPropagation();document.getElementById('guestPagoCaptura').click()">
                                                 Elegir imagen</button>
                                             <button type="button" class="captura-btn captura-btn-cam"
-                                                onclick="event.stopPropagation();document.getElementById('guestPagoCapturaCam').click()">📷
+                                                onclick="event.stopPropagation();document.getElementById('guestPagoCapturaCam').click()">
                                                 Tomar foto</button>
                                         </div>
                                         <div class="captura-filename" id="guestCapturaFilename"></div>
@@ -375,7 +409,7 @@
                         </form>
                         <div id="guestSuccess"
                             style="display:none;background:#dcfce7;border-radius:24px;padding:32px;text-align:center;margin-top:16px;">
-                            <div style="font-size:48px;margin-bottom:12px;">✅</div>
+                            <div style="font-size:48px;margin-bottom:12px;"><i data-lucide="circle-check" style="width:1em;height:1em;"></i></div>
                             <h3 style="color:#166534;margin-bottom:8px;">¡Inscripción enviada!</h3>
                             <p style="color:#065f46;">Tu inscripción ha sido registrada. El administrador revisará y
                                 confirmará tu pago.</p>
@@ -383,32 +417,6 @@
                         </div><!-- /edlGuestContent -->
                     </div>
 
-                    <!-- Info card -->
-                    <div class="section-card"
-                        style="background: linear-gradient(135deg, #f8fafc, #f1f4f9); border: 1px solid var(--border-light); margin-top:24px;">
-                        <h3 style="font-size:16px; font-weight:700; color:var(--brand-blue); margin-bottom:12px;">📢
-                            Información EDL</h3>
-                        <p style="font-size:13.5px; line-height:1.6; color:var(--text-secondary);">Buen día amados
-                            hermanos 😃, no es tiempo de detenernos, es necesario seguir avanzando y seguir
-                            preparándote, por ello te animamos a inscribirte ✏️ en los cursos y seminarios que tenemos
-                            este ciclo en la EDL. 🤓.</p>
-                        <p style="margin-top:12px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">🔥
-                            El requisito para el seminario de Int. Dones del Espíritu Santo es haber aprobado el
-                            Discipulado 3.</p>
-                        <p style="margin-top:8px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">🔥 El
-                            seminario de Apologética no tiene requisito.</p>
-                        <p style="margin-top:12px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">
-                            📒🖊️ Inscripciones en oficina, o al Yape o Plin al número <strong>964940579</strong> y
-                            enviar la captura.</p>
-                        <div
-                            style="margin-top:16px; padding:16px; background:#ffffff; border-radius:12px; border:1.5px solid var(--border-light); font-size:13.5px; line-height:1.6;">
-                            <strong style="color:var(--brand-blue);">💰 Costos:</strong><br>
-                            Discipulado 1: S/ 30.00<br>
-                            Discipulado 2 y 3: S/ 50.00<br>
-                            Lidere 1,2 y 3: S/ 50.00<br>
-                            Seminarios: S/ 50.00
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -455,6 +463,11 @@
                         </div>
                     </div>
                     <div class="form-group">
+                                <label>Fecha de nacimiento</label>
+                                <input type="date" id="insFechaNac" class="form-control" max="2026-12-31">
+                                <div class="edad-chip" id="insEdad" aria-live="polite"></div>
+                            </div>
+                            <div class="form-group">
                         <label>Líder de GC *</label>
                         <input type="text" id="insLider" class="form-control" required>
                     </div>
@@ -502,15 +515,15 @@
                             <label>Captura de pago</label>
                             <div class="captura-zone" id="insCapturaZone"
                                 onclick="document.getElementById('insPagoCaptura').click()">
-                                <div class="captura-zone-icon">🖼️</div>
+                                <div class="captura-zone-icon"></div>
                                 <div class="captura-zone-title">Sube tu comprobante de pago</div>
                                 <div class="captura-zone-sub">Yape, Plin o Transferencia</div>
                                 <div class="captura-zone-actions">
                                     <button type="button" class="captura-btn"
-                                        onclick="event.stopPropagation();document.getElementById('insPagoCaptura').click()">📁
+                                        onclick="event.stopPropagation();document.getElementById('insPagoCaptura').click()">
                                         Elegir imagen</button>
                                     <button type="button" class="captura-btn captura-btn-cam"
-                                        onclick="event.stopPropagation();document.getElementById('insPagoCapturaCam').click()">📷
+                                        onclick="event.stopPropagation();document.getElementById('insPagoCapturaCam').click()">
                                         Tomar foto</button>
                                 </div>
                                 <div class="captura-filename" id="insCapturaFilename"></div>
@@ -545,7 +558,7 @@
         const esVoces = usuarioActual.rol === 'voces';   // registra y ve inscripciones; no edita/borra ni ve Observaciones
         if (!esAdmin && !esInvitado && !esVoces) { window.location.href = 'index.html'; }
         document.getElementById('userName').innerText = esAdmin ? usuarioActual.nombre : usuarioActual.nombre;
-        document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : (esVoces ? '✍️ Inscripciones' : '👥 Invitado');
+        document.getElementById('userRole').innerText = esAdmin ? 'Administrador' : (esVoces ? ' Inscripciones' : 'Invitado');
         document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
 
         if (esVoces) {
@@ -715,7 +728,8 @@
                     String(a.c.nombre).localeCompare(String(b.c.nombre), 'es', { numeric: true });
             });
             lista.forEach(x => {
-                const opt = `<option value="${x.c.id}">${x.etiqueta}</option>`;
+                const horaIni = x.c.dia ? ' · ' + x.c.dia + ' ' + String(x.c.hora || '').split(' - ')[0] : '';
+                const opt = `<option value="${x.c.id}">${x.etiqueta}${horaIni}</option>`;
                 if (selModal) selModal.innerHTML += opt;
                 if (selGuest && x.etiqueta === x.c.nombre) selGuest.innerHTML += opt;
             });
@@ -771,7 +785,7 @@
                 reader.readAsDataURL(file);
                 container.classList.add('visible');
                 zone.classList.add('has-file');
-                filename.textContent = '✅ ' + file.name;
+                filename.textContent = ' ' + file.name;
                 filename.classList.add('visible');
             }
         }
@@ -818,11 +832,11 @@
             const curso = getCurso(this.value, CICLO_ACTUAL);
             const info = document.getElementById('cursoInfo');
             if (!curso) { info.style.display = 'none'; return; }
-            info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}<br><strong>🔒 Inscripciones hasta:</strong> ${fechaCierreTexto(curso)}<br><strong>💰 Costo:</strong> ${formatMonto(curso.monto)}`;
+            info.innerHTML = `<strong>Inicio:</strong> ${curso.inicio}<br><strong>Día:</strong> ${curso.dia}<br><strong>Hora:</strong> ${curso.hora}<br><strong>Inscripciones hasta:</strong> ${fechaCierreTexto(curso)}<br><strong>Costo:</strong> ${formatMonto(curso.monto)}`;
             info.style.display = 'block';
             document.getElementById('insMonto').value = formatMonto(curso.monto);
             if (curso.requiereDisc3) {
-                toast('⚠️ Requiere haber aprobado Discipulado 3', 'warning');
+                toast(' Requiere haber aprobado Discipulado 3', 'warning');
             }
         });
 
@@ -870,7 +884,7 @@
                 const curso = getCurso(this.value, CICLO_ACTUAL);
                 const info = document.getElementById('guestCursoInfo');
                 if (!curso) { info.style.display = 'none'; return; }
-                info.innerHTML = `<strong>📅 Inicio:</strong> ${curso.inicio}<br><strong>📆 Día:</strong> ${curso.dia}<br><strong>⏰ Hora:</strong> ${curso.hora}<br><strong>🔒 Inscripciones hasta:</strong> ${fechaCierreTexto(curso)}<br><strong>💰 Costo:</strong> ${formatMonto(curso.monto)}`;
+                info.innerHTML = `<strong>Inicio:</strong> ${curso.inicio}<br><strong>Día:</strong> ${curso.dia}<br><strong>Hora:</strong> ${curso.hora}<br><strong>Inscripciones hasta:</strong> ${fechaCierreTexto(curso)}<br><strong>Costo:</strong> ${formatMonto(curso.monto)}`;
                 info.style.display = 'block';
                 if (curso.requiereDisc3) {
                     toast('El alumno debe haber aprobado Discipulado 3. Verifique que cumpla el requisito.', 'warning');
@@ -917,6 +931,8 @@
                         throw new Error('Celular debe tener entre 7 y 15 dígitos');
                     }
 
+                    const fnGuest = document.getElementById('guestFechaNac').value;
+                    if (!fnGuest || !edadTexto(fnGuest)) { throw new Error('Escribe tu fecha de nacimiento'); }
                     const data = {
                         nombres: document.getElementById('guestNombres').value.trim(),
                         docTipo: docTipo,
@@ -924,6 +940,7 @@
                         celular: celular,
                         correo: document.getElementById('guestCorreo').value.trim(),
                         lider: document.getElementById('guestLider').value.trim(),
+                        fechaNacimiento: fnGuest,
                         sede: sede,
                         cursoId: cursoId,
                         cursoNombre: curso.nombre,
@@ -942,7 +959,7 @@
 
                     const existente = await verificarDuplicado(docNum, cursoId);
                     if (existente) {
-                        const ok = confirm('⚠️ Ya existe una inscripción de ' + existente.nombres + ' (DNI: ' + docNum + ') en el curso ' + curso.nombre + '.\n\n¿Deseas inscribirte de todas formas?');
+                        const ok = confirm(' Ya existe una inscripción de ' + existente.nombres + ' (DNI: ' + docNum + ') en el curso ' + curso.nombre + '.\n\n¿Deseas inscribirte de todas formas?');
                         if (!ok) { throw new Error('Inscripción cancelada'); }
                     }
 
@@ -953,9 +970,9 @@
                     guardarCacheLocal(inscripciones);
                     document.getElementById('guestSuccess').style.display = 'block';
                     guestForm.style.display = 'none';
-                    toast('✅ ¡Inscripción registrada exitosamente!');
+                    toast(' ¡Inscripción registrada exitosamente!');
                 } catch (err) {
-                    toast('❌ ' + err.message, 'warning');
+                    toast(' ' + err.message, 'warning');
                     btn.disabled = false;
                     btn.innerHTML = '<i data-lucide="check" style="width:16px; height:16px;"></i> Inscribirme';
                     if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -1018,7 +1035,7 @@
                 if (inscripciones.length > 0) {
                     aplicarFiltros();
                 } else {
-                    document.getElementById('tablaInscripciones').innerHTML = '<tr><td colspan="14" style="text-align:center;padding:24px;color:#dc2626;">⚠️ Sin conexión. Intenta de nuevo más tarde.</td></tr>';
+                    document.getElementById('tablaInscripciones').innerHTML = '<tr><td colspan="16" style="text-align:center;padding:24px;color:#dc2626;">Sin conexión. Intenta de nuevo más tarde.</td></tr>';
                 }
             }
         }
@@ -1073,7 +1090,7 @@
                 const vacio = cicloSel
                     ? `No hay inscripciones en el ciclo ${cicloSel} todavía. Cambia el filtro de ciclo para ver los demás.`
                     : 'No hay inscripciones';
-                tbody.innerHTML = `<tr><td colspan="14" style="text-align:center;padding:48px;color:var(--text-muted);">${vacio}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="16" style="text-align:center;padding:48px;color:var(--text-muted);">${vacio}</td></tr>`;
                 return;
             }
             tbody.innerHTML = inscripcionesFiltradas.map(i => {
@@ -1082,7 +1099,7 @@
                 const estadoCls = i.estadoPago === 'Canceló' ? 'estado-pagado' : 'estado-debe';
                 const metodo = i.metodoPago ? i.metodoPago.charAt(0).toUpperCase() + i.metodoPago.slice(1) : '-';
                 const initials = getInitials(i.nombres);
-                const capturaHtml = `<button type="button" class="captura-thumb captura-btn" data-id="${i.id}" title="Ver captura de pago">📷</button>`;
+                const capturaHtml = `<button type="button" class="captura-thumb captura-btn" data-id="${i.id}" title="Ver captura de pago"><i data-lucide="camera" style="width:1em;height:1em;"></i></button>`;
 
                 return `<tr>
                     <td>
@@ -1096,6 +1113,8 @@
                     <td>${i.dni}</td>
                     <td>${i.celular}</td>
                     <td><span style="font-size:11.5px;color:var(--text-secondary);">${i.correo}</span></td>
+                    <td>${i.fechaNacimiento ? fechaCorta(i.fechaNacimiento) : '<span style="color:var(--text-secondary);">-</span>'}</td>
+                    <td style="white-space:nowrap;"><strong>${i.fechaNacimiento ? edadTexto(i.fechaNacimiento) : '-'}</strong></td>
                     <td>${i.lider}</td>
                     <td><span class="badge rol-badge badge-produccion">${i.cursoNombre || curso?.nombre || '-'}</span></td>
                     <td><span style="font-size:11.5px;padding:3px 8px;border-radius:6px;background:#f0fdf4;color:#16a34a;font-weight:600;">${i.sede || '-'}</span></td>
@@ -1149,18 +1168,18 @@
                 const celular = document.getElementById('insCelular').value.trim();
                 const sede = document.getElementById('insSede').value;
 
-                if (!sede) { toast('❌ Selecciona una sede', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
+                if (!sede) { toast(' Selecciona una sede', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
                 if (!validarDocNum(docTipo, docNum)) {
-                    toast('❌ ' + (docTipo === 'DNI' ? 'DNI debe tener 8 dígitos' : 'Carnet de Extranjería inválido'), 'warning');
+                    toast(' ' + (docTipo === 'DNI' ? 'DNI debe tener 8 dígitos' : 'Carnet de Extranjería inválido'), 'warning');
                     btn.disabled = false; btn.innerHTML = 'Guardar'; return;
                 }
                 if (!validarCelular(celular)) {
-                    toast('❌ Celular debe tener entre 7 y 15 dígitos', 'warning');
+                    toast(' Celular debe tener entre 7 y 15 dígitos', 'warning');
                     btn.disabled = false; btn.innerHTML = 'Guardar'; return;
                 }
 
                 const capturaFile = getCapturaFile('ins');
-                if (capturaFile && capturaFile.size > 5000000) { toast('❌ La imagen es muy grande (máx 5MB)', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
+                if (capturaFile && capturaFile.size > 5000000) { toast(' La imagen es muy grande (máx 5MB)', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
                 let pagoCaptura = editandoId ? undefined : '';
                 if (capturaFile) pagoCaptura = await fileToBase64(capturaFile);
 
@@ -1171,6 +1190,7 @@
                     celular: celular,
                     correo: document.getElementById('insCorreo').value.trim(),
                     lider: document.getElementById('insLider').value.trim(),
+                    fechaNacimiento: document.getElementById('insFechaNac').value || '',
                     sede: document.getElementById('insSede').value,
                     cursoId: cursoId,
                     cursoNombre: curso.nombre,
@@ -1191,7 +1211,7 @@
                 if (!editandoId) {
                     const existente = await verificarDuplicado(docNum, cursoId);
                     if (existente) {
-                        const ok = confirm('⚠️ Ya existe una inscripción de ' + existente.nombres + ' (DNI: ' + docNum + ') en el curso ' + curso.nombre + '.\n\n¿Deseas inscribirlo de todas formas?');
+                        const ok = confirm(' Ya existe una inscripción de ' + existente.nombres + ' (DNI: ' + docNum + ') en el curso ' + curso.nombre + '.\n\n¿Deseas inscribirlo de todas formas?');
                         if (!ok) { btn.disabled = false; btn.innerHTML = 'Guardar'; return; }
                     }
                 }
@@ -1199,29 +1219,82 @@
                 if (editandoId) {
                     await firestoreUpdateDoc('inscripciones', editandoId, data);
                     Object.assign(inscripciones.find(x => x.id === editandoId) || {}, data);
-                    toast('✅ Inscripción actualizada');
+                    toast(' Inscripción actualizada');
                 } else {
                     var result = await firestoreAdd('inscripciones', data);
                     var newId = result.name ? result.name.split('/').pop() : 'local_' + Date.now();
                     data.id = newId;
                     inscripciones.unshift(data);
-                    toast('✅ Inscripción registrada');
+                    toast(' Inscripción registrada');
                 }
                 guardarCacheLocal(inscripciones);
                 cerrarModal();
                 aplicarFiltros();
             } catch (err) {
-                toast('❌ Error: ' + err.message, 'error');
+                toast(' Error: ' + err.message, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = 'Guardar';
             }
         });
 
+
+        // ── Fecha de nacimiento y edad (años y meses, al día de hoy) ──
+        function edadTexto(f) {
+            const p = String(f || '').slice(0, 10).split('-').map(Number);
+            if (p.length < 3 || p.some(isNaN)) return '';
+            const h = new Date();
+            let a = h.getFullYear() - p[0];
+            let m = (h.getMonth() + 1) - p[1];
+            if (h.getDate() < p[2]) m--;
+            if (m < 0) { a--; m += 12; }
+            if (a < 0 || a > 120) return '';
+            return a + (a === 1 ? ' año' : ' años') + (m ? ' y ' + m + (m === 1 ? ' mes' : ' meses') : '');
+        }
+        function fechaCorta(f) {
+            const p = String(f || '').slice(0, 10).split('-');
+            return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : '';
+        }
+        function actualizarEdad(pref) {
+            const inp = document.getElementById(pref + 'FechaNac');
+            const out = document.getElementById(pref + 'Edad');
+            if (!inp || !out) return;
+            const t = edadTexto(inp.value);
+            out.textContent = t ? 'Tienes ' + t : '';
+            if (pref === 'ins' && t) out.textContent = 'Edad: ' + t;
+            out.classList.toggle('visible', !!t);
+        }
+        ['guest', 'ins'].forEach(function (pref) {
+            const inp = document.getElementById(pref + 'FechaNac');
+            if (inp) { inp.max = new Date().toISOString().slice(0, 10); inp.addEventListener('input', function () { actualizarEdad(pref); }); inp.addEventListener('change', function () { actualizarEdad(pref); }); }
+        });
+
+
+        // ── Ordenar la tabla al pulsar el encabezado ──
+        let ordenClave = null, ordenAsc = true;
+        function ordenarTabla(clave) {
+            ordenAsc = (ordenClave === clave) ? !ordenAsc : true;
+            ordenClave = clave;
+            const val = (i) => {
+                if (clave === 'curso') return String(i.cursoNombre || '').toLowerCase();
+                const v = i[clave];
+                return typeof v === 'string' ? v.toLowerCase() : (v || '');
+            };
+            inscripcionesFiltradas.sort((a, b) => {
+                const x = val(a), y = val(b);
+                return (x > y ? 1 : x < y ? -1 : 0) * (ordenAsc ? 1 : -1);
+            });
+            renderTabla();
+            document.querySelectorAll('th.sortable').forEach(th => th.classList.remove('asc', 'desc'));
+            const th = [...document.querySelectorAll('th.sortable')].find(t => (t.getAttribute('onclick') || '').indexOf("'" + clave + "'") !== -1);
+            if (th) th.classList.add(ordenAsc ? 'asc' : 'desc');
+        }
+
         function abrirModal() {
             document.getElementById('insObservacionesGroup').style.display = esAdmin ? '' : 'none';
             editandoId = null;
             document.getElementById('formInscripcion').reset();
+            actualizarEdad('ins');
             document.getElementById('insEstado').value = 'Debe';
             document.getElementById('insSede').value = '';
             document.getElementById('insMetodoPago').value = '';
@@ -1247,6 +1320,8 @@
             document.getElementById('insCelular').value = i.celular;
             document.getElementById('insCorreo').value = i.correo;
             document.getElementById('insLider').value = i.lider;
+            document.getElementById('insFechaNac').value = i.fechaNacimiento || '';
+            actualizarEdad('ins');
             document.getElementById('insSede').value = i.sede || '';
             const selIns = document.getElementById('insCurso');
             selIns.value = i.cursoId;
@@ -1283,7 +1358,7 @@
                 inscripciones = inscripciones.filter(x => x.id !== id);
                 guardarCacheLocal(inscripciones);
                 aplicarFiltros();
-                toast('🗑️ Inscripción eliminada');
+                toast(' Inscripción eliminada');
             }
         }
 
@@ -1297,7 +1372,7 @@
             guardarCacheLocal(inscripciones);
             renderTabla();
             actualizarStats(inscripcionesFiltradas);
-            toast(nuevoEstado === 'Canceló' ? '✅ Inscripción confirmada' : '❌ Inscripción en estado Debe');
+            toast(nuevoEstado === 'Canceló' ? ' Inscripción confirmada' : ' Inscripción en estado Debe');
         }
 
         function exportarExcel() {
@@ -1305,6 +1380,7 @@
                 const curso = getCurso(i.cursoId, i.ciclo);
                 return {
                     Nombres: i.nombres, DNI: i.dni, Celular: i.celular, Correo: i.correo,
+                    'F. Nacimiento': i.fechaNacimiento ? fechaCorta(i.fechaNacimiento) : '', Edad: i.fechaNacimiento ? edadTexto(i.fechaNacimiento) : '',
                     Lider: i.lider, Sede: i.sede || '-', Curso: i.cursoNombre || curso?.nombre,
                     'Fecha/Horario': i.fechaHorario || (curso ? `${curso.dia} ${curso.hora}` : ''),
                     Observaciones: esVoces ? '' : (i.observaciones || '')
@@ -1314,8 +1390,8 @@
             const rows = [
                 ['INSCRIPCIONES ESCUELA DE LIDERAZGO 2026'],
                 [],
-                ['Nombres', 'DNI', 'Celular', 'Correo', 'Lider', 'Sede', 'Curso', 'Fecha/Horario', 'Observaciones'],
-                ...datos.map(d => [d.Nombres, d.DNI, d.Celular, d.Correo, d.Lider, d.Sede, d.Curso, d['Fecha/Horario'], d.Observaciones])
+                ['Nombres', 'DNI', 'Celular', 'Correo', 'F. Nacimiento', 'Edad', 'Lider', 'Sede', 'Curso', 'Fecha/Horario', 'Observaciones'],
+                ...datos.map(d => [d.Nombres, d.DNI, d.Celular, d.Correo, d['F. Nacimiento'], d.Edad, d.Lider, d.Sede, d.Curso, d['Fecha/Horario'], d.Observaciones])
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(rows);
@@ -1339,7 +1415,7 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Inscripciones EDL');
             XLSX.writeFile(wb, `edl_inscripciones_${hoyPeru()}.xlsx`);
-            toast('📎 Excel exportado');
+            toast(' Excel exportado');
         }
 
         function toast(msg, tipo = 'success') {
@@ -1430,6 +1506,16 @@
         });
 
         if (typeof lucide !== 'undefined') lucide.createIcons();
+    
+        // Enlace directo desde la portada: abre el formulario de inscripción
+        window.addEventListener('load', () => {
+            if (!/[?&]inscribir=1/.test(location.search)) return;
+            setTimeout(() => {
+                if (esAdmin) { abrirModal(); return; }
+                const f = document.getElementById('formInscripcionGuest');
+                if (f) { f.scrollIntoView({ behavior: 'smooth', block: 'start' }); const n = document.getElementById('guestNombres'); if (n) setTimeout(() => n.focus({ preventScroll: true }), 500); }
+            }, 700);
+        });
     </script>
 
     <div id="lightboxCaptura" class="lightbox-modal">

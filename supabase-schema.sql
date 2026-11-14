@@ -171,3 +171,6 @@ alter table config_notas enable row level security;
 drop policy if exists "public_access" on config_notas;
 create policy "public_access" on config_notas for all to anon, authenticated using (true) with check (true);
 grant all on config_notas to anon, authenticated, service_role;
+
+-- Fecha de nacimiento (la edad se calcula en la página)
+alter table inscripciones add column if not exists "fechaNacimiento" text;

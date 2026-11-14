@@ -15,8 +15,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="supabase.js?v=2"></script>
-    <link rel="stylesheet" href="theme.css?v=1">
+    <script src="supabase.js?v=3"></script>
+    <link rel="stylesheet" href="theme.css?v=16">
 </head>
 
 <body>
@@ -46,7 +46,7 @@
                 <a href="notas.html" class="nav-link" id="nav-notas"><span class="nav-icon"><i data-lucide="clipboard-check"></i></span><span>Registro de Notas</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
-                <a href="#" class="nav-link"><span class="nav-icon"><i
+                <a href="#" class="nav-link" id="nav-config"><span class="nav-icon"><i
                             data-lucide="settings"></i></span><span>Configuración</span></a>
                 <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i
                             data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
@@ -73,30 +73,30 @@
 
             <div class="container">
                 <div id="rateLimitAlert" class="perm-alert" style="display:none;background:#fef3cd;border:1px solid #f59e0b;color:#92400e;">
-                    <h4>⏳ Sin conexión con la base de datos</h4>
+                    <h4>Sin conexión con la base de datos</h4>
                     <p>No se pudo conectar con Supabase. Revisa tu conexión a internet; tus datos locales siguen seguros.</p>
                     <button class="btn btn-primary" onclick="location.reload()" style="margin-top:10px">Reintentar</button>
                 </div>
 
                 <div class="filters-bar">
                     <div class="filter-group">
-                        <label>📍 Sede</label>
+                        <label>Sede</label>
                         <select id="filtroSede" class="filter-select">
                             <option value="todas">Todas las sedes</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>📅 Semana</label>
+                        <label>Semana</label>
                         <div class="input-constrain"><input type="week" id="filtroSemana" class="filter-input"></div>
                     </div>
                     <div class="filter-group">
-                        <label>📆 Mes</label>
+                        <label>Mes</label>
                         <select id="filtroMes" class="filter-select">
                             <option value="">Todos</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>🗓️ Año</label>
+                        <label>Año</label>
                         <select id="filtroAnio" class="filter-select">
                             <option value="2026" selected>2026</option>
                             <option value="2025">2025</option>
@@ -216,14 +216,14 @@
     <div id="editModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>✏️ Editar registro</h3>
+                <h3>Editar registro</h3>
                 <button class="modal-close" onclick="cerrarModal()">&times;</button>
             </div>
             <div class="modal-body" id="editModalBody"></div>
         </div>
     </div>
 
-    <script src="auth.js?v=4"></script>
+    <script src="auth.js?v=5"></script>
     <script>
         // Initialize Lucide icons (non-blocking if CDN fails)
         if (typeof lucide !== 'undefined') if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -389,19 +389,19 @@
             }
             document.getElementById('reportCards').innerHTML = `
                 <div class="report-card domingo" style="border-left-color:#10b981">
-                    <h3>☀️ DOMINGO</h3>
+                    <h3>DOMINGO</h3>
                     <div class="report-row"><span>Hombres:</span>${domH}</div>
                     <div class="report-row"><span>Mujeres:</span>${domM}</div>
                     <div class="report-row"><span>Total:</span><strong>${domT}</strong></div>
                 </div>
                 <div class="report-card next" style="border-left-color:#38bdf8">
-                    <h3>🌙 NEXT</h3>
+                    <h3>NEXT</h3>
                     <div class="report-row"><span>Hombres:</span>${nextH}</div>
                     <div class="report-row"><span>Mujeres:</span>${nextM}</div>
                     <div class="report-row"><span>Total:</span><strong>${nextT}</strong></div>
                 </div>
                 <div class="report-card kids" style="border-left-color:#f59e0b">
-                    <h3>🧒 KIDS</h3>
+                    <h3>KIDS</h3>
                     <div class="report-row"><span>Niños:</span>${kidsH}</div>
                     <div class="report-row"><span>Niñas:</span>${kidsM}</div>
                     <div class="report-row"><span>Total:</span><strong>${kidsT}</strong></div>
@@ -428,8 +428,8 @@
                 let badge = d.origen === 'invitado'
                     ? '<span class="badge-origen badge-inv">Invitado</span>'
                     : (d.origen === 'admin' ? '<span class="badge-origen badge-adm">Admin</span>' : '');
-                let acciones = `<button class="btn btn-secondary" style="padding: 5px 10px; font-size:11px; margin-right:4px;" onclick="abrirEditar('${d.firebaseId}')">✏️ Editar</button>
-                               <button class="btn btn-secondary" style="padding: 5px 10px; font-size:11px; color:var(--danger);" onclick="eliminarRegistro('${d.firebaseId}')">🗑️ Eliminar</button>`;
+                let acciones = `<button class="btn btn-secondary" style="padding: 5px 10px; font-size:11px; margin-right:4px;" onclick="abrirEditar('${d.firebaseId}')">Editar</button>
+                               <button class="btn btn-secondary" style="padding: 5px 10px; font-size:11px; color:var(--danger);" onclick="eliminarRegistro('${d.firebaseId}')">Eliminar</button>`;
                 html += `<tr>
                     <td><strong>${d.fecha}</strong></td>
                     <td>${formatearSede(d.sede)}</td>
@@ -448,10 +448,11 @@
         function actualizarGraficos() {
             let sedesMap = {};
             for (let d of datosFiltrados) sedesMap[d.sede] = (sedesMap[d.sede] || 0) + d.totalGeneral;
+            const OPC_ANIM = { animation: { duration: 1000, easing: 'easeOutQuart' }, plugins: { legend: { labels: { usePointStyle: true, font: { family: 'Source Sans 3', weight: '600' } } }, tooltip: { backgroundColor: '#1b335f', padding: 12, cornerRadius: 10, titleFont: { weight: '700' } } }, scales: undefined };
             if (chartSedes) chartSedes.destroy();
             chartSedes = new Chart(document.getElementById('chartSedes'), {
-                type: 'bar', data: { labels: Object.keys(sedesMap).map(s => formatearSede(s)), datasets: [{ label: 'Asistentes', data: Object.values(sedesMap), backgroundColor: '#1b4570', borderRadius: 8 }] },
-                options: { responsive: true, maintainAspectRatio: true }
+                type: 'bar', data: { labels: Object.keys(sedesMap).map(s => formatearSede(s)), datasets: [{ label: 'Asistentes', data: Object.values(sedesMap), backgroundColor: ['#2a4f8f', '#4fc3f0', '#46d1ab', '#26488a', '#7fb2e8', '#2fae93', '#1b335f', '#9edcf8'], hoverBackgroundColor: '#ffb703', borderRadius: 12, borderSkipped: false, maxBarThickness: 56 }] },
+                options: Object.assign({ responsive: true, maintainAspectRatio: true, aspectRatio: 1.5 }, OPC_ANIM)
             });
             // Trend chart: use ALL data (unfiltered)
             let semanasMapTotal = {};
@@ -459,15 +460,15 @@
             let semanasOrdenadasTotal = Object.keys(semanasMapTotal).sort();
             if (chartTendencia) chartTendencia.destroy();
             chartTendencia = new Chart(document.getElementById('chartTendencia'), {
-                type: 'line', data: { labels: semanasOrdenadasTotal, datasets: [{ label: 'Asistencia total', data: semanasOrdenadasTotal.map(s => semanasMapTotal[s]), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.05)', fill: true, tension: 0.3 }] },
-                options: { responsive: true, maintainAspectRatio: true }
+                type: 'line', data: { labels: semanasOrdenadasTotal, datasets: [{ label: 'Asistencia total', data: semanasOrdenadasTotal.map(s => semanasMapTotal[s]), borderColor: '#2a4f8f', borderWidth: 3, backgroundColor: 'rgba(79,195,240,0.18)', fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 8, pointBackgroundColor: '#fff', pointBorderColor: '#2a4f8f', pointBorderWidth: 2 }] },
+                options: Object.assign({ responsive: true, maintainAspectRatio: true, aspectRatio: 1.5, interaction: { mode: 'index', intersect: false } }, OPC_ANIM)
             });
             let totalV = datosFiltrados.reduce((s, d) => s + d.totalVarones, 0);
             let totalM = datosFiltrados.reduce((s, d) => s + d.totalMujeres, 0);
             if (chartGenero) chartGenero.destroy();
             chartGenero = new Chart(document.getElementById('chartGenero'), {
-                type: 'doughnut', data: { labels: ['Varones', 'Mujeres'], datasets: [{ data: [totalV, totalM], backgroundColor: ['#3b82f6', '#ec4899'] }] },
-                options: { responsive: true, maintainAspectRatio: true }
+                type: 'doughnut', data: { labels: ['Varones', 'Mujeres'], datasets: [{ data: [totalV, totalM], backgroundColor: ['#2a4f8f', '#46d1ab'], borderColor: '#fff', borderWidth: 4, hoverOffset: 12 }] },
+                options: Object.assign({ responsive: true, maintainAspectRatio: true, aspectRatio: 1.5, cutout: '66%' }, OPC_ANIM)
             });
         }
 
@@ -482,8 +483,8 @@
 
         function mostrarModalEdicion(reg) {
             let html = `
-                <div class="form-group"><label>📅 FECHA</label><input type="date" id="editFecha" class="form-control" value="${reg.fecha}"></div>
-                <div class="form-group"><label>📍 SEDE</label><select id="editSede" class="form-select">
+                <div class="form-group"><label>FECHA</label><input type="date" id="editFecha" class="form-control" value="${reg.fecha}"></div>
+                <div class="form-group"><label>SEDE</label><select id="editSede" class="form-select">
                     <option value="hyo_10am" ${reg.sede === 'hyo_10am' ? 'selected' : ''}>Huancayo 10am</option>
                     <option value="hyo_12pm" ${reg.sede === 'hyo_12pm' ? 'selected' : ''}>Huancayo - 12pm</option>
                     <option value="NEXT_5pm" ${reg.sede === 'NEXT_5pm' ? 'selected' : ''}>NEXT - 5pm</option>
@@ -496,15 +497,15 @@
                     <option value="transformando_ciudades" ${reg.sede === 'transformando_ciudades' ? 'selected' : ''}>Transformando Ciudades</option>
                 </select></div>
                 <div class="double-input">
-                    <div class="form-group"><label>👥 TOTAL</label><input type="number" id="editTotal" class="form-control" value="${reg.totalGeneral}" min="0"></div>
-                    <div class="form-group"><label>🧒 KIDS</label><input type="number" id="editKids" class="form-control" value="${(reg.totalKV || 0) + (reg.totalKM || 0)}" min="0"></div>
+                    <div class="form-group"><label>TOTAL</label><input type="number" id="editTotal" class="form-control" value="${reg.totalGeneral}" min="0"></div>
+                    <div class="form-group"><label>KIDS</label><input type="number" id="editKids" class="form-control" value="${(reg.totalKV || 0) + (reg.totalKM || 0)}" min="0"></div>
                 </div>
                 <div class="double-input">
-                    <div class="form-group"><label>👨 VARONES</label><input type="number" id="editVarones" class="form-control" value="${reg.totalVarones}" min="0"></div>
-                    <div class="form-group"><label>👩 MUJERES</label><input type="number" id="editMujeres" class="form-control" value="${reg.totalMujeres}" min="0"></div>
+                    <div class="form-group"><label>VARONES</label><input type="number" id="editVarones" class="form-control" value="${reg.totalVarones}" min="0"></div>
+                    <div class="form-group"><label>MUJERES</label><input type="number" id="editMujeres" class="form-control" value="${reg.totalMujeres}" min="0"></div>
                 </div>
-                <div class="form-group"><label>👤 REGISTRADO POR (no se modifica)</label><input type="text" class="form-control" value="${reg.registradoPor || '-'}" readonly style="background:#f0f0f0;cursor:not-allowed;"></div>
-                <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="guardarEdicion()">💾 Guardar cambios</button>
+                <div class="form-group"><label>REGISTRADO POR (no se modifica)</label><input type="text" class="form-control" value="${reg.registradoPor || '-'}" readonly style="background:#f0f0f0;cursor:not-allowed;"></div>
+                <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="guardarEdicion()">Guardar cambios</button>
             `;
             document.getElementById('editModalBody').innerHTML = html;
             document.getElementById('editModal').style.display = 'flex';
@@ -533,14 +534,14 @@
                 }
                 procesarDatos(); // Actualizar UI
                 cerrarModal();
-                toast('✅ Cambio guardado localmente');
+                toast(' Cambio guardado localmente');
 
                 // 2. Intentar guardar en Supabase
                 await firebaseReady;
                 await firestoreUpdateDoc('registros', registroEditando.firebaseId, datosActualizados);
             } catch (err) {
                 console.error(err);
-                toast('⚠️ Guardado localmente, pero error al sincronizar: ' + err.message, 'warning');
+                toast(' Guardado localmente, pero error al sincronizar: ' + err.message, 'warning');
             }
         }
 
@@ -554,14 +555,14 @@
                     guardarCacheLocal(registros);
                 }
                 procesarDatos();
-                toast('🗑️ Registro eliminado');
+                toast(' Registro eliminado');
                 // 2. Intentar eliminar de Supabase
                 try {
                     await firebaseReady;
                     await firestoreDeleteDoc('registros', firebaseId);
                 } catch (err) {
                     console.error(err);
-                    toast('⚠️ Eliminado localmente, pero error al sincronizar: ' + err.message, 'warning');
+                    toast(' Eliminado localmente, pero error al sincronizar: ' + err.message, 'warning');
                 }
             }
         }
@@ -579,7 +580,7 @@
             let wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
             XLSX.writeFile(wb, `iglesia_${hoyPeru()}.xlsx`);
-            toast('📎 Excel exportado');
+            toast(' Excel exportado');
         }
 
         function toast(msg, tipo) {
@@ -630,7 +631,7 @@
 
         function cargarUsuario() {
             document.getElementById('userName').innerText = usuarioActual.nombre || 'Administrador';
-            document.getElementById('userRole').innerText = esAdmin ? 'Administrador' : '📋 Líder de Sede';
+            document.getElementById('userRole').innerText = esAdmin ? 'Administrador' : ' Líder de Sede';
             document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
         }
 

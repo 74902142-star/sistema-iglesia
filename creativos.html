@@ -13,9 +13,9 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="supabase.js?v=2"></script>
-    <script src="auth.js?v=4"></script>
-    <link rel="stylesheet" href="theme.css?v=1">
+    <script src="supabase.js?v=3"></script>
+    <script src="auth.js?v=5"></script>
+    <link rel="stylesheet" href="theme.css?v=16">
 </head>
 
 <body>
@@ -45,7 +45,7 @@
                 <a href="notas.html" class="nav-link" id="nav-notas"><span class="nav-icon"><i data-lucide="clipboard-check"></i></span><span>Registro de Notas</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
-                <a href="#" class="nav-link"><span class="nav-icon"><i
+                <a href="#" class="nav-link" id="nav-config"><span class="nav-icon"><i
                             data-lucide="settings"></i></span><span>Configuración</span></a>
                 <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i
                             data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
@@ -170,9 +170,9 @@
                         <div class="form-group">
                             <label>Rol</label>
                             <select id="creRol" class="form-control" required>
-                                <option value="Producción">🎛️ Producción</option>
-                                <option value="Fotografía">📸 Fotografía</option>
-                                <option value="Multimedia">💻 Multimedia</option>
+                                <option value="Producción">Producción</option>
+                                <option value="Fotografía">Fotografía</option>
+                                <option value="Multimedia">Multimedia</option>
                                 <option value="Anfitrión">Redes Sociales</option>
                             </select>
                         </div>
@@ -307,10 +307,10 @@
 
             if (editandoId) {
                 await dbCreativos.doc(editandoId).update(data);
-                toast('✅ Creativo actualizado');
+                toast(' Creativo actualizado');
             } else {
                 await dbCreativos.add(data);
-                toast('✅ Creativo agregado');
+                toast(' Creativo agregado');
             }
             cerrarModal();
             cargarCreativos();
@@ -340,7 +340,7 @@
         async function eliminarCreativo(id) {
             if (confirm('¿Eliminar a este creativo?')) {
                 await dbCreativos.doc(id).delete();
-                toast('🗑️ Creativo eliminado');
+                toast(' Creativo eliminado');
                 cargarCreativos();
             }
         }
@@ -348,7 +348,7 @@
         function enviarWhatsApp(id) {
             dbCreativos.doc(id).get().then(doc => {
                 const c = doc.data();
-                if (!c.telefono) { toast('❌ No hay teléfono registrado'); return; }
+                if (!c.telefono) { toast(' No hay teléfono registrado'); return; }
                 const msg = `🙏 RECORDATORIO IGLESIA AGUA VIVA 🙏\n\nHola ${c.nombre}, este es tu recordatorio para el servicio ${c.servicio}.\n\n🎭 Tu rol: ${c.rol}\n\n📅 Fecha: ${c.fecha || 'Próximo servicio'}\n⏰ Hora de llegada: 60 min antes\n\n¡Llegar puntual! ⛪`;
                 window.open(`https://wa.me/${c.telefono}?text=${encodeURIComponent(msg)}`, '_blank');
             });

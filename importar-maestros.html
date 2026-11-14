@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Importar Maestros KIDS | Iglesia Agua Viva</title>
-    <script src="supabase.js?v=2"></script>
+    <script src="supabase.js?v=3"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -178,7 +178,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>📥 Importar Maestros KIDS</h1>
+        <h1>Importar Maestros KIDS</h1>
         <p class="subtitle">Herramienta para importar masivamente los maestros del ministerio KIDS a Firestore.</p>
 
         <div class="stats" id="stats">
@@ -198,8 +198,8 @@
 
         <div class="card">
             <div class="actions">
-                <button class="btn btn-primary" id="btnImportar" onclick="importarTodo()">🚀 Importar todos los maestros</button>
-                <button class="btn btn-danger" id="btnLimpiar" onclick="limpiarTodo()">🗑️ Limpiar todos los maestros</button>
+                <button class="btn btn-primary" id="btnImportar" onclick="importarTodo()">Importar todos los maestros</button>
+                <button class="btn btn-danger" id="btnLimpiar" onclick="limpiarTodo()">Limpiar todos los maestros</button>
             </div>
             <div class="progress-bar" id="progressBar">
                 <div class="fill" id="progressFill"></div>
@@ -208,7 +208,7 @@
         </div>
 
         <div class="card">
-            <h3 style="margin-bottom:16px;color:#00334f;">📋 Vista previa de datos</h3>
+            <h3 style="margin-bottom:16px;color:#00334f;">Vista previa de datos</h3>
             <div style="overflow-x:auto;">
                 <table>
                     <thead>
@@ -292,7 +292,7 @@
                             <td>${m.dni}</td>
                             <td>${m.nombres}</td>
                             <td>${m.celular}</td>
-                            <td>${m.sexo === 'Masculino' ? '♂️' : '♀️'}</td>
+                            <td>${m.sexo === 'Masculino' ? 'Varón' : 'Mujer'}</td>
                             <td>${m.lider}</td>
                             <td><span class="badge badge-pending">Pendiente</span></td>
                         </tr>
@@ -312,10 +312,10 @@
                 const badge = filas[i].querySelector('.badge');
                 if (tipo === 'success') {
                     badge.className = 'badge badge-success';
-                    badge.innerText = '✅ Importado';
+                    badge.innerText = ' Importado';
                 } else if (tipo === 'error') {
                     badge.className = 'badge badge-error';
-                    badge.innerText = '❌ Error';
+                    badge.innerText = ' Error';
                 }
             }
         }
@@ -334,12 +334,12 @@
             let success = 0,
                 errors = 0;
 
-            log('🚀 Iniciando importación...', 'info');
+            log(' Iniciando importación...', 'info');
 
             for (let i = 0; i < MAESTROS.length; i++) {
                 const m = MAESTROS[i];
                 try {
-                    log(`📄 (${i + 1}/${MAESTROS.length}) ${m.nombres}...`, 'info');
+                    log(` (${i + 1}/${MAESTROS.length}) ${m.nombres}...`, 'info');
                     await dbKids.add({
                         dni: m.dni,
                         nombres: m.nombres,
@@ -350,26 +350,26 @@
                     success++;
                     resultados.push({ ...m, estado: 'success' });
                     actualizarEstado(i, 'success');
-                    log(`✅ ${m.nombres} importado correctamente`, 'success');
+                    log(` ${m.nombres} importado correctamente`, 'success');
                 } catch (e) {
                     errors++;
                     resultados.push({ ...m, estado: 'error', error: e.message });
                     actualizarEstado(i, 'error');
-                    log(`❌ ${m.nombres}: ${e.message}`, 'error');
+                    log(` ${m.nombres}: ${e.message}`, 'error');
                 }
                 fill.style.width = `${((i + 1) / MAESTROS.length) * 100}%`;
                 document.getElementById('countSuccess').innerText = success;
                 document.getElementById('countError').innerText = errors;
             }
 
-            log(`\n🎉 ¡Importación completada! ${success} exitosos, ${errors} errores.`, 'info');
+            log(`\n ¡Importación completada! ${success} exitosos, ${errors} errores.`, 'info');
             btn.disabled = false;
             btnLimpiar.disabled = false;
         }
 
         async function limpiarTodo() {
             if (!confirm('¿ESTÁS SEGURO? Esto eliminará TODOS los maestros de la colección kids_maestros.')) return;
-            if (!confirm('⚠️ ÚLTIMA ADVERTENCIA: Esta acción no se puede deshacer. ¿Continuar?')) return;
+            if (!confirm(' ÚLTIMA ADVERTENCIA: Esta acción no se puede deshacer. ¿Continuar?')) return;
 
             const btn = document.getElementById('btnImportar');
             const btnLimpiar = document.getElementById('btnLimpiar');
@@ -377,7 +377,7 @@
             btnLimpiar.disabled = true;
             document.getElementById('log').innerHTML = '';
 
-            log('🗑️ Limpiando colección kids_maestros...', 'info');
+            log(' Limpiando colección kids_maestros...', 'info');
 
             try {
                 const snap = await dbKids.get();
@@ -387,10 +387,10 @@
                 for (const doc of snap.docs) {
                     await doc.ref.delete();
                     count++;
-                    log(`🗑️ Eliminado: ${doc.data().nombres || doc.id}`, 'info');
+                    log(` Eliminado: ${doc.data().nombres || doc.id}`, 'info');
                 }
 
-                log(`\n✅ ${count} maestros eliminados correctamente.`, 'success');
+                log(`\n ${count} maestros eliminados correctamente.`, 'success');
                 document.getElementById('countSuccess').innerText = '0';
                 document.getElementById('countTotal').innerText = '0';
 
@@ -401,7 +401,7 @@
                 });
 
             } catch (e) {
-                log(`❌ Error al limpiar: ${e.message}`, 'error');
+                log(` Error al limpiar: ${e.message}`, 'error');
             }
 
             btn.disabled = false;

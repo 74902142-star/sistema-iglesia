@@ -13,8 +13,8 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="supabase.js?v=2"></script>
-    <script src="auth.js?v=4"></script>
+    <script src="supabase.js?v=3"></script>
+    <script src="auth.js?v=5"></script>
     <style>
         /* Guest Mode - Full Screen No Sidebar */
         body.guest-mode .sidebar,
@@ -836,7 +836,7 @@
         .daily-attendee .info h5 { font-size:13px; font-weight:600; color:#00334f; }
         .daily-attendee .info span { font-size:11px; color:#94a3b8; }
     </style>
-    <link rel="stylesheet" href="theme.css?v=1">
+    <link rel="stylesheet" href="theme.css?v=16">
 </head>
 
 <body id="kidsBody">
@@ -866,7 +866,7 @@
                 <a href="notas.html" class="nav-link" id="nav-notas"><span class="nav-icon"><i data-lucide="clipboard-check"></i></span><span>Registro de Notas</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
-                <a href="#" class="nav-link"><span class="nav-icon"><i
+                <a href="#" class="nav-link" id="nav-config"><span class="nav-icon"><i
                             data-lucide="settings"></i></span><span>Configuración</span></a>
                 <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i
                             data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
@@ -928,7 +928,7 @@
                             </div>
                         </div>
                         <div class="kids-stat-card">
-                            <div class="kids-stat-icon purple"><i data-lucide="male" style="width:24px;height:24px;"></i></div>
+                            <div class="kids-stat-icon purple"><i data-lucide="mars" style="width:24px;height:24px;"></i></div>
                             <div class="kids-stat-info">
                                 <h4>Varones</h4>
                                 <div class="value" id="statVarones">0</div>
@@ -936,7 +936,7 @@
                             </div>
                         </div>
                         <div class="kids-stat-card">
-                            <div class="kids-stat-icon pink"><i data-lucide="female" style="width:24px;height:24px;"></i></div>
+                            <div class="kids-stat-icon pink"><i data-lucide="venus" style="width:24px;height:24px;"></i></div>
                             <div class="kids-stat-info">
                                 <h4>Mujeres</h4>
                                 <div class="value" id="statMujeres">0</div>
@@ -1091,7 +1091,7 @@
                             <p>Registro de Asistencia de Maestros</p>
                         </div>
                         <div class="kids-pass-card">
-                            <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+                            <div style="font-size:40px;margin-bottom:12px;"><i data-lucide="lock" style="width:1em;height:1em;"></i></div>
                             <h2>Acceso Restringido</h2>
                             <p>Ingresa la contraseña para continuar</p>
                             <input type="password" id="kidsPasswordInput" class="kids-pass-input"
@@ -1101,7 +1101,7 @@
                                 Ingresar
                             </button>
                             <p id="passwordError" class="kids-pass-error">
-                                ❌ Contraseña incorrecta
+                                 Contraseña incorrecta
                             </p>
                         </div>
                     </div>
@@ -1155,7 +1155,7 @@
                         <div id="kidsStepRegister" style="display:none;">
                             <div class="kids-register-card">
                                 <div style="text-align:center;margin-bottom:20px;">
-                                    <div style="font-size:40px;margin-bottom:8px;">📝</div>
+                                    <div style="font-size:40px;margin-bottom:8px;"><i data-lucide="file-pen-line" style="width:1em;height:1em;"></i></div>
                                     <h3>DNI no registrado</h3>
                                     <p class="subtitle">Completa tus datos para registrarte y marcar asistencia</p>
                                 </div>
@@ -1198,7 +1198,7 @@
                         <div id="kidsStepSuccess" style="display:none;">
                             <div class="kids-search-card">
                                 <div class="kids-success">
-                                    <div class="kids-success-icon">✅</div>
+                                    <div class="kids-success-icon"><i data-lucide="circle-check" style="width:1em;height:1em;"></i></div>
                                     <h2>¡Asistencia Registrada!</h2>
                                     <p>Tu ingreso ha sido registrado correctamente.</p>
                                     <p style="margin-top:4px;font-weight:600;">¡Gracias por servir!</p>
@@ -1275,7 +1275,7 @@
         if (!esAdmin && !esInvitado) { window.location.href = 'index.html'; }
 
         document.getElementById('userName').innerText = esAdmin ? usuarioActual.nombre : usuarioActual.nombre;
-        document.getElementById('userRole').innerText = esAdmin ? '👑 Administrador' : '👥 Invitado';
+        document.getElementById('userRole').innerText = esAdmin ? 'Administrador' : 'Invitado';
         document.getElementById('userAvatar').innerText = (usuarioActual.nombre || 'A').charAt(0).toUpperCase();
 
         if (esAdmin) {
@@ -1374,7 +1374,7 @@
             }
             tbody.innerHTML = maestros.map(m => {
                 const isFem = m.sexo === 'Femenino';
-                const sexoIcon = isFem ? '♀️' : '♂️';
+                const sexoIcon = isFem ? 'Mujer' : 'Varón';
                 return `<tr>
                     <td>
                         <div class="teacher-cell">
@@ -1403,7 +1403,7 @@
             const dni = document.getElementById('dniBuscar').value.trim();
             if (!dni) { toast('Ingresa un DNI', 'warning'); return; }
             const m = maestros.find(x => x.dni === dni);
-            if (!m) { toast('❌ Maestro no encontrado', 'warning'); return; }
+            if (!m) { toast(' Maestro no encontrado', 'warning'); return; }
             mostrarMaestro(m);
         }
 
@@ -1461,7 +1461,7 @@
                 hora: horaPeru(),
                 timestamp: now.toISOString()
             });
-            toast('✅ Asistencia registrada para ' + maestroActual.nombres);
+            toast(' Asistencia registrada para ' + maestroActual.nombres);
             cargarHistorial(maestroActual.id, maestroActual.nombres);
             actualizarStats();
         }
@@ -1478,7 +1478,7 @@
         async function buscarMaestroGuest() {
             const dni = document.getElementById('guestDniInput').value.trim();
             if (!dni) { toast('Ingresa tu DNI', 'warning'); return; }
-            if (!/^\d{8}$/.test(dni)) { toast('❌ DNI debe tener 8 dígitos', 'warning'); return; }
+            if (!/^\d{8}$/.test(dni)) { toast(' DNI debe tener 8 dígitos', 'warning'); return; }
 
             await firebaseReady;
             let snap = await dbKids.where('dni', '==', dni).get();
@@ -1500,7 +1500,7 @@
                         createdAt: new Date().toISOString(),
                         origen: 'edl'
                     });
-                    toast('✅ Registro importado desde EDL');
+                    toast(' Registro importado desde EDL');
                     snap = await dbKids.where('dni', '==', dni).get();
                 }
             }
@@ -1557,7 +1557,7 @@
             const sexo = document.getElementById('regSexo').value;
             const lider = document.getElementById('regLider').value.trim();
 
-            if (!nombres) { toast('❌ Ingresa tus nombres', 'warning'); return; }
+            if (!nombres) { toast(' Ingresa tus nombres', 'warning'); return; }
 
             // "Agua Viva Hyo" → show selection panel
             if (nombres === 'Agua Viva Hyo') {
@@ -1565,12 +1565,12 @@
                 return;
             }
 
-            if (!celular) { toast('❌ Ingresa tu celular', 'warning'); return; }
-            if (!sexo) { toast('❌ Selecciona tu sexo', 'warning'); return; }
+            if (!celular) { toast(' Ingresa tu celular', 'warning'); return; }
+            if (!sexo) { toast(' Selecciona tu sexo', 'warning'); return; }
 
             const btn = document.querySelector('.kids-register-btn');
             btn.disabled = true;
-            btn.textContent = '⏳ Guardando...';
+            btn.textContent = ' Guardando...';
 
             try {
                 await firebaseReady;
@@ -1594,7 +1594,7 @@
                 maestroActual = { id: docRef.id, dni, nombres, celular, sexo, lider: lider || 'Pendiente' };
                 await registrarAsistenciaGuest();
             } catch (e) {
-                toast('❌ Error al registrarte: ' + e.message, 'error');
+                toast(' Error al registrarte: ' + e.message, 'error');
                 btn.disabled = false;
                 btn.textContent = 'Registrarme y marcar asistencia';
             }
@@ -1633,9 +1633,9 @@
 
             try {
                 const dni = document.getElementById('mDni').value.trim();
-                if (!/^\d{8}$/.test(dni)) { toast('❌ DNI debe tener 8 dígitos', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Maestro'; return; }
+                if (!/^\d{8}$/.test(dni)) { toast(' DNI debe tener 8 dígitos', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Maestro'; return; }
                 const celular = document.getElementById('mCelular').value.trim();
-                if (celular && !/^9\d{8}$/.test(celular)) { toast('❌ Celular inválido', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Maestro'; return; }
+                if (celular && !/^9\d{8}$/.test(celular)) { toast(' Celular inválido', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Maestro'; return; }
 
                 const data = {
                     nombres: document.getElementById('mNombres').value.trim(),
@@ -1647,15 +1647,15 @@
 
                 if (editandoId) {
                     await dbKids.doc(editandoId).update(data);
-                    toast('✅ Maestro actualizado');
+                    toast(' Maestro actualizado');
                 } else {
                     await dbKids.add(data);
-                    toast('✅ Maestro registrado');
+                    toast(' Maestro registrado');
                 }
                 cerrarModal();
                 cargarMaestros();
             } catch (err) {
-                toast('❌ Error: ' + err.message, 'error');
+                toast(' Error: ' + err.message, 'error');
                 btn.disabled = false;
                 btn.innerHTML = 'Guardar Maestro';
             }
@@ -1687,7 +1687,7 @@
         async function eliminarMaestroId(id, nombre) {
             if (!confirm('¿Eliminar a ' + nombre + '?')) return;
             await dbKids.doc(id).delete();
-            toast('🗑️ Maestro eliminado');
+            toast(' Maestro eliminado');
             if (maestroActual && maestroActual.id === id) limpiarBusqueda();
             cargarMaestros();
         }
@@ -1699,7 +1699,7 @@
 
         // ── Export ──
         function exportarExcel() {
-            if (typeof XLSX === 'undefined') { toast('❌ Librería XLSX no cargada', 'error'); return; }
+            if (typeof XLSX === 'undefined') { toast(' Librería XLSX no cargada', 'error'); return; }
             const datos = maestros.map(m => ({
                 Nombres: m.nombres,
                 DNI: m.dni,
@@ -1711,7 +1711,7 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Maestros KIDS');
             XLSX.writeFile(wb, `kids_maestros_${hoyPeru()}.xlsx`);
-            toast('📎 Excel exportado');
+            toast(' Excel exportado');
         }
 
         // ── Toast ──

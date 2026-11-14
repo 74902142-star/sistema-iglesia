@@ -9,374 +9,506 @@
     <link rel="shortcut icon" href="favicon.ico?v=2">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Iglesia Agua Viva | Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+
+        :root {
+            --lago: #1b335f;
+            --lago-2: #26488a;
+            --agua: #4fc3f0;
+            --agua-d: #2a4f8f;
+            --espuma: #e3f1fb;
+            --papel: #f5f9fd;
+            --sol: #46d1ab;
+            --tinta: #101d36;
+            --suave: #55688a;
+            --borde: #d3e0ef;
+            --display: 'Source Sans 3', 'Source Sans 3', system-ui, sans-serif;
+            --cuerpo: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #00334f 0%, #1c6390 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            color: #1e293b;
+            font-family: var(--cuerpo);
+            background: var(--papel);
+            color: var(--tinta);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
         }
+        ::selection { background: var(--sol); color: var(--lago); }
+        :focus-visible { outline: 3px solid var(--sol); outline-offset: 3px; }
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: var(--papel); }
+        ::-webkit-scrollbar-thumb { background: var(--agua-d); border-radius: 12px; border: 3px solid var(--papel); }
+        img { max-width: 100%; display: block; }
 
-        .login-container {
-            width: 100%;
-            max-width: 420px;
-            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        /* ── Barra superior ── */
+        .top {
+            position: absolute; inset: 0 0 auto 0; z-index: 20;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 22px clamp(20px, 5vw, 64px);
         }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .marca { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; }
+        .marca img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px rgba(255,255,255,.35); }
+        .marca span { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+        .top a.entrar {
+            color: var(--lago); background: var(--sol); text-decoration: none; font-weight: 700; font-size: 14px;
+            padding: 10px 20px; border-radius: 999px; transition: transform .2s var(--ease), box-shadow .2s var(--ease);
+            box-shadow: 0 6px 16px rgba(0,0,0,.25);
         }
+        .top a.entrar:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0,0,0,.3); }
 
-        .login-card {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 40px 32px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+        /* ── Portada ── */
+        .hero {
+            position: relative; overflow: hidden; color: #fff;
+            background:
+                radial-gradient(60% 70% at 78% 40%, rgba(79, 195, 240, .42), transparent 70%),
+                radial-gradient(50% 60% at 8% 100%, rgba(70, 209, 171, .18), transparent 70%),
+                var(--lago);
+            padding: clamp(110px, 16vh, 150px) clamp(20px, 5vw, 64px) clamp(120px, 16vw, 190px);
         }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 32px;
+        .hero-grid {
+            position: relative; z-index: 2;
+            max-width: 1240px; margin: 0 auto;
+            display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 440px); gap: clamp(32px, 6vw, 88px); align-items: center;
         }
-
-        .logo-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 64px;
-            height: 64px;
-            background-color: #eff6ff;
-            color: #1b4570;
-            border-radius: 18px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(27, 69, 112, 0.1);
+        .hero h1 {
+            font-family: var(--display); font-weight: 900;
+            font-size: clamp(2.6rem, 6.4vw, 5.6rem); line-height: 0.98; letter-spacing: -0.035em;
+            text-wrap: balance;
         }
-
-        .logo h1 {
-            font-size: 24px;
-            font-weight: 800;
-            color: #0f172a;
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
+        .hero h1 em { font-style: normal; color: var(--sol); }
+        .hero p.lead { margin-top: 26px; max-width: 46ch; font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: #d3e3f8; }
+        .hero .atajos { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .hero .atajos a {
+            color: #fff; text-decoration: none; font-weight: 600; font-size: 14.5px;
+            border: 1.5px solid rgba(255,255,255,.35); padding: 10px 18px; border-radius: 999px;
+            transition: background-color .2s, border-color .2s;
         }
+        .hero .atajos a:hover { background: rgba(255,255,255,.12); border-color: #fff; }
 
-        .logo p {
-            color: #64748b;
-            font-size: 13px;
-            font-weight: 500;
+        /* Ondas: único momento animado, una sola vez al cargar */
+        .ondas { position: absolute; z-index: 1; right: clamp(-120px, 4vw, 120px); top: 50%; width: 760px; height: 760px; transform: translateY(-50%); pointer-events: none; }
+        .ondas i {
+            position: absolute; inset: 0; margin: auto; border-radius: 50%;
+            border: 1.5px solid rgba(143, 232, 222, .5);
+            width: 120px; height: 120px; opacity: 0;
+            animation: onda 3.2s var(--ease) 0.2s 1 both;
         }
-
-        .form-group {
-            margin-bottom: 20px;
+        .ondas i:nth-child(2) { animation-delay: .55s; }
+        .ondas i:nth-child(3) { animation-delay: .9s; }
+        .ondas i:nth-child(4) { animation-delay: 1.25s; }
+        .ondas i:nth-child(5) { animation-delay: 1.6s; }
+        @keyframes onda {
+            0% { width: 120px; height: 120px; opacity: .9; }
+            100% { width: 760px; height: 760px; opacity: 0.16; }
         }
+        .hero-entra { animation: entra .9s var(--ease) both; }
+        .hero-entra.d2 { animation-delay: .12s; }
+        .hero-entra.d3 { animation-delay: .24s; }
+        @keyframes entra { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
 
-        .form-group label {
-            display: block;
-            font-size: 11px;
-            font-weight: 700;
-            color: #475569;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .hero .olas { position: absolute; z-index: 3; left: 0; right: 0; bottom: -1px; width: 100%; height: clamp(70px, 11vw, 150px); display: block; }
 
-        .input-wrapper {
+        /* ── Panel de acceso (misma lógica de siempre) ── */
+        .acceso {
+            background: var(--papel); color: var(--tinta);
+            border-radius: 20px; padding: 30px 28px 26px;
+            box-shadow: 0 2px 0 rgba(255,255,255,.4) inset, 0 28px 60px -12px rgba(0,0,0,.45);
             position: relative;
-            display: flex;
-            align-items: center;
         }
-
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            color: #94a3b8;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .acceso::before {
+            content: ''; position: absolute; left: 28px; right: 28px; top: -9px; height: 9px;
+            background:
+                linear-gradient(135deg, transparent 50%, var(--sol) 50%) 0 0 / 18px 9px repeat-x;
+            opacity: .95;
         }
-
+        .acceso h2 { font-family: var(--display); font-weight: 700; font-size: 1.15rem; letter-spacing: -0.02em; margin-bottom: 4px; }
+        .acceso .sub { font-size: 14px; color: var(--suave); margin-bottom: 20px; }
+        .acceso .sub strong { color: var(--tinta); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13.5px; font-weight: 600; color: var(--tinta); margin-bottom: 6px; }
+        .input-wrapper { position: relative; }
+        .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--suave); display: flex; pointer-events: none; }
         .input {
-            width: 100%;
-            padding: 13px 16px 13px 44px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            font-family: inherit;
-            transition: all 0.2s;
-            background: #f8fafc;
-            color: #0f172a;
+            width: 100%; padding: 13px 14px 13px 44px; font-size: 15px; font-family: inherit; color: var(--tinta);
+            background: #fff; border: 1.5px solid var(--borde); border-radius: 12px; outline: none;
+            transition: border-color .15s, box-shadow .15s;
         }
-
-        .input:focus {
-            outline: none;
-            border-color: #1b4570;
-            background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(27, 69, 112, 0.1);
+        .input::placeholder { color: #8a9bb8; }
+        .input:focus { border-color: var(--agua-d); box-shadow: 0 0 0 4px rgba(79, 195, 240, .22); }
+        .btn, .btn-guest {
+            width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 14px 20px; border: 0; border-radius: 12px; cursor: pointer;
+            font-family: inherit; font-weight: 700; font-size: 15px; color: #fff; background: var(--agua-d);
+            box-shadow: 0 8px 18px -6px rgba(42, 79, 143, .6);
+            transition: transform .18s var(--ease), box-shadow .18s var(--ease), background-color .18s;
         }
+        .btn:hover, .btn-guest:hover { background: #1f3f78; transform: translateY(-2px); box-shadow: 0 12px 22px -6px rgba(42, 79, 143, .65); }
+        .btn:active, .btn-guest:active { transform: translateY(0); }
+        .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+        .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0 16px; font-size: 13px; color: var(--suave); }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--borde); }
+        .btn-link-admin { display: block; text-align: center; margin-top: 8px; font-size: 14px; font-weight: 600; color: var(--agua-d); text-decoration: none; }
+        .btn-link-admin:hover { text-decoration: underline; text-underline-offset: 4px; }
+        .admin-section { display: none; }
+        .admin-section.visible { display: block; animation: fadeIn .3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .input::placeholder {
-            color: #94a3b8;
+        /* ── Secciones ── */
+        .sec { padding: clamp(64px, 9vw, 120px) clamp(20px, 5vw, 64px); }
+        .sec .in { max-width: 1240px; margin: 0 auto; }
+        .sec h2.titulo { font-family: var(--display); font-weight: 700; font-size: clamp(1.8rem, 3.6vw, 3rem); line-height: 1.08; letter-spacing: -0.025em; max-width: 18ch; text-wrap: balance; }
+        .sec p.intro { margin-top: 16px; max-width: 52ch; color: var(--suave); font-size: 1.08rem; }
+
+        /* Módulos: lista tipográfica, no tarjetas */
+        .modulos { margin-top: 44px; border-top: 1.5px solid var(--lago); }
+        .modulo {
+            display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) 44px; gap: 24px; align-items: center;
+            padding: 26px 8px; border-bottom: 1px solid var(--borde); text-decoration: none; color: inherit;
+            transition: background-color .25s var(--ease), padding .25s var(--ease);
         }
+        .modulo b { font-family: var(--display); font-weight: 600; font-size: clamp(1.15rem, 2.2vw, 1.7rem); letter-spacing: -0.02em; transition: transform .25s var(--ease), color .25s; }
+        .modulo span { color: var(--suave); font-size: 1rem; }
+        .modulo svg { justify-self: end; color: var(--agua-d); transition: transform .25s var(--ease); }
+        .modulo:hover { background: var(--espuma); padding-left: 20px; padding-right: 20px; }
+        .modulo:hover b { color: var(--agua-d); }
+        .modulo:hover svg { transform: translate(4px, -4px); }
 
-        .btn {
-            width: 100%;
-            padding: 14px;
-            background: #1b4570;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: 8px;
-            box-shadow: 0 4px 10px rgba(27, 69, 112, 0.15);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+        /* Semana de la escuela: columnas escalonadas */
+        .escuela { background: var(--lago); color: #fff; position: relative; overflow: hidden; }
+        .escuela::before { content: ''; position: absolute; inset: 0; background: radial-gradient(50% 60% at 90% 0, rgba(79,195,240,.3), transparent 70%); pointer-events: none; }
+        .escuela .in { position: relative; }
+        .escuela p.intro { color: #c3d6f1; }
+        .semana { margin-top: 56px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; align-items: end; }
+        .dia { padding: 26px 22px 28px; border-left: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.04); }
+        .dia:nth-child(1) { margin-top: 0; }
+        .dia:nth-child(2) { margin-top: -28px; }
+        .dia:nth-child(3) { margin-top: -56px; }
+        .dia:nth-child(4) { margin-top: -84px; background: rgba(70,209,171,.1); }
+        .dia h3 { font-family: var(--display); font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em; }
+        .dia .hora { color: var(--sol); font-weight: 700; font-size: 14px; margin: 4px 0 16px; }
+        .dia ul { list-style: none; display: grid; gap: 8px; }
+        .dia li { font-size: 15px; color: #eaf2fd; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.1); }
+        .dia li small { display: block; color: #a9c2e8; font-size: 12.5px; }
+        .escuela .cta { margin-top: 44px; display: inline-flex; align-items: center; gap: 10px; background: var(--sol); color: var(--lago); font-weight: 700; padding: 15px 28px; border-radius: 999px; text-decoration: none; transition: transform .2s var(--ease), box-shadow .2s var(--ease); box-shadow: 0 10px 24px -8px rgba(70,209,171,.6); }
+        .escuela .cta:hover { transform: translateY(-3px); box-shadow: 0 16px 30px -8px rgba(70,209,171,.7); }
 
-        .btn:hover {
-            background: #26598c;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 14px rgba(27, 69, 112, 0.25);
-        }
+        footer { padding: 36px clamp(20px, 5vw, 64px); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--suave); font-size: 14px; max-width: 1240px; margin: 0 auto; }
+        footer b { font-family: var(--display); color: var(--tinta); font-weight: 700; }
 
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 28px 0;
-            color: #94a3b8;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #e2e8f0;
-        }
-
-        .guest-card {
-            background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 8px;
-        }
-
-        .guest-card h3 {
-            font-size: 15px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .guest-card p {
-            font-size: 12.5px;
-            color: #64748b;
-            margin-bottom: 16px;
-            line-height: 1.5;
-        }
-
-        .btn-guest {
-            width: 100%;
-            padding: 12px;
-            background: #10b981;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-guest:hover {
-            background: #059669;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.25);
-        }
-
-        .btn-guest:active {
-            transform: translateY(0);
-        }
-
-        .btn-link-admin {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            font-size: 13px;
-            color: #64748b;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-
-        .btn-link-admin:hover {
-            color: #1b4570;
-        }
-
-        .admin-section {
-            display: none;
-        }
-
-        .admin-section.visible {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
+        /* ── Aviso (usado por el script) ── */
         .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 24px;
-            right: 24px;
-            padding: 14px;
-            border-radius: 60px;
-            color: white;
-            text-align: center;
-            font-weight: 600;
-            font-size: 14px;
-            z-index: 1000;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: fixed; bottom: 24px; left: 24px; right: 24px; max-width: 460px; margin: 0 auto;
+            padding: 14px 20px; border-radius: 14px; color: #fff; text-align: center; font-weight: 600; font-size: 14.5px; z-index: 1000;
+            box-shadow: 0 14px 30px -6px rgba(0, 0, 0, .35); animation: slideUp .3s var(--ease);
+        }
+        .toast-success { background: var(--agua-d); }
+        .toast-error { background: #c0392b; }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+        @media (max-width: 980px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .ondas { right: -300px; top: 30%; opacity: .6; }
+            .semana { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+            .dia, .dia:nth-child(n) { margin-top: 0; border: 1px solid rgba(255,255,255,.14); border-radius: 14px; }
+        }
+        @media (max-width: 640px) {
+            .modulo { grid-template-columns: 1fr 32px; }
+            .modulo span { grid-column: 1 / 2; }
+            .modulo svg { grid-row: 1; grid-column: 2; }
+            .semana { grid-template-columns: 1fr; }
+            .top a.entrar { padding: 9px 16px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .ondas i, .hero-entra { animation: none; opacity: 1; }
+            .ondas i { opacity: .25; width: 560px; height: 560px; }
+            * { transition-duration: .01ms !important; }
         }
 
-        .toast-success {
-            background: #10b981;
+        /* Dos modos claros: invitado o administrador, nunca los dos a la vez */
+        .acceso:has(.admin-section.visible) .guest-block { display: none; }
+        .btn-link-admin {
+            display: block; text-align: center; margin-top: 14px; padding: 12px 16px; border-radius: 12px;
+            border: 1.5px solid var(--borde); background: #fff; color: var(--agua-d); font-weight: 700; font-size: 14.5px; text-decoration: none;
+            transition: border-color .15s, background-color .15s;
+        }
+        .btn-link-admin:hover { border-color: var(--agua-d); background: var(--espuma); text-decoration: none; }
+        .acceso:has(.admin-section.visible) .divider { display: none; }
+        .acceso:has(.admin-section.visible) .admin-section { margin-top: 4px; }
+        .marca span { font-weight: 800; font-size: 17px; }
+
+        /* ── Segunda pasada: el logo es la fuente del agua ── */
+        .hero { padding-bottom: clamp(150px, 20vw, 260px); }
+        .disco {
+            position: absolute; z-index: 1; width: clamp(520px, 62vw, 940px); aspect-ratio: 1;
+            right: clamp(-340px, -14vw, -120px); top: 50%; transform: translateY(-50%);
+            border-radius: 50%; pointer-events: none; opacity: .95;
+            box-shadow: 0 0 0 clamp(18px, 2.4vw, 40px) rgba(79,195,240,.10), 0 0 0 clamp(40px, 5vw, 84px) rgba(79,195,240,.06);
+            animation: surge 1.4s var(--ease) both;
+        }
+        @keyframes surge { from { opacity: 0; transform: translateY(-50%) scale(.82); } to { opacity: .95; transform: translateY(-50%) scale(1); } }
+        .ondas { right: clamp(-340px, -14vw, -120px); width: clamp(520px, 62vw, 940px); height: clamp(520px, 62vw, 940px); }
+        .ondas i { border-color: rgba(158, 220, 248, .55); }
+        @keyframes onda {
+            0% { width: 20%; height: 20%; opacity: .9; }
+            100% { width: 150%; height: 150%; opacity: 0; }
+        }
+        .gigante {
+            position: absolute; z-index: 1; left: 50%; bottom: clamp(36px, 7vw, 100px); transform: translateX(-50%);
+            font-weight: 900; font-size: clamp(5rem, 21vw, 22rem); line-height: .8; letter-spacing: -0.05em; white-space: nowrap;
+            color: transparent; -webkit-text-stroke: 2px rgba(158, 220, 248, .22); pointer-events: none; user-select: none;
+        }
+        .acceso { box-shadow: 0 2px 0 rgba(255,255,255,.5) inset, 0 40px 80px -20px rgba(8, 20, 48, .7); }
+        .hero h1 { text-shadow: 0 2px 30px rgba(8, 20, 48, .35); }
+        @media (max-width: 980px) {
+            .disco, .ondas { right: -55vw; top: 22%; width: 120vw; height: 120vw; }
+            .disco { opacity: .5; animation: none; }
+        }
+        @media (prefers-reduced-motion: reduce) { .disco { animation: none; } }
+
+        /* ── Tercera pasada: el logo queda libre a la derecha, el acceso a la izquierda ── */
+        .hero-grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); align-items: center; }
+        .hero h1 { font-size: clamp(2.4rem, 5.2vw, 4.7rem); }
+        .hero .acceso { margin-top: 34px; max-width: 460px; }
+        .fuente { position: relative; width: min(100%, 520px); aspect-ratio: 1; justify-self: center; }
+        .fuente .disco {
+            position: absolute; inset: 0; width: 100%; height: 100%; right: auto; top: auto;
+            transform: none; animation: surge2 1.4s var(--ease) both;
+            box-shadow: 0 0 0 clamp(14px, 2vw, 30px) rgba(79,195,240,.12), 0 0 0 clamp(32px, 4vw, 64px) rgba(79,195,240,.07), 0 40px 90px -20px rgba(6, 16, 40, .7);
+        }
+        @keyframes surge2 { from { opacity: 0; transform: scale(.82); } to { opacity: .98; transform: scale(1); } }
+        .fuente .ondas { position: absolute; inset: 0; right: auto; top: auto; width: 100%; height: 100%; transform: none; display: grid; place-items: center; }
+        @media (max-width: 980px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .fuente { order: -1; width: min(62vw, 300px); margin-bottom: 8px; }
+            .fuente .disco { opacity: 1; animation: surge2 1.2s var(--ease) both; }
+            .hero .acceso { max-width: none; }
         }
 
-        .toast-error {
-            background: #ef4444;
+        /* ── Vidrio líquido en el panel de acceso ── */
+        .hero .acceso {
+            background: linear-gradient(145deg, rgba(255,255,255,.20), rgba(255,255,255,.06));
+            -webkit-backdrop-filter: blur(22px) saturate(1.5); backdrop-filter: blur(22px) saturate(1.5);
+            border: 1px solid rgba(255,255,255,.34); color: #fff;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 0 rgba(255,255,255,.08), 0 30px 70px -20px rgba(6,16,40,.65);
         }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(100px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .hero .acceso h2 { color: #fff; }
+        .hero .acceso .sub, .hero .acceso .divider { color: #cfe0f7; }
+        .hero .acceso .sub strong { color: #fff; }
+        .hero .acceso .form-group label { color: #eaf2fd; }
+        .hero .acceso .input { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.32); color: #fff; }
+        .hero .acceso .input::placeholder { color: rgba(255,255,255,.55); }
+        .hero .acceso .input:focus { background: rgba(255,255,255,.2); border-color: #9edcf8; box-shadow: 0 0 0 4px rgba(79,195,240,.28); }
+        .hero .acceso .input-icon { color: #cfe0f7; }
+        .hero .acceso .divider::before, .hero .acceso .divider::after { background: rgba(255,255,255,.28); }
+        .hero .acceso .btn, .hero .acceso .btn-guest {
+            background: linear-gradient(135deg, #4fc3f0 0%, #46d1ab 100%); color: #10264a;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 12px 26px -10px rgba(70,209,171,.7);
         }
+        .hero .acceso .btn:hover, .hero .acceso .btn-guest:hover { background: linear-gradient(135deg, #67cff6 0%, #5adcb9 100%); }
+        .hero .acceso .btn-link-admin { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.34); color: #fff; }
+        .hero .acceso .btn-link-admin:hover { background: rgba(255,255,255,.2); border-color: #fff; }
+        .escuela .cta { background: linear-gradient(135deg, #4fc3f0, #46d1ab); color: #10264a; }
+        .top a.entrar { display: none; }
+
+        /* ══ Acceso dividido e interactivo (el velo con el logo se desliza) ══ */
+        .hero-grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
+        .hero .acceso.split {
+            position: relative; display: grid; grid-template-columns: 1fr 1fr; max-width: 780px; width: 100%; margin: 0; padding: 0;
+            background: #fff; color: var(--tinta); border: 0; border-radius: 26px; overflow: hidden; min-height: 470px;
+            -webkit-backdrop-filter: none; backdrop-filter: none;
+            box-shadow: 0 50px 90px -30px rgba(6, 16, 40, .8), 0 0 0 1px rgba(255,255,255,.25);
+        }
+        .hero .acceso.split::before { display: none; }
+        .cara { padding: 40px 34px; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
+        .hero .acceso.split h2 { color: var(--lago); font-size: 1.7rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 6px; }
+        .hero .acceso.split .sub { color: var(--suave); }
+        .hero .acceso.split .sub strong { color: var(--lago); }
+        .hero .acceso.split .form-group label { color: var(--lago); }
+        .hero .acceso.split .input { background: #f1f6fc; border: 1.5px solid #d3e0ef; color: #101d36; -webkit-text-fill-color: #101d36; }
+        .hero .acceso.split .input::placeholder { color: #7c8eab; -webkit-text-fill-color: #7c8eab; }
+        .hero .acceso.split .input:focus { background: #fff; border-color: #2a4f8f; box-shadow: 0 0 0 4px rgba(79,195,240,.28); }
+        .hero .acceso.split .input:-webkit-autofill { -webkit-text-fill-color: #101d36; box-shadow: 0 0 0 100px #f1f6fc inset; }
+        .hero .acceso.split .input-icon { color: #55688a; }
+        .hero .acceso.split .btn, .hero .acceso.split .btn-guest {
+            background: linear-gradient(135deg, #2a4f8f 0%, #2f86c4 100%); color: #fff;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 14px 26px -12px rgba(42,79,143,.85);
+        }
+        .hero .acceso.split .btn:hover, .hero .acceso.split .btn-guest:hover { background: linear-gradient(135deg, #24457f 0%, #2a78b3 100%); }
+        .hero .acceso.split .btn:disabled { opacity: .55; }
+        .campo-error { display: none; margin-top: 8px; font-size: 13.5px; font-weight: 600; color: #b3261e; }
+        .campo-error.visible { display: block; animation: sacude .35s; }
+        @keyframes sacude { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .hero .acceso.split .admin-section { display: block; visibility: hidden; opacity: 0; transition: opacity .3s .15s; }
+        .hero .acceso.split .admin-section.visible { visibility: visible; opacity: 1; animation: none; }
+        .cara-invitado { grid-column: 1; }
+        .cara-admin { grid-column: 2; }
+        .velo {
+            position: absolute; z-index: 3; top: 0; bottom: 0; left: 50%; width: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; padding: 34px 28px;
+            color: #fff; overflow: hidden;
+            background: radial-gradient(90% 70% at 50% 0%, rgba(79,195,240,.55), transparent 70%), linear-gradient(160deg, #26488a 0%, #1b335f 70%);
+            transition: transform .7s var(--ease);
+        }
+        .hero .acceso.split.modo-admin .velo { transform: translateX(-100%); }
+        .velo-ondas { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+        .velo-ondas i { position: absolute; border-radius: 50%; border: 1.5px solid rgba(158,220,248,.5); width: 150px; height: 150px; opacity: 0; animation: ondaVelo 5s ease-out infinite; }
+        .velo-ondas i:nth-child(2) { animation-delay: 1.25s; } .velo-ondas i:nth-child(3) { animation-delay: 2.5s; } .velo-ondas i:nth-child(4) { animation-delay: 3.75s; }
+        @keyframes ondaVelo { 0% { width: 150px; height: 150px; opacity: .8; } 100% { width: 520px; height: 520px; opacity: 0; } }
+        .velo-logo { position: relative; width: clamp(120px, 11vw, 168px); aspect-ratio: 1; border-radius: 50%; box-shadow: 0 0 0 10px rgba(79,195,240,.14), 0 0 0 22px rgba(79,195,240,.07), 0 24px 40px -16px rgba(0,0,0,.6); margin-bottom: 8px; }
+        .velo-t { position: relative; font-weight: 900; font-size: 1.45rem; letter-spacing: -0.03em; }
+        .velo-s { position: relative; color: #c3d6f1; font-size: 14.5px; max-width: 24ch; }
+        .hero .acceso.split .velo .btn-link-admin {
+            position: relative; width: auto; margin-top: 10px; padding: 12px 22px; border-radius: 999px; background: rgba(255,255,255,.14); border: 1.5px solid rgba(255,255,255,.7); color: #fff;
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+        }
+        .hero .acceso.split .velo .btn-link-admin:hover { background: #fff; color: #1b335f; }
+        @media (max-width: 980px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .hero .acceso.split { max-width: 520px; margin: 0 auto; }
+        }
+        @media (max-width: 640px) {
+            .hero .acceso.split { grid-template-columns: 1fr; min-height: 0; }
+            .cara { padding: 30px 24px 18px; grid-column: 1 !important; }
+            .cara-admin { display: none; }
+            .hero .acceso.split.modo-admin .cara-admin { display: flex; }
+            .hero .acceso.split.modo-admin .cara-invitado { display: none; }
+            .velo { position: relative; left: 0; width: 100%; transform: none !important; padding: 22px 24px 28px; order: 3; }
+            .velo-logo, .velo-ondas, .velo-t { display: none; }
+            .velo-s { margin: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) { .velo { transition: none; } .velo-ondas i { animation: none; } }
+
+        /* ── Horario: filas alineadas, hora debajo del nombre ── */
+        .semana { align-items: start; gap: 16px; }
+        .dia, .dia:nth-child(n) { margin-top: 0; padding: 22px 20px 12px; border: 1px solid rgba(255,255,255,.16); border-radius: 18px; background: linear-gradient(160deg, rgba(255,255,255,.12), rgba(255,255,255,.04)); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: inset 0 1px 0 rgba(255,255,255,.2); }
+        .dia h3 { font-size: 1.35rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 10px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.18); }
+        .dia ul { gap: 0; }
+        .dia li { display: grid; gap: 3px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.1); }
+        .dia li:last-child { border-bottom: 0; }
+        .dia li b { font-size: 16px; font-weight: 700; color: #fff; }
+        
+        .dia .rango { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: #9edcf8; }
+        .dia .rango svg { opacity: .9; }
+        .leyenda { margin-top: 22px; display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: #a9c2e8; }
+        .leyenda .punto { width: 8px; height: 8px; border-radius: 50%; background: #46d1ab; }
+        .escuela .cta { margin-top: 20px; }
+        .dia .rango { white-space: nowrap; }
     </style>
-    <link rel="stylesheet" href="theme.css?v=1">
 </head>
 
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="logo">
-                <div class="logo-icon">
-                    <img src="logo.png" alt="Logo" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover;" />
-                </div>
-                <h1>Agua Viva Huancayo</h1>
-                <p>Sistema de Gestión</p>
-            </div>
+    <header class="top">
+        <a class="marca" href="#" aria-label="Agua Viva Huancayo">
+            <img src="logo.png" alt="Logo de Agua Viva" />
+            <span>Agua Viva Huancayo</span>
+        </a>
+    </header>
 
-            <div class="guest-card">
-                <h3><i data-lucide="user-check" style="width: 18px; height: 18px; color: #10b981;"></i> Acceso invitado
-                </h3>
-                <p>Ingresa tu nombre para acceder a los módulos de <strong>Reporte de Asistencia</strong> y <strong>EDL
-                        (Escuela de Liderazgo)</strong>.</p>
-                <div class="form-group" style="margin-bottom:16px;">
-                    <label>Tu nombre</label>
-                    <div class="input-wrapper">
-                        <span class="input-icon"><i data-lucide="user" style="width: 18px; height: 18px;"></i></span>
-                        <input type="text" id="guestName" class="input" placeholder="Ej: Jesus">
+    <main>
+        <section class="hero">
+            <div class="gigante" aria-hidden="true">AGUA VIVA</div>
+            <div class="hero-grid">
+                <div class="hero-text">
+                    <h1 class="hero-entra">Todo el ministerio, <em>en un solo lugar.</em></h1>
+                    <p class="lead hero-entra d2">Asistencia de los servicios, inscripciones a la Escuela de Liderazgo y notas de cada curso, para quienes sirven en Agua Viva Huancayo.</p>
+                </div>
+
+                <div class="acceso split hero-entra d2" id="acceso">
+                    <div class="cara cara-invitado">
+                        <h2>Entra con tu nombre</h2>
+                        <p class="sub">Como invitado entras al <strong>Reporte de Asistencia</strong> y a la <strong>Escuela de Liderazgo</strong>, y puedes inscribirte.</p>
+                        <div class="form-group">
+                            <label for="guestName">Tu nombre y apellido *</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon"><i data-lucide="user" style="width: 18px; height: 18px;"></i></span>
+                                <input type="text" id="guestName" class="input" placeholder="Ej: Jesús Pérez" autocomplete="name" required>
+                            </div>
+                            <p class="campo-error" id="guestNameError" role="alert">Escribe tu nombre para continuar.</p>
+                        </div>
+                        <button type="button" class="btn-guest" id="guestBtn">Continuar <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></button>
+                    </div>
+
+                    <div class="cara cara-admin">
+                        <h2>Acceso administrador</h2>
+                        <p class="sub">Con tu correo y contraseña del equipo.</p>
+                        <div id="adminSection" class="admin-section">
+                        <div class="form-group">
+                            <label for="loginEmail">Correo electrónico</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon"><i data-lucide="mail" style="width: 18px; height: 18px;"></i></span>
+                                <input type="email" id="loginEmail" class="input" placeholder="tu@email.com">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Contraseña</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon"><i data-lucide="lock" style="width: 18px; height: 18px;"></i></span>
+                                <input type="password" id="loginPassword" class="input" placeholder="••••••••">
+                            </div>
+                        </div>
+                        <button id="loginBtn" class="btn"><i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
+                            Iniciar sesión (Admin)</button>
+                        </div>
+                    </div>
+
+                    <div class="velo">
+                        <div class="velo-ondas" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+                        <img class="velo-logo" src="logo.png" alt="Logo de Agua Viva">
+                        <p class="velo-t">Agua Viva Huancayo</p>
+                        <p class="velo-s">¿Eres administrador?</p>
+                        <a href="#" class="btn-link-admin" id="toggleAdmin">Iniciar sesión como administrador</a>
                     </div>
                 </div>
-                <button type="button" class="btn-guest" id="guestBtn">Continuar <i data-lucide="arrow-right"
-                        style="width: 16px; height: 16px;"></i></button>
             </div>
 
-            <div class="divider">o acceso administrador</div>
+            <svg class="olas" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M0 70 C 180 20, 360 20, 540 70 S 900 120, 1080 70 S 1320 30, 1440 60 L1440 150 L0 150 Z" fill="#4fc3f0" opacity=".35" />
+                <path d="M0 95 C 200 55, 400 55, 600 95 S 1000 135, 1200 95 S 1380 70, 1440 85 L1440 150 L0 150 Z" fill="#2a4f8f" opacity=".55" />
+                <path d="M0 118 C 240 90, 480 90, 720 118 S 1200 146, 1440 112 L1440 150 L0 150 Z" fill="#f5f9fd" />
+            </svg>
+        </section>
 
-            <div id="adminSection" class="admin-section">
-                <div class="form-group">
-                    <label>📧 Correo Electrónico</label>
-                    <div class="input-wrapper">
-                        <span class="input-icon"><i data-lucide="mail" style="width: 18px; height: 18px;"></i></span>
-                        <input type="email" id="loginEmail" class="input" placeholder="tu@email.com">
-                    </div>
+        <section class="sec" id="modulos">
+            <div class="in">
+                <h2 class="titulo">Lo que se gestiona aquí</h2>
+                <p class="intro">Cada módulo tiene su propia pantalla. Inicia sesión y entra al que te toca.</p>
+                <div class="modulos">
+                    <a class="modulo" href="#acceso"><b>Asistencia de servicios</b><span>Reporte por sede y servicio, con ministerios y totales.</span><i data-lucide="arrow-up-right"></i></a>
+                    <a class="modulo" href="#acceso"><b>Escuela de Liderazgo</b><span>Inscripciones, cursos y cobros de cada ciclo.</span><i data-lucide="arrow-up-right"></i></a>
+                    <a class="modulo" href="#acceso"><b>Registro de notas</b><span>Asistencia, crecimiento espiritual y nota final por curso.</span><i data-lucide="arrow-up-right"></i></a>
                 </div>
-                <div class="form-group">
-                    <label>🔒 Contraseña</label>
-                    <div class="input-wrapper">
-                        <span class="input-icon"><i data-lucide="lock" style="width: 18px; height: 18px;"></i></span>
-                        <input type="password" id="loginPassword" class="input" placeholder="••••••••">
-                    </div>
-                </div>
-                <button id="loginBtn" class="btn"><i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
-                    Iniciar sesión (Admin)</button>
             </div>
+        </section>
 
-            <a href="#" class="btn-link-admin" id="toggleAdmin">¿Eres administrador? Mostrar login</a>
-        </div>
-    </div>
+        <section class="sec escuela" id="escuela">
+            <div class="in">
+                <h2 class="titulo">Horario de clases de la semana</h2>
+                <p class="intro">Escuela de Liderazgo · Ciclo 202620</p>
+                <div class="semana">
+                    <div class="dia"><h3>Martes</h3><ul><li class=""><b>Discipulado 2</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>7:30 – 9:00 p. m.</span></li><li class=""><b>Discipulado 3</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>7:30 – 9:00 p. m.</span></li></ul></div>
+                    <div class="dia"><h3>Miércoles</h3><ul><li class=""><b>Lidere 1</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>7:30 – 9:00 p. m.</span></li><li class=""><b>Lidere 2</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>7:30 – 9:00 p. m.</span></li><li class=""><b>Lidere 3</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>7:30 – 9:00 p. m.</span></li><li class=""><b>Escuela para Padres</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>7:30 – 9:00 p. m.</span></li></ul></div>
+                    <div class="dia"><h3>Jueves</h3><ul><li class=""><b>Discipulado 1</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>7:30 – 9:00 p. m.</span></li><li class=""><b>Sanidad Interior</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>7:30 – 9:00 p. m.</span></li></ul></div>
+                    <div class="dia"><h3>Sábado</h3><ul><li class=""><b>Discipulado 1 NEXT</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>3:30 – 4:30 p. m.</span></li><li class=""><b>Discipulado 2 NEXT</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>3:30 – 4:30 p. m.</span></li><li class=""><b>Discipulado 3 NEXT</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>3:30 – 4:30 p. m.</span></li><li class=""><b>Consejería</b><span class="rango"><i data-lucide="clock" style="width:13px;height:13px"></i>6:00 – 7:30 p. m.</span></li></ul></div>
+                </div>
+                <a class="cta" href="#acceso" id="ctaInscribirme">Inscribirme <i data-lucide="arrow-right" style="width:18px;height:18px"></i></a>
+            </div>
+        </section>
+    </main>
 
-    <script src="auth.js?v=4"></script>
+    <footer>
+        <span><b>Agua Viva</b> · Huancayo</span>
+        <span>© 2026 John Smith · Todos los derechos reservados</span>
+    </footer>
+
+<script src="auth.js?v=5"></script>
     <script>
         // Init Lucide
         if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -410,16 +542,37 @@
             e.preventDefault();
             adminVisible = !adminVisible;
             adminSection.classList.toggle('visible', adminVisible);
-            toggleAdmin.textContent = adminVisible ? 'Volver a modo invitado' : '¿Eres administrador? Mostrar login';
+            toggleAdmin.textContent = adminVisible ? 'Volver a modo invitado' : 'Iniciar sesión como administrador';
+            document.getElementById('acceso').classList.toggle('modo-admin', adminVisible);
+            if (adminVisible) setTimeout(() => document.getElementById('loginEmail').focus(), 450); else document.getElementById('guestName').focus();
         });
 
         document.getElementById('guestBtn').addEventListener('click', () => {
-            const nombre = document.getElementById('guestName').value.trim();
+            const nombre = document.getElementById('guestName').value.trim().replace(/\s+/g, ' ');
+            const err = document.getElementById('guestNameError');
+            if (nombre.length < 3) {
+                err.classList.add('visible');
+                document.getElementById('guestName').focus();
+                return;
+            }
+            err.classList.remove('visible');
             Auth.entrarComoInvitado(nombre);
-            mostrarNotificacion('✅ Bienvenido ' + (nombre || 'Invitado'), 'success');
-            setTimeout(() => window.location.href = 'guest.html', 500);
+            const destino = sessionStorage.getItem('destinoTrasNombre');
+            sessionStorage.removeItem('destinoTrasNombre');
+            mostrarNotificacion(' Bienvenido ' + nombre, 'success');
+            setTimeout(() => window.location.href = destino || 'guest.html', 500);
         });
 
+        document.getElementById('ctaInscribirme').addEventListener('click', (e) => {
+            e.preventDefault();
+            sessionStorage.setItem('destinoTrasNombre', 'edl.html?inscribir=1');
+            document.getElementById('acceso').classList.remove('modo-admin');
+            document.getElementById('adminSection').classList.remove('visible');
+            document.getElementById('toggleAdmin').textContent = 'Iniciar sesión como administrador';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => document.getElementById('guestName').focus({ preventScroll: true }), 500);
+        });
+        document.getElementById('guestName').addEventListener('input', () => document.getElementById('guestNameError').classList.remove('visible'));
         document.getElementById('guestName').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') document.getElementById('guestBtn').click();
         });
@@ -438,7 +591,7 @@
             const btn = document.getElementById('loginBtn');
 
             if (!email || !password) {
-                mostrarNotificacion('❌ Completa todos los campos', 'error');
+                mostrarNotificacion(' Completa todos los campos', 'error');
                 return;
             }
 
@@ -456,10 +609,10 @@
                         rol: usuario.rol,
                         sede: usuario.sede || 'admin'
                     }));
-                    mostrarNotificacion('✅ ¡' + (usuario.nombre === 'Elizabeth' ? 'Bienvenida ' : 'Bienvenido ') + usuario.nombre + '!', 'success');
+                    mostrarNotificacion(' ¡' + (usuario.nombre === 'Elizabeth' ? 'Bienvenida ' : 'Bienvenido ') + usuario.nombre + '!', 'success');
                     setTimeout(() => window.location.href = (usuario.rol === 'voces' ? 'edl.html' : 'dashboard.html'), 800);
                 } else {
-                    mostrarNotificacion('❌ Correo o contraseña incorrectos', 'error');
+                    mostrarNotificacion(' Correo o contraseña incorrectos', 'error');
                     btn.disabled = false;
                     btn.innerHTML = '<i data-lucide="log-in" style="width: 16px; height: 16px;"></i> Iniciar sesión (Admin)';
                     if (typeof lucide !== 'undefined') lucide.createIcons();

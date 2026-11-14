@@ -13,9 +13,9 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="supabase.js?v=2"></script>
-    <script src="auth.js?v=4"></script>
-    <link rel="stylesheet" href="theme.css?v=1">
+    <script src="supabase.js?v=3"></script>
+    <script src="auth.js?v=5"></script>
+    <link rel="stylesheet" href="theme.css?v=16">
 </head>
 
 <body>
@@ -45,7 +45,7 @@
                 <a href="notas.html" class="nav-link" id="nav-notas"><span class="nav-icon"><i data-lucide="clipboard-check"></i></span><span>Registro de Notas</span></a>
             </div>
             <div class="nav-section-content" style="margin-top: auto;">
-                <a href="#" class="nav-link"><span class="nav-icon"><i
+                <a href="#" class="nav-link" id="nav-config"><span class="nav-icon"><i
                             data-lucide="settings"></i></span><span>Configuración</span></a>
                 <a href="#" class="nav-link" onclick="cerrarSesion()"><span class="nav-icon"><i
                             data-lucide="log-out"></i></span><span>Cerrar Sesión</span></a>
@@ -246,7 +246,7 @@
                     </div>
                     <div class="photo-upload-group"
                         style="margin-top: 12px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid var(--border-light);">
-                        <label>🎨 Paleta de colores (opcional)</label>
+                        <label>Paleta de colores (opcional)</label>
                         <input type="file" id="regFoto" class="form-control" accept="image/png,image/jpeg,image/webp">
                         <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Sube la imagen de la paleta
                             de colores para enviar junto al mensaje</div>
@@ -265,7 +265,7 @@
     <div id="modalWhatsApp" class="modal">
         <div class="modal-content" style="max-width:500px;">
             <div class="modal-header">
-                <h3>📱 Enviar WhatsApp</h3>
+                <h3>Enviar WhatsApp</h3>
                 <button class="modal-close" onclick="cerrarWAModal()">&times;</button>
             </div>
             <div class="wa-modal-body modal-body">
@@ -320,24 +320,24 @@
 
         const TEMPLATES = {
             NEXT: {
-                predicador: (nombre, dia) => `${nombre}, comentarte que el *${dia}* te toca predicar en el culto de *NEXT*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n30 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 20 min de prédica \n✅ 5 min de llamado\n✅ 5 min de ministración \n\nBendiciones, Gracias ☺️`,
-                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia}, eres anfitriona(e) en el culto de NEXT. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
+                predicador: (nombre, dia) => `${nombre}, comentarte que el *${dia}* te toca predicar en el culto de *NEXT*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n30 min de prédica, los cuales se dividen de la siguiente manera.\n\n 20 min de prédica \n 5 min de llamado\n 5 min de ministración \n\nBendiciones, Gracias `,
+                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia}, eres anfitriona(e) en el culto de NEXT. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias `
             },
             NEXT_PLUS: {
-                predicador: (nombre, dia) => `${nombre} buenas noches, recordarte que el *${dia}* te toca predicar en el culto de *NEXT PLUS*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n40 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 5 min de ministración \n\nBendiciones, Gracias ☺️`,
-                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia}, eres anfitriona(e) en el culto de NEXT PLUS. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
+                predicador: (nombre, dia) => `${nombre} buenas noches, recordarte que el *${dia}* te toca predicar en el culto de *NEXT PLUS*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n40 min de prédica, los cuales se dividen de la siguiente manera.\n\n 30 min de prédica \n 5 min de llamado\n 5 min de ministración \n\nBendiciones, Gracias `,
+                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia}, eres anfitriona(e) en el culto de NEXT PLUS. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias `
             },
             DOMINGO: {
-                predicador: (nombre, dia, hora, sede) => `${nombre} buenas noches, recordarte que el *${dia}* te toca predicar en el culto de las *${hora}*. En la sede de *${sede || 'Huancayo'}*, le envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
-                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia}, eres anfitriona(e) en el culto de las ${hora} en la sede ${sede || 'Huancayo'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias ☺️`
+                predicador: (nombre, dia, hora, sede) => `${nombre} buenas noches, recordarte que el *${dia}* te toca predicar en el culto de las *${hora}*. En la sede de *${sede || 'Huancayo'}*, le envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n 30 min de prédica \n 5 min de llamado\n 10 min de ministración \n\nBendiciones, Gracias `,
+                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia}, eres anfitriona(e) en el culto de las ${hora} en la sede ${sede || 'Huancayo'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para poder repasar los anuncios correspondientes.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am. del día de mañana.\n\nGracias `
             },
             JAUJA: {
-                predicador: (nombre, dia, hora, sede) => `${nombre} buenas noches, comentarte que el *${dia}* te toca predicar en el culto de las *${hora}*. En la sede de *${sede || 'JAUJA'}* te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *30 min* antes para coordinar detalles y acercarse a la jefa de Piso *Martha Tapara.*\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
-                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia} eres anfitriona(e) en el culto de las ${hora} en la sede de ${sede || 'JAUJA'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 30 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am.\n\nGracias ☺️`
+                predicador: (nombre, dia, hora, sede) => `${nombre} buenas noches, comentarte que el *${dia}* te toca predicar en el culto de las *${hora}*. En la sede de *${sede || 'JAUJA'}* te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *30 min* antes para coordinar detalles y acercarse a la jefa de Piso *Martha Tapara.*\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n 30 min de prédica \n 5 min de llamado\n 10 min de ministración \n\nBendiciones, Gracias `,
+                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, comentarte que el ${dia} eres anfitriona(e) en el culto de las ${hora} en la sede de ${sede || 'JAUJA'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 30 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am.\n\nGracias `
             },
             CHUPACA: {
-                predicador: (nombre, dia, hora, sede) => `${nombre} buenas noches, recordarte que el *${dia}* te toca predicar en el culto de las *${hora}*. En la *sede de ${sede || 'Chupaca'}*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n✅ 30 min de prédica \n✅ 5 min de llamado\n✅ 10 min de ministración \n\nBendiciones, Gracias ☺️`,
-                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, recordarte que el ${dia} eres anfitriona(e) en el culto de las ${hora} en la sede de ${sede || 'Chupaca'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am.\n\nGracias ☺️`
+                predicador: (nombre, dia, hora, sede) => `${nombre} buenas noches, recordarte que el *${dia}* te toca predicar en el culto de las *${hora}*. En la *sede de ${sede || 'Chupaca'}*, te envío las indicaciones a tener en cuenta:\n\n1. Deberá de estar *60 min* antes para coordinar detalles.\n2. *Respetar* la paleta de colores del outfit y *considerar una vestimenta adecuada*.\n3. Los tiempos establecidos son:\n\n45 min de prédica, los cuales se dividen de la siguiente manera.\n\n 30 min de prédica \n 5 min de llamado\n 10 min de ministración \n\nBendiciones, Gracias `,
+                anfitrion: (nombre, dia, hora, sede) => `Hola ${nombre} buenas noches, recordarte que el ${dia} eres anfitriona(e) en el culto de las ${hora} en la sede de ${sede || 'Chupaca'}. Te envío las indicaciones a tener en cuenta:\n\n1. Deberás de estar 60 min antes para coordinar detalles.\n2. Respetar la paleta de colores del outfit y considerar la vestimenta adecuada.\n3. Enviar tu versículo de ofrendas máximo hasta las 10 am.\n\nGracias `
             }
         };
 
@@ -503,7 +503,7 @@
             tbody.innerHTML = data.map(p => {
                 const enviado = esEnviado(p);
                 const servicioLabel = document.querySelector(`#regServicio option[value="${p.tipoServicio}"]`);
-                const servicioTexto = servicioLabel ? servicioLabel.textContent.replace(/🏛️|🌙|🏔️|🌍/g, '').trim() : (p.tipoServicio || '-');
+                const servicioTexto = servicioLabel ? servicioLabel.textContent.replace(/|||/g, '').trim() : (p.tipoServicio || '-');
                 const initials = getInitials(p.nombre);
                 const telText = p.telefono ? p.telefono.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3') : '-';
 
@@ -561,7 +561,7 @@
             await firebaseReady;
             const telefono = document.getElementById('regTelefono').value.trim();
             if (!/^9\d{8}$/.test(telefono)) {
-                toast('❌ Celular debe tener 9 dígitos y comenzar con 9', 'warning');
+                toast(' Celular debe tener 9 dígitos y comenzar con 9', 'warning');
                 return;
             }
 
@@ -573,7 +573,7 @@
                 const fotoFile = document.getElementById('regFoto').files[0];
                 let foto = undefined;
                 if (fotoFile) {
-                    if (fotoFile.size > 500000) { toast('❌ La imagen es muy grande (máx 500KB)', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Registro'; return; }
+                    if (fotoFile.size > 500000) { toast(' La imagen es muy grande (máx 500KB)', 'warning'); btn.disabled = false; btn.innerHTML = 'Guardar Registro'; return; }
                     foto = await fileToBase64(fotoFile);
                 }
 
@@ -618,11 +618,11 @@
                     console.warn('No se pudo sincronizar con personas:', e.message);
                 }
 
-                toast('✅ Registro guardado');
+                toast(' Registro guardado');
                 cerrarModal();
                 cargarParticipantes();
             } catch (err) {
-                toast('❌ Error al guardar: ' + err.message, 'error');
+                toast(' Error al guardar: ' + err.message, 'error');
                 btn.disabled = false;
                 btn.innerHTML = 'Guardar Registro';
             }
@@ -664,7 +664,7 @@
         async function eliminarRegistro(id) {
             if (confirm('¿Eliminar este registro?')) {
                 await dbPart.doc(id).delete();
-                toast('🗑️ Registro eliminado');
+                toast(' Registro eliminado');
                 cargarParticipantes();
             }
         }
@@ -712,13 +712,13 @@
             window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
             dbPart.doc(waTargetId).update({ enviado: true, recordatorioEnviado: true });
             cerrarWAModal();
-            toast('✅ Mensaje enviado a ' + p.nombre);
+            toast(' Mensaje enviado a ' + p.nombre);
             cargarParticipantes();
         }
 
         function copiarMensaje() {
             const msg = document.getElementById('waMsgPreview').innerText;
-            navigator.clipboard.writeText(msg).then(() => toast('📋 Mensaje copiado'));
+            navigator.clipboard.writeText(msg).then(() => toast(' Mensaje copiado'));
         }
 
         function descargarFotoWA() {
@@ -755,7 +755,7 @@
                     const msg = construirMensaje(p);
                     window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(msg)}`, '_blank');
                     dbPart.doc(doc.id).update({ enviado: true, recordatorioEnviado: true });
-                    toast('🔔 Recordatorio enviado a ' + p.nombre);
+                    toast(' Recordatorio enviado a ' + p.nombre);
                 });
             } catch (e) { console.error('Error:', e); }
         }
@@ -770,7 +770,7 @@
             link.href = URL.createObjectURL(blob);
             link.download = 'plantilla_participantes.csv';
             link.click();
-            toast('📎 Plantilla CSV descargada');
+            toast(' Plantilla CSV descargada');
         }
 
         function toast(msg, tipo = 'success') {

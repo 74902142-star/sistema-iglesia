@@ -141,3 +141,39 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     } catch (e) { }
 });
+
+
+// ══════════════ Configuración (botón del menú lateral) ══════════════
+document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('nav-config');
+    if (!btn) return;
+    btn.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        var u = Auth.getUsuario() || {};
+        var esEditor = (u.email || '').toLowerCase() === 'jhonfernandezcondor@gmail.com';
+        var viejo = document.getElementById('modalConfiguracion');
+        if (viejo) viejo.remove();
+        var m = document.createElement('div');
+        m.id = 'modalConfiguracion';
+        m.className = 'modal';
+        m.style.display = 'flex';
+        m.innerHTML =
+            '<div class="modal-content" style="max-width:480px;">' +
+            '<div class="modal-header"><h3>Configuración</h3><button class="modal-close" id="cfgCerrar" aria-label="Cerrar">&times;</button></div>' +
+            '<div class="modal-body" style="display:grid;gap:14px;">' +
+            '<div style="padding:14px 16px;border-radius:14px;background:#eef5fc;border:1px solid #d3e0ef;"><strong style="display:block;font-size:16px;">' + (u.nombre || 'Usuario') + '</strong><span style="font-size:13px;color:#55688a;">' + (u.email || '') + ' · ' + (u.rol === 'admin' ? 'Administrador' : (u.rol || '')) + '</span></div>' +
+            (esEditor ? '<button class="btn btn-primary" id="cfgEditor" style="justify-content:flex-start;">Modo editor de notas (semana abierta de cada curso)</button>' : '') +
+            '<button class="btn btn-secondary" id="cfgInscripciones" style="justify-content:flex-start;">Ver inscripciones de la EDL</button>' +
+            '<button class="btn btn-secondary" id="cfgRecargar" style="justify-content:flex-start;">Actualizar datos ahora</button>' +
+            '<button class="btn btn-secondary" id="cfgSalir" style="justify-content:flex-start;">Cerrar sesión</button>' +
+            '</div></div>';
+        document.body.appendChild(m);
+        function cerrar() { m.remove(); }
+        m.addEventListener('click', function (e) { if (e.target === m) cerrar(); });
+        document.getElementById('cfgCerrar').onclick = cerrar;
+        var ed = document.getElementById('cfgEditor'); if (ed) ed.onclick = function () { location.href = 'notas.html?editor=1'; };
+        document.getElementById('cfgInscripciones').onclick = function () { location.href = 'edl.html'; };
+        document.getElementById('cfgRecargar').onclick = function () { location.reload(); };
+        document.getElementById('cfgSalir').onclick = function () { Auth.cerrarSesion(); };
+    });
+});

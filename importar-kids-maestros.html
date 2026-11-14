@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Importar Maestros KIDS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="supabase.js?v=2"></script>
+    <script src="supabase.js?v=3"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f0f4ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
@@ -87,7 +87,7 @@
         async function importar() {
             const btn = document.getElementById('btnImportar');
             btn.disabled = true;
-            btn.textContent = '⏳ Importando...';
+            btn.textContent = ' Importando...';
             let importados = 0, duplicados = 0;
 
             const col = sb.collection('kids_maestros');
@@ -106,16 +106,16 @@
                         origen: 'importacion'
                     });
                     importados++;
-                    log(`✅ ${m.nombres} (DNI ${m.dni}) — importado`, 'ok');
+                    log(` ${m.nombres} (DNI ${m.dni}) — importado`, 'ok');
                 } catch (e) {
-                    log(`❌ ${m.nombres} — error: ${e.message}`, 'err');
+                    log(` ${m.nombres} — error: ${e.message}`, 'err');
                 }
                 document.getElementById('importados').textContent = importados;
                 document.getElementById('duplicados').textContent = duplicados;
             }
 
-            log(`\n🏁 Fin: ${importados} importados, ${duplicados} duplicados`, 'info');
-            btn.textContent = '✅ Importación completa';
+            log(`\n Fin: ${importados} importados, ${duplicados} duplicados`, 'info');
+            btn.textContent = ' Importación completa';
         }
 
         async function limpiar() {
@@ -125,7 +125,7 @@
                 await doc.ref.delete();
                 count++;
             }
-            log(`🗑️ ${count} documentos eliminados`, 'err');
+            log(` ${count} documentos eliminados`, 'err');
         }
     </script>
 </body>

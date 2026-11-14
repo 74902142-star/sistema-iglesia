@@ -13,8 +13,8 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=12">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="supabase.js?v=2"></script>
-    <link rel="stylesheet" href="theme.css?v=1">
+    <script src="supabase.js?v=3"></script>
+    <link rel="stylesheet" href="theme.css?v=16">
 </head>
 
 <body>
@@ -73,7 +73,7 @@
             <!-- Content Container -->
             <div class="container">
                 <div id="guestBanner" class="guest-banner">
-                    <p>👤 <strong>Modo invitado</strong></p>
+                    <p> <strong>Modo invitado</strong></p>
                     <a href="#" style="color:#ef4444;font-size:13px;font-weight:700;"
                         onclick="if(confirm('¿Cerrar sesión?')){localStorage.removeItem('usuarioActual');window.location.href='index.html';}return false;">Salir</a>
                 </div>
@@ -94,7 +94,7 @@
                 <form id="registroForm">
                     <div class="section-card" id="groupNombreInvitado" style="display:none; margin-bottom: 24px;">
                         <label
-                            style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:8px;">👤
+                            style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:8px;">
                             Tu Nombre</label>
                         <div class="input-with-icon">
                             <span class="input-icon"><i data-lucide="user" style="width:18px; height:18px;"></i></span>
@@ -105,28 +105,28 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="premium-form-card">
-                            <label class="premium-label">📅 Fecha del Servicio</label>
+                            <label class="premium-label">Fecha del Servicio</label>
                             <div class="premium-input-wrapper">
                                 <i data-lucide="calendar" style="width:18px; height:18px; color:var(--text-muted);"></i>
                                 <input type="date" id="fecha" class="premium-input" required>
                             </div>
                         </div>
                         <div class="premium-form-card">
-                            <label class="premium-label">📍 Sede</label>
+                            <label class="premium-label">Sede</label>
                             <div class="premium-input-wrapper">
                                 <i data-lucide="map-pin" style="width:18px; height:18px; color:var(--text-muted);"></i>
                                 <select id="sede" class="premium-input" required>
                                     <option value="">Seleccionar</option>
-                                    <option value="hyo_10am">🏛️ Huancayo - 10am </option>
-                                    <option value="hyo_12pm">🏛️ Huancayo - 12pm </option>
-                                    <option value="NEXT_5pm">🌙 NEXT - 5pm </option>
-                                    <option value="NEXT_PLUS_7pm">🌙 NEXT PLUS - 7pm </option>
-                                    <option value="el_tambo_12pm">🏛️ El Tambo - 12pm </option>
-                                    <option value="el_tambo_6pm">🌙 El Tambo - 6pm </option>
-                                    <option value="chupaca_6pm">🌙 Chupaca - 6pm </option>
-                                    <option value="jauja">🏔️ Jauja - 10am </option>
-                                    <option value="belen">🏠 Belén - Tu Casa </option>
-                                    <option value="transformando_ciudades">🌍 Transformando Ciudades </option>
+                                    <option value="hyo_10am">Huancayo - 10am </option>
+                                    <option value="hyo_12pm">Huancayo - 12pm </option>
+                                    <option value="NEXT_5pm">NEXT - 5pm </option>
+                                    <option value="NEXT_PLUS_7pm">NEXT PLUS - 7pm </option>
+                                    <option value="el_tambo_12pm">El Tambo - 12pm </option>
+                                    <option value="el_tambo_6pm">El Tambo - 6pm </option>
+                                    <option value="chupaca_6pm">Chupaca - 6pm </option>
+                                    <option value="jauja">Jauja - 10am </option>
+                                    <option value="belen">Belén - Tu Casa </option>
+                                    <option value="transformando_ciudades">Transformando Ciudades </option>
                                 </select>
                             </div>
                         </div>
@@ -150,7 +150,7 @@
         </div>
     </div>
 
-    <script src="auth.js?v=4"></script>
+    <script src="auth.js?v=5"></script>
     <script>
         // Init Lucide (non-blocking)
         if (typeof lucide !== 'undefined') if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -384,12 +384,12 @@
             const btn = document.getElementById('btnGuardar');
             const datos = obtenerDatos();
 
-            if (!datos.fecha) { toast('❌ Seleccione una fecha', 'error'); return; }
-            if (!datos.sede) { toast('❌ Seleccione una sede', 'error'); return; }
+            if (!datos.fecha) { toast(' Seleccione una fecha', 'error'); return; }
+            if (!datos.sede) { toast(' Seleccione una sede', 'error'); return; }
 
             let nombreRegistro = esAdmin ? (usuario.nombre || 'Administrador') : document.getElementById('nombreInvitado').value.trim();
             if (esInvitado && !nombreRegistro) {
-                toast('❌ Escribe tu nombre para identificar el registro', 'error');
+                toast(' Escribe tu nombre para identificar el registro', 'error');
                 return;
             }
             if (esInvitado) Auth.entrarComoInvitado(nombreRegistro);
@@ -432,7 +432,7 @@
                     localStorage.setItem('dashboard_registros', JSON.stringify(cache));
                     localStorage.setItem('dashboard_lastSync', String(Date.now()));
                 } catch(e) {}
-                toast('✅ Registro guardado exitosamente');
+                toast(' Registro guardado exitosamente');
                 if (esInvitado) {
                     document.getElementById('registroForm').reset();
                     document.getElementById('fecha').value = hoyPeru();
@@ -444,7 +444,7 @@
                 }
             } catch (err) {
                 console.error('Error Supabase:', err);
-                toast('❌ Error al guardar: ' + err.message, 'error');
+                toast(' Error al guardar: ' + err.message, 'error');
                 btn.disabled = false;
                 btn.innerHTML = '<i data-lucide="save" style="width: 16px; height: 16px;"></i> Guardar Registro';
             }
