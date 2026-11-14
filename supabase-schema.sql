@@ -174,3 +174,16 @@ grant all on config_notas to anon, authenticated, service_role;
 
 -- Fecha de nacimiento (la edad se calcula en la página)
 alter table inscripciones add column if not exists "fechaNacimiento" text;
+
+-- Semanas cerradas que se vuelven a habilitar desde el Modo editor de notas
+create table if not exists notas_habilitadas (
+  "id" text primary key,
+  "cursoId" text,
+  "semanas" text,   -- arreglo JSON, por ejemplo [3,4]
+  "actualizado" text,
+  "actualizadoPor" text
+);
+alter table notas_habilitadas enable row level security;
+drop policy if exists "public_access" on notas_habilitadas;
+create policy "public_access" on notas_habilitadas for all to anon, authenticated using (true) with check (true);
+grant all on notas_habilitadas to anon, authenticated, service_role;
