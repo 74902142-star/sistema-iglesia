@@ -543,7 +543,7 @@
             adminVisible = !adminVisible;
             adminSection.classList.toggle('visible', adminVisible);
             toggleAdmin.textContent = adminVisible ? 'Volver a modo invitado' : 'Iniciar sesión como administrador';
-            document.getElementById('veloTexto').textContent = adminVisible ? '¿Solo vienes a ver o a inscribirte?' : '¿Eres administrador?';
+            document.getElementById('veloTexto').textContent = adminVisible ? '¿Prefieres entrar como invitado?' : '¿Eres administrador?';
             document.getElementById('acceso').classList.toggle('modo-admin', adminVisible);
             if (adminVisible) setTimeout(() => document.getElementById('loginEmail').focus(), 450); else document.getElementById('guestName').focus();
         });
