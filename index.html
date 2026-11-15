@@ -463,7 +463,7 @@
                         <div class="velo-ondas" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
                         <img class="velo-logo" src="logo.png" alt="Logo de Agua Viva">
                         <p class="velo-t">Agua Viva Huancayo</p>
-                        <p class="velo-s">¿Eres administrador?</p>
+                        <p class="velo-s" id="veloTexto">¿Eres administrador?</p>
                         <a href="#" class="btn-link-admin" id="toggleAdmin">Iniciar sesión como administrador</a>
                     </div>
                 </div>
@@ -543,6 +543,7 @@
             adminVisible = !adminVisible;
             adminSection.classList.toggle('visible', adminVisible);
             toggleAdmin.textContent = adminVisible ? 'Volver a modo invitado' : 'Iniciar sesión como administrador';
+            document.getElementById('veloTexto').textContent = adminVisible ? '¿Solo vienes a ver o a inscribirte?' : '¿Eres administrador?';
             document.getElementById('acceso').classList.toggle('modo-admin', adminVisible);
             if (adminVisible) setTimeout(() => document.getElementById('loginEmail').focus(), 450); else document.getElementById('guestName').focus();
         });
@@ -569,6 +570,7 @@
             document.getElementById('acceso').classList.remove('modo-admin');
             document.getElementById('adminSection').classList.remove('visible');
             document.getElementById('toggleAdmin').textContent = 'Iniciar sesión como administrador';
+            document.getElementById('veloTexto').textContent = '¿Eres administrador?';
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => document.getElementById('guestName').focus({ preventScroll: true }), 500);
         });
